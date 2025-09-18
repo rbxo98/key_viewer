@@ -83,7 +83,11 @@ class _KeyViewerSettingsPageState extends ConsumerState<KeyViewerSettingsPage> w
 
                   IconButton(
                     onPressed: () async {
-                      final data = await showDialog<KeyTileDataModel>(context: context, builder: (_) => KeyTileSettingDialog());
+                      final data = await showDialog<KeyTileDataModel>(
+                          context: context,
+                          builder: (_) => KeyTileSettingDialog(cellPx: _cell, gapPx: _gap,),
+                        barrierDismissible: false
+                      );
                       print(data);
                       if(data != null){
                         viewModel.addKeyTile(data);

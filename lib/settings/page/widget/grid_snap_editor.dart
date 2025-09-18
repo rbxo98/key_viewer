@@ -230,7 +230,7 @@ class _GridSnapEditorState extends State<GridSnapEditor> {
               onTap: () async {
                 final data = await showDialog<KeyTileDataModel>(
                   context: context,
-                  builder: (_) => KeyTileSettingDialog(keyTileData: b),
+                  builder: (_) => KeyTileSettingDialog(keyTileData: b, cellPx: _pitch,),
                 );
                 if (data != null) {
                   final idx = _tiles.indexWhere((e) => e.primaryKey == b.primaryKey);

@@ -1,276 +1,27 @@
 import 'dart:async';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:key_viewer_v2/core/lib/key_input_monitor.dart';
 import 'package:key_viewer_v2/core/model/key/key_tile_data_model.dart';
-
 import 'package:key_viewer_v2/core/widget/key_tile_widget.dart';
-
-
-class _KeyMappingDialog extends StatefulWidget {
-  final double width;
-  final bool excludeModifiers;
-  const _KeyMappingDialog({required this.width, this.excludeModifiers = true});
-
-  @override
-  State<_KeyMappingDialog> createState() => _KeyMappingDialogState();
-}
-
-class _KeyMappingDialogState extends State<_KeyMappingDialog> {
-  late final KeyInputMonitor _monitor;
-  VoidCallback? _listener;
-  Set<int> _last = <int>{};
-  bool _listening = false;
-  int? _vk;
-  String? _label;
-  final _nameCtrl = TextEditingController();
-  final _nameFocus = FocusNode();
-
-  @override
-  void initState() {
-    super.initState();
-    _monitor = KeyInputMonitor();
-  }
-
-  @override
-  void dispose() {
-    _stop();
-    _monitor.dispose();
-    _nameCtrl.dispose();
-    _nameFocus.dispose();
-    super.dispose();
-  }
-
-  void _begin() {
-    if (_listening) return;
-    setState(() {
-      _listening = true;
-      _vk = null;
-      _label = null;
-    });
-    _last = _monitor.snapshotPressed();
-    _monitor.start();
-
-    _listener = () {
-      final cur = _monitor.pressedKeys.value;
-      final newly = cur.difference(_last);
-      _last = cur;
-      if (newly.isEmpty) return;
-
-      final vk = newly.first;
-      if (widget.excludeModifiers && _isMod(vk)) return;
-
-      final label = _vkLabel(vk);
-      setState(() {
-        _vk = vk;
-        _label = label;
-        _listening = false;
-        if (_nameCtrl.text.trim().isEmpty) {
-          _nameCtrl.text = label;
-          _nameFocus.requestFocus();
-          _nameCtrl.selection = TextSelection(baseOffset: 0, extentOffset: _nameCtrl.text.length);
-        }
-      });
-
-      _stop();
-    };
-
-    _monitor.pressedKeys.addListener(_listener!);
-  }
-
-  void _stop() {
-    if (_listener != null) {
-      _monitor.pressedKeys.removeListener(_listener!);
-      _listener = null;
-    }
-    _monitor.stop();
-  }
-
-  bool _isMod(int vk) {
-    const mods = {0x10, 0xA0, 0xA1, 0x11, 0xA2, 0xA3, 0x12, 0xA4, 0xA5, 0x5B, 0x5C};
-    return mods.contains(vk);
-  }
-
-  String _vkLabel(int vk) {
-    if (vk >= 0x41 && vk <= 0x5A) return String.fromCharCode(vk);
-    if (vk >= 0x30 && vk <= 0x39) return String.fromCharCode(vk);
-    if (vk >= 0x70 && vk <= 0x87) return 'F${vk - 0x70 + 1}';
-    if (vk >= 0x60 && vk <= 0x69) return 'Num ${vk - 0x60}';
-    switch (vk) {
-      case 0x0D:
-        return 'Enter';
-      case 0x1B:
-        return 'Esc';
-      case 0x20:
-        return 'Space';
-      case 0x08:
-        return 'Backspace';
-      case 0x09:
-        return 'Tab';
-      case 0x25:
-        return 'Left';
-      case 0x26:
-        return 'Up';
-      case 0x27:
-        return 'Right';
-      case 0x28:
-        return 'Down';
-      case 0x2E:
-        return 'Delete';
-      case 0x2D:
-        return 'Insert';
-      case 0x21:
-        return 'Page Up';
-      case 0x22:
-        return 'Page Down';
-      case 0x24:
-        return 'Home';
-      case 0x23:
-        return 'End';
-      case 0x14:
-        return 'Caps Lock';
-      case 0x90:
-        return 'Num Lock';
-      case 0x91:
-        return 'Scroll Lock';
-      case 0x2C:
-        return 'Print Screen';
-      case 0x15:
-        return '한/영';
-      case 0x19:
-        return '한자';
-    }
-    const oem = {
-      0xBA: ';',
-      0xBB: '=',
-      0xBC: ',',
-      0xBD: '-',
-      0xBE: '.',
-      0xBF: '/',
-      0xC0: '`',
-      0xDB: '[',
-      0xDC: r'\\',
-      0xDD: ']',
-      0xDE: '\'',
-      0xE2: r'\\ (Non-US)',
-    };
-    return oem[vk] ?? 'VK 0x${vk.toRadixString(16).toUpperCase()}';
-  }
-
-  void _confirm() {
-    if (_vk == null) return;
-    Navigator.pop(context, _vk);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final bg = const Color(0xFF202124);
-    final textColor = Colors.white.withOpacity(0.9);
-    final cap = Colors.white.withOpacity(0.7);
-
-    return LayoutBuilder(builder: (context, c) {
-      final w = widget.width.clamp(280.0, c.maxWidth - 48.0).toDouble();
-      return Dialog(
-        backgroundColor: bg,
-        insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: SizedBox(
-          width: w,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 18, 20, 12),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(children: [
-                  Text('키 매핑', style: TextStyle(color: textColor, fontWeight: FontWeight.w700)),
-                  const Spacer(),
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close, size: 18, color: Colors.white70),
-                  ),
-                ]),
-                const SizedBox(height: 12),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('키', style: TextStyle(color: cap, fontWeight: FontWeight.w600)),
-                    const SizedBox(width: 16),
-                    InkWell(
-                      onTap: _begin,
-                      borderRadius: BorderRadius.circular(8),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: (_listening ? const Color(0x1A7AB8FF) : Colors.white.withOpacity(0.06)),
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                              color: _listening ? const Color(0xFF7AB8FF) : Colors.white.withOpacity(0.18)),
-                        ),
-                        child: Text(
-                          _listening ? '아무 키나 눌러주세요…' : (_label ?? 'Click to set key'),
-                          style: TextStyle(color: textColor, fontWeight: FontWeight.w600),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 14),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('키 이름', style: TextStyle(color: cap, fontWeight: FontWeight.w600)),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: TextField(
-                        controller: _nameCtrl,
-                        focusNode: _nameFocus,
-                        textInputAction: TextInputAction.done,
-                        onSubmitted: (_) => _confirm(),
-                        style: TextStyle(color: textColor, fontWeight: FontWeight.w600),
-                        decoration: InputDecoration(
-                          isDense: true,
-                          hintText: _label ?? '예: Jump',
-                          hintStyle: TextStyle(color: Colors.white.withOpacity(0.45)),
-                          filled: true,
-                          fillColor: Colors.white.withOpacity(0.06),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(color: Colors.white.withOpacity(0.18)),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(color: Color(0xFF7AB8FF)),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                  TextButton(onPressed: () => Navigator.pop(context), child: const Text('취소')),
-                  const SizedBox(width: 8),
-                  FilledButton(onPressed: (_vk != null) ? _confirm : null, child: const Text('확인')),
-                ]),
-              ],
-            ),
-          ),
-        ),
-      );
-    });
-  }
-}
+import 'package:key_viewer_v2/settings/page/widget/key_tile_settings_dialog_widget.dart';
 
 class KeyTileSettingDialog extends StatefulWidget {
   final KeyTileDataModel? keyTileData;
-  final double width; // dialog width (height = auto)
+  final double width;
+
+  // 에디터와 동일한 픽셀 크기 미리보기를 원할 경우 사용 (원치 않으면 null)
+  final double? cellPx;
+  final double? gapPx;
 
   const KeyTileSettingDialog({
     super.key,
     this.keyTileData,
     this.width = 560,
+    this.cellPx,
+    this.gapPx,
   });
 
   @override
@@ -278,20 +29,29 @@ class KeyTileSettingDialog extends StatefulWidget {
 }
 
 class _KeyTileSettingDialogState extends State<KeyTileSettingDialog> {
+  static const double _INT_FIELD_W = 64;
+
   late KeyTileDataModel keyTileDataModel;
 
-  // 미리보기
   bool _previewPressed = false;
 
-  // 컨트롤러
   final _nameCtrl = TextEditingController();
   final _gwCtrl = TextEditingController();
   final _ghCtrl = TextEditingController();
 
+  // 키 매핑
+  bool _isMapping = false;
+
+  // 기타 옵션
+  bool _advancedOpen = false;
+
+  final KeyInputMonitor keyInputMonitor = KeyInputMonitor();
+
   @override
   void initState() {
     super.initState();
-    keyTileDataModel = widget.keyTileData ?? KeyTileDataModel.empty();
+    keyTileDataModel =
+        (widget.keyTileData ?? KeyTileDataModel.empty());
     _nameCtrl.text = keyTileDataModel.label;
     _gwCtrl.text = keyTileDataModel.gw.toString();
     _ghCtrl.text = keyTileDataModel.gh.toString();
@@ -302,27 +62,31 @@ class _KeyTileSettingDialogState extends State<KeyTileSettingDialog> {
     _nameCtrl.dispose();
     _gwCtrl.dispose();
     _ghCtrl.dispose();
+    keyInputMonitor.dispose();
     super.dispose();
   }
 
-  // 숫자 필드 공통 처리(0~50 클램프)
+  // ───────────────── 유틸 ─────────────────
   int _clampGridValue(String text) {
     final v = int.tryParse(text) ?? 0;
     return v.clamp(0, 50);
   }
 
-  // Label/Caption 스타일
-  TextStyle get _cap => const TextStyle(color: Colors.white70, fontWeight: FontWeight.w600);
+  TextStyle get _cap =>
+      const TextStyle(color: Colors.white70, fontWeight: FontWeight.w600);
+
   InputDecoration _fieldDeco({String? hint}) => InputDecoration(
     isDense: true,
     hintText: hint,
     hintStyle: TextStyle(color: Colors.white.withOpacity(0.45)),
     filled: true,
     fillColor: Colors.white.withOpacity(0.06),
-    contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+    contentPadding:
+    const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
     enabledBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(10),
-      borderSide: BorderSide(color: Colors.white.withOpacity(0.18), width: 1),
+      borderSide:
+      BorderSide(color: Colors.white.withOpacity(0.18), width: 1),
     ),
     focusedBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(10),
@@ -331,11 +95,11 @@ class _KeyTileSettingDialogState extends State<KeyTileSettingDialog> {
     counterText: '',
   );
 
-  // 정수필드 위젯(0~50)
+  // ───────────────── 숫자/색상/폰트 위젯 ─────────────────
   Widget _intField({
     required TextEditingController controller,
     required void Function(int) onChanged,
-    double width = 64,
+    double width = _INT_FIELD_W,
   }) {
     return SizedBox(
       width: width,
@@ -351,7 +115,8 @@ class _KeyTileSettingDialogState extends State<KeyTileSettingDialog> {
           final c = _clampGridValue(controller.text);
           if ((int.tryParse(controller.text) ?? c) != c) {
             controller.text = '$c';
-            controller.selection = TextSelection.collapsed(offset: controller.text.length);
+            controller.selection =
+                TextSelection.collapsed(offset: controller.text.length);
           }
           onChanged(c);
           setState(() {});
@@ -366,7 +131,8 @@ class _KeyTileSettingDialogState extends State<KeyTileSettingDialog> {
           setState(() {});
         },
         textAlign: TextAlign.center,
-        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+        style: const TextStyle(
+            color: Colors.white, fontWeight: FontWeight.w600),
         decoration: _fieldDeco(hint: '0~50'),
         cursorHeight: 16,
         maxLength: 2,
@@ -374,7 +140,73 @@ class _KeyTileSettingDialogState extends State<KeyTileSettingDialog> {
     );
   }
 
-  // 색상 선택(스와치 + ColorPicker)
+  // ───────────────── 저장 ─────────────────
+  void _saveAndClose() {
+    final gw = _clampGridValue(_gwCtrl.text);
+    final gh = _clampGridValue(_ghCtrl.text);
+    final label = _nameCtrl.text.trim();
+
+    final updated = keyTileDataModel.copyWith(
+      label: label.isEmpty ? keyTileDataModel.label : label,
+      gw: gw,
+      gh: gh,
+    );
+    Navigator.pop(context, updated);
+  }
+
+  // ───────────────── 키 매핑: KeyInputMonitor 사용 ─────────────────
+  void _toggleMapping() {
+    setState(() => _isMapping = !_isMapping);
+
+    if (_isMapping) {
+      keyInputMonitor.pressedKeys.addListener(_onKey);
+      keyInputMonitor.start();
+    } else {
+      keyInputMonitor.pressedKeys.removeListener(_onKey);
+      keyInputMonitor.stop();
+    }
+  }
+
+  void _onKey() {
+    if (!_isMapping || keyInputMonitor.pressedKeys.value.isEmpty) return;
+    final vk = keyInputMonitor.pressedKeys.value.first;
+    setState(() {
+      keyTileDataModel = keyTileDataModel.copyWith(key: vk);
+      _isMapping = false;
+    });
+
+  }
+
+  // ───────────────── 섹션 헬퍼 ─────────────────
+  Widget _section(String title, {required List<Widget> children}) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(title,
+              style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white70)),
+          const SizedBox(height: 8),
+          ...children,
+          const SizedBox(height: 8),
+        ],
+      ),
+    );
+  }
+
+  Widget _row2(String label, Widget right) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [Text(label, style: _cap), const SizedBox(width: 16), right],
+    );
+  }
+
+
+// ───────────────── 위젯 빌더 ─────────────────
+
   Widget _colorRow({
     required String label,
     required int argb,
@@ -427,70 +259,28 @@ class _KeyTileSettingDialogState extends State<KeyTileSettingDialog> {
     );
   }
 
-  // 더블(사이즈/반지름/두께) 필드
-  Widget _doubleField({
-    required double value,
-    required void Function(double) onChanged,
-    String? hint,
-    double min = 0,
-    double max = 100,
-    double width = 80,
-  }) {
-    final ctrl = TextEditingController(text: value.toString());
-    return SizedBox(
-      width: width,
-      child: TextField(
-        controller: ctrl,
-        keyboardType: const TextInputType.numberWithOptions(decimal: true),
-        inputFormatters: [
-          FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
-          LengthLimitingTextInputFormatter(6),
-        ],
-        textAlign: TextAlign.center,
-        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
-        decoration: _fieldDeco(hint: hint),
-        onSubmitted: (_) {
-          final v = double.tryParse(ctrl.text) ?? value;
-          final c = v.clamp(min, max);
-          if (v != c) {
-            ctrl.text = '$c';
-            ctrl.selection = TextSelection.collapsed(offset: ctrl.text.length);
-          }
-          onChanged(c.toDouble());
-          setState(() {});
-        },
-        onChanged: (_) {
-          final v = double.tryParse(ctrl.text);
-          if (v != null) {
-            onChanged(v.clamp(min, max).toDouble());
-            setState(() {});
-          }
-        },
-      ),
-    );
-  }
-
-  // FontWeight 드롭다운(100~900)
   Widget _weightDropdown({
     required String label,
     required int value,
     required void Function(int) onChanged,
   }) {
-    const weights = [100, 200, 300, 400, 500, 600, 700, 800, 900];
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(label, style: _cap),
         const SizedBox(width: 16),
         DropdownButton<int>(
-          value: weights.contains(value) ? value : 400,
+          value: 4,
           dropdownColor: const Color(0xFF2A2C30),
           items: [
-            for (final w in weights)
               DropdownMenuItem(
-                value: w,
-                child: Text('w$w', style: const TextStyle(color: Colors.white)),
+                value: 4,
+                child: Text('normal', style: const TextStyle(color: Colors.white)),
               ),
+            DropdownMenuItem(
+              value: 6,
+              child: Text('bold', style: const TextStyle(color: Colors.white)),
+            ),
           ],
           onChanged: (v) {
             if (v == null) return;
@@ -502,31 +292,7 @@ class _KeyTileSettingDialogState extends State<KeyTileSettingDialog> {
     );
   }
 
-  // 저장 팝
-  void _saveAndClose() {
-    final gw = _clampGridValue(_gwCtrl.text);
-    final gh = _clampGridValue(_ghCtrl.text);
-    final label = _nameCtrl.text.trim();
-
-    final updated = keyTileDataModel.copyWith(
-      label: label.isEmpty ? keyTileDataModel.label : label,
-      gw: gw,
-      gh: gh,
-    );
-    Navigator.pop(context, updated);
-  }
-
-  // 키 매핑 호출
-  Future<void> _openKeyMapping() async {
-    // final res = await showKeyMappingDialog(context, width: 520);
-    // if (res == null) return;
-    // setState(() {
-    //   // VK 코드/이름 반영 (모델 필드명 맞춰 수정)
-    //   keyTileDataModel = keyTileDataModel.copyWith(key: res.vk, label: res.name);
-    //   if (_nameCtrl.text.trim().isEmpty) _nameCtrl.text = res.name;
-    // });
-  }
-
+  // ───────────────── 빌드 ─────────────────
   @override
   Widget build(BuildContext context) {
     final bg = const Color(0xFF202124);
@@ -534,313 +300,443 @@ class _KeyTileSettingDialogState extends State<KeyTileSettingDialog> {
 
     return LayoutBuilder(builder: (context, c) {
       final w = widget.width.clamp(360.0, c.maxWidth - 48.0).toDouble();
+      final maxH = (c.maxHeight - 48.0).clamp(420.0, 900.0);
+
       return Dialog(
         backgroundColor: bg,
-        insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        insetPadding:
+        const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12)),
         child: SizedBox(
           width: w,
+          height: maxH.toDouble(),
           child: Padding(
             padding: const EdgeInsets.fromLTRB(20, 18, 20, 12),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // 헤더
+            child: Column(
+              children: [
+                // 헤더
+                Row(children: [
+                  Text('KeyTile 설정',
+                      style: TextStyle(
+                          color: textColor,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 16)),
+                  const Spacer(),
                   Row(children: [
-                    Text('KeyTile 설정',
-                        style: TextStyle(color: textColor, fontWeight: FontWeight.w700, fontSize: 16)),
-                    const Spacer(),
-                    Row(children: [
-                      const Text('Pressed', style: TextStyle(color: Colors.white70)),
-                      Switch(
-                        value: _previewPressed,
-                        onChanged: (v) => setState(() => _previewPressed = v),
-                      ),
-                    ]),
-                    IconButton(
-                      onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.close, size: 18, color: Colors.white70),
+                    const Text('Pressed',
+                        style: TextStyle(color: Colors.white70)),
+                    Switch(
+                      value: _previewPressed,
+                      onChanged: (v) =>
+                          setState(() => _previewPressed = v),
                     ),
                   ]),
-                  const SizedBox(height: 12),
-
-                  // 미리보기
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.04),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.white.withOpacity(0.10)),
-                    ),
-                    child: KeyTile(
-                      pressed: _previewPressed,
-                      keyTileDataModel: keyTileDataModel,
-                    ),
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.close,
+                        size: 18, color: Colors.white70),
                   ),
+                ]),
+                const SizedBox(height: 12),
 
-                  const SizedBox(height: 16),
+                // ── 미리보기(고정)
+                _PreviewBox(
+                  model: keyTileDataModel,
+                  pressed: _previewPressed,
+                  cellPx: widget.cellPx,
+                  gapPx: widget.gapPx,
+                ),
+                const SizedBox(height: 14),
 
-                  // 키 매핑 + 이름
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('키 매핑', style: _cap),
-                      const SizedBox(width: 16),
-                      OutlinedButton(
-                        onPressed: _openKeyMapping,
-                        child: Text(
-                          keyTileDataModel.key != 0 ? 'VK ${keyTileDataModel.key}' : 'Click to set key',
+                // ── 스크롤 영역
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.zero,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // 키 매핑
+                        Row(
+                          mainAxisAlignment:
+                          MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('키 매핑', style: _cap),
+                            const SizedBox(width: 16),
+                            Wrap(
+                              crossAxisAlignment:
+                              WrapCrossAlignment.center,
+                              spacing: 8,
+                              children: [
+                                OutlinedButton(
+                                  onPressed: _toggleMapping,
+                                  child: Text(
+                                    _isMapping
+                                        ? '아무 키나 누르세요…'
+                                        : (keyTileDataModel.key != 0
+                                        ? "${keyTileDataModel.key}"
+                                        : '키 설정'),
+                                  ),
+                                ),
+                                if (_isMapping)
+                                  const Icon(Icons.keyboard,
+                                      size: 16, color: Colors.white70),
+                              ],
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('키 이름', style: _cap),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: TextField(
-                          controller: _nameCtrl,
-                          textInputAction: TextInputAction.done,
-                          onSubmitted: (_) => _saveAndClose(),
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
-                          decoration: _fieldDeco(hint: '예: Jump'),
+                        const SizedBox(height: 10),
+
+                        // 키 이름 (가운데 정렬 + 실시간 반영)
+                        Row(
+                          mainAxisAlignment:
+                          MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('키 이름', style: _cap),
+                            const SizedBox(width: 16),
+                            SizedBox(
+                              width: _INT_FIELD_W,
+                              child: TextField(
+                                controller: _nameCtrl,
+                                textAlign: TextAlign.center,
+                                textInputAction: TextInputAction.done,
+                                onChanged: (txt) => setState(() {
+                                  keyTileDataModel =
+                                      keyTileDataModel.copyWith(
+                                          label: txt);
+                                }),
+                                onSubmitted: (_) => _saveAndClose(),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                decoration:
+                                _fieldDeco(hint: 'ex. W'),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 10),
+
+                        // gw / gh
+                        Row(
+                          mainAxisAlignment:
+                          MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('너비(그리드)', style: _cap),
+                            const SizedBox(width: 16),
+                            _intField(
+                              controller: _gwCtrl,
+                              onChanged: (v) => setState(() {
+                                keyTileDataModel =
+                                    keyTileDataModel.copyWith(gw: v);
+                              }),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        Row(
+                          mainAxisAlignment:
+                          MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('높이(그리드)', style: _cap),
+                            const SizedBox(width: 16),
+                            _intField(
+                              controller: _ghCtrl,
+                              onChanged: (v) => setState(() {
+                                keyTileDataModel =
+                                    keyTileDataModel.copyWith(gh: v);
+                              }),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 12),
+                        const Divider(height: 1, color: Colors.white12),
+                        const SizedBox(height: 8),
+
+                        ExpansionTile(
+                          initiallyExpanded: _advancedOpen,
+                          onExpansionChanged: (v) => setState(() => _advancedOpen = v),
+                          tilePadding: EdgeInsets.zero,
+                          collapsedIconColor: Colors.white70,
+                          iconColor: Colors.white70,
+                          title: Text('기타 설정', style: _cap.copyWith(fontSize: 13)),
+                          childrenPadding: EdgeInsets.zero,
+                          children: [
+                            // ── Border (idle)
+                            _section('Border (idle)', children: [
+                              _row2('Radius', IntOnlyField(
+                                value: keyTileDataModel.style.idleBorderRadius.round(),
+                                onChanged: (v) => setState(() =>
+                                keyTileDataModel = keyTileDataModel.copyWith
+                                    .style(idleBorderRadius: v.toDouble())),
+                                min: 0, max: 64, hint: '0~64',
+                              )),
+                              const SizedBox(height: 8),
+                              _row2('Width', IntOnlyField(
+                                value: keyTileDataModel.style.idleBorderWidth.round(),
+                                onChanged: (v) => setState(() =>
+                                keyTileDataModel = keyTileDataModel.copyWith.style(idleBorderWidth: v.toDouble())),
+                                min: 0, max: 20, hint: '0~20',
+                              )),
+                              const SizedBox(height: 8),
+                              _colorRow(
+                                label: 'Color',
+                                argb: keyTileDataModel.style.idleBorderColor,
+                                onChanged: (v) => setState(() =>
+                                keyTileDataModel = keyTileDataModel.copyWith.style(idleBorderColor: v)),
+                              ),
+                            ]),
+
+                            // ── Border (pressed)
+                            _section('Border (pressed)', children: [
+                              _row2('Radius', IntOnlyField(
+                                value: keyTileDataModel.style.pressedBorderRadius.round(),
+                                onChanged: (v) => setState(() =>
+                                keyTileDataModel = keyTileDataModel.copyWith.style(pressedBorderRadius: v.toDouble())),
+                                min: 0, max: 64, hint: '0~64',
+                              )),
+                              const SizedBox(height: 8),
+                              _row2('Width', IntOnlyField(
+                                value: keyTileDataModel.style.pressedBorderWidth.round(),
+                                onChanged: (v) => setState(() =>
+                                keyTileDataModel = keyTileDataModel.copyWith.style(pressedBorderWidth: v.toDouble())),
+                                min: 0, max: 20, hint: '0~20',
+                              )),
+                              const SizedBox(height: 8),
+                              _colorRow(
+                                label: 'Color',
+                                argb: keyTileDataModel.style.pressedBorderColor,
+                                onChanged: (v) => setState(() =>
+                                keyTileDataModel = keyTileDataModel.copyWith.style(pressedBorderColor: v)),
+                              ),
+                            ]),
+
+                            // ── Background
+                            _section('Background', children: [
+                              _colorRow(
+                                label: 'Idle',
+                                argb: keyTileDataModel.style.idleBackgroundColor,
+                                onChanged: (v) => setState(() =>
+                                keyTileDataModel = keyTileDataModel.copyWith.style(idleBackgroundColor: v)),
+                              ),
+                              const SizedBox(height: 8),
+                              _colorRow(
+                                label: 'Pressed',
+                                argb: keyTileDataModel.style.pressedBackgroundColor,
+                                onChanged: (v) => setState(() =>
+                                keyTileDataModel = keyTileDataModel.copyWith.style(pressedBackgroundColor: v)),
+                              ),
+                            ]),
+
+                            // ── Key Font
+                            _section('Key Font (idle)', children: [
+                              _row2('Size', IntOnlyField(
+                                value: keyTileDataModel.style.idleKeyFontSize.round(),
+                                onChanged: (v) => setState(() =>
+                                keyTileDataModel = keyTileDataModel.copyWith.style(idleKeyFontSize: v.toDouble())),
+                                min: 6, max: 96, hint: '6~96',
+                              )),
+                              const SizedBox(height: 8),
+                              _weightDropdown(
+                                label: 'Weight',
+                                value: keyTileDataModel.style.idleKeyFontWeight,
+                                onChanged: (w) => setState(() =>
+                                keyTileDataModel = keyTileDataModel.copyWith.style(idleKeyFontWeight: w)),
+                              ),
+                              const SizedBox(height: 8),
+                              _colorRow(
+                                label: 'Color',
+                                argb: keyTileDataModel.style.idleKeyFontColor,
+                                onChanged: (v) => setState(() =>
+                                keyTileDataModel = keyTileDataModel.copyWith.style(idleKeyFontColor: v)),
+                              ),
+                            ]),
+
+                            _section('Key Font (pressed)', children: [
+                              _row2('Size', IntOnlyField(
+                                value: keyTileDataModel.style.pressedKeyFontSize.round(),
+                                onChanged: (v) => setState(() =>
+                                keyTileDataModel = keyTileDataModel.copyWith.style(pressedKeyFontSize: v.toDouble())),
+                                min: 6, max: 96, hint: '6~96',
+                              )),
+                              const SizedBox(height: 8),
+                              _weightDropdown(
+                                label: 'Weight',
+                                value: keyTileDataModel.style.pressedKeyFontWeight,
+                                onChanged: (w) => setState(() =>
+                                keyTileDataModel = keyTileDataModel.copyWith.style(pressedKeyFontWeight: w)),
+                              ),
+                              const SizedBox(height: 8),
+                              _colorRow(
+                                label: 'Color',
+                                argb: keyTileDataModel.style.pressedKeyFontColor,
+                                onChanged: (v) => setState(() =>
+                                keyTileDataModel = keyTileDataModel.copyWith.style(pressedKeyFontColor: v)),
+                              ),
+                            ]),
+
+                            // ── Counter Font
+                            _section('Counter Font (idle)', children: [
+                              _row2('Size', IntOnlyField(
+                                value: keyTileDataModel.style.idleCounterFontSize.round(),
+                                onChanged: (v) => setState(() =>
+                                keyTileDataModel = keyTileDataModel.copyWith.style(idleCounterFontSize: v.toDouble())),
+                                min: 6, max: 96, hint: '6~96',
+                              )),
+                              const SizedBox(height: 8),
+                              _weightDropdown(
+                                label: 'Weight',
+                                value: keyTileDataModel.style.idleCounterFontWeight,
+                                onChanged: (w) => setState(() =>
+                                keyTileDataModel = keyTileDataModel.copyWith.style(idleCounterFontWeight: w)),
+                              ),
+                              const SizedBox(height: 8),
+                              _colorRow(
+                                label: 'Color',
+                                argb: keyTileDataModel.style.idleCounterFontColor,
+                                onChanged: (v) => setState(() =>
+                                keyTileDataModel = keyTileDataModel.copyWith.style(idleCounterFontColor: v)),
+                              ),
+                            ]),
+
+                            _section('Counter Font (pressed)', children: [
+                              _row2('Size', IntOnlyField(
+                                value: keyTileDataModel.style.pressedCounterFontSize.round(),
+                                onChanged: (v) => setState(() =>
+                                keyTileDataModel = keyTileDataModel.copyWith.style(pressedCounterFontSize: v.toDouble())),
+                                min: 6, max: 96, hint: '6~96',
+                              )),
+                              const SizedBox(height: 8),
+                              _weightDropdown(
+                                label: 'Weight',
+                                value: keyTileDataModel.style.pressedCounterFontWeight,
+                                onChanged: (w) => setState(() =>
+                                keyTileDataModel = keyTileDataModel.copyWith.style(pressedCounterFontWeight: w)),
+                              ),
+                              const SizedBox(height: 8),
+                              _colorRow(
+                                label: 'Color',
+                                argb: keyTileDataModel.style.pressedCounterFontColor,
+                                onChanged: (v) => setState(() =>
+                                keyTileDataModel = keyTileDataModel.copyWith.style(pressedCounterFontColor: v)),
+                              ),
+                            ]),
+                          ],
+                        ),
+
+                      ],
+                    ),
                   ),
+                ),
 
-                  const SizedBox(height: 16),
+                const SizedBox(height: 8),
+                const Divider(height: 1, color: Colors.white12),
+                const SizedBox(height: 8),
 
-                  // 크기 (gw/gh)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('너비(그리드)', style: _cap),
-                      const SizedBox(width: 16),
-                      _intField(
-                        controller: _gwCtrl,
-                        onChanged: (v) => keyTileDataModel = keyTileDataModel.copyWith(gw: v),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('높이(그리드)', style: _cap),
-                      const SizedBox(width: 16),
-                      _intField(
-                        controller: _ghCtrl,
-                        onChanged: (v) => keyTileDataModel = keyTileDataModel.copyWith(gh: v),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 18),
-
-                  // ── Border (idle/pressed)
-                  _section('Border (idle)', children: [
-                    _row2('Radius', _doubleField(
-                      value: keyTileDataModel.style.idleBorderRadius,
-                      onChanged: (v) => setState(() =>
-                      keyTileDataModel = keyTileDataModel.copyWith.style(idleBorderRadius: v)),
-                      min: 0, max: 64, hint: '0~64',
-                    )),
-                    const SizedBox(height: 8),
-                    _row2('Width', _doubleField(
-                      value: keyTileDataModel.style.idleBorderWidth,
-                      onChanged: (v) => setState(() =>
-                      keyTileDataModel = keyTileDataModel.copyWith.style(idleBorderWidth: v)),
-                      min: 0, max: 20, hint: '0~20',
-                    )),
-                    const SizedBox(height: 8),
-                    _colorRow(
-                      label: 'Color',
-                      argb: keyTileDataModel.style.idleBorderColor,
-                      onChanged: (v) => setState(() =>
-                      keyTileDataModel = keyTileDataModel.copyWith.style(idleBorderColor: v)),
-                    ),
-                  ]),
-
-                  _section('Border (pressed)', children: [
-                    _row2('Radius', _doubleField(
-                      value: keyTileDataModel.style.pressedBorderRadius,
-                      onChanged: (v) => setState(() =>
-                      keyTileDataModel = keyTileDataModel.copyWith.style(pressedBorderRadius: v)),
-                      min: 0, max: 64, hint: '0~64',
-                    )),
-                    const SizedBox(height: 8),
-                    _row2('Width', _doubleField(
-                      value: keyTileDataModel.style.pressedBorderWidth,
-                      onChanged: (v) => setState(() =>
-                      keyTileDataModel = keyTileDataModel.copyWith.style(pressedBorderWidth: v)),
-                      min: 0, max: 20, hint: '0~20',
-                    )),
-                    const SizedBox(height: 8),
-                    _colorRow(
-                      label: 'Color',
-                      argb: keyTileDataModel.style.pressedBorderColor,
-                      onChanged: (v) => setState(() =>
-                      keyTileDataModel = keyTileDataModel.copyWith.style(pressedBorderColor: v)),
-                    ),
-                  ]),
-
-                  // Background
-                  _section('Background', children: [
-                    _colorRow(
-                      label: 'Idle',
-                      argb: keyTileDataModel.style.idleBackgroundColor,
-                      onChanged: (v) => setState(() =>
-                      keyTileDataModel = keyTileDataModel.copyWith.style(idleBackgroundColor: v)),
-                    ),
-                    const SizedBox(height: 8),
-                    _colorRow(
-                      label: 'Pressed',
-                      argb: keyTileDataModel.style.pressedBackgroundColor,
-                      onChanged: (v) => setState(() =>
-                      keyTileDataModel = keyTileDataModel.copyWith.style(pressedBackgroundColor: v)),
-                    ),
-                  ]),
-
-                  // Key Font
-                  _section('Key Font (idle)', children: [
-                    _row2('Size', _doubleField(
-                      value: keyTileDataModel.style.idleKeyFontSize,
-                      onChanged: (v) => setState(() =>
-                      keyTileDataModel = keyTileDataModel.copyWith.style(idleKeyFontSize: v)),
-                      min: 6, max: 96, hint: '6~96',
-                    )),
-                    const SizedBox(height: 8),
-                    _weightDropdown(
-                      label: 'Weight',
-                      value: keyTileDataModel.style.idleKeyFontWeight,
-                      onChanged: (w) => setState(() =>
-                      keyTileDataModel = keyTileDataModel.copyWith.style(idleKeyFontWeight: w)),
-                    ),
-                    const SizedBox(height: 8),
-                    _colorRow(
-                      label: 'Color',
-                      argb: keyTileDataModel.style.idleKeyFontColor,
-                      onChanged: (v) => setState(() =>
-                      keyTileDataModel = keyTileDataModel.copyWith.style(idleKeyFontColor: v)),
-                    ),
-                  ]),
-
-                  _section('Key Font (pressed)', children: [
-                    _row2('Size', _doubleField(
-                      value: keyTileDataModel.style.pressedKeyFontSize,
-                      onChanged: (v) => setState(() =>
-                      keyTileDataModel = keyTileDataModel.copyWith.style(pressedKeyFontSize: v)),
-                      min: 6, max: 96, hint: '6~96',
-                    )),
-                    const SizedBox(height: 8),
-                    _weightDropdown(
-                      label: 'Weight',
-                      value: keyTileDataModel.style.pressedKeyFontWeight,
-                      onChanged: (w) => setState(() =>
-                      keyTileDataModel = keyTileDataModel.copyWith.style(pressedKeyFontWeight: w)),
-                    ),
-                    const SizedBox(height: 8),
-                    _colorRow(
-                      label: 'Color',
-                      argb: keyTileDataModel.style.pressedKeyFontColor,
-                      onChanged: (v) => setState(() =>
-                      keyTileDataModel = keyTileDataModel.copyWith.style(pressedKeyFontColor: v)),
-                    ),
-                  ]),
-
-                  // Counter Font
-                  _section('Counter Font (idle)', children: [
-                    _row2('Size', _doubleField(
-                      value: keyTileDataModel.style.idleCounterFontSize,
-                      onChanged: (v) => setState(() =>
-                      keyTileDataModel = keyTileDataModel.copyWith.style(idleCounterFontSize: v)),
-                      min: 6, max: 96, hint: '6~96',
-                    )),
-                    const SizedBox(height: 8),
-                    _weightDropdown(
-                      label: 'Weight',
-                      value: keyTileDataModel.style.idleCounterFontWeight,
-                      onChanged: (w) => setState(() =>
-                      keyTileDataModel = keyTileDataModel.copyWith.style(idleCounterFontWeight: w)),
-                    ),
-                    const SizedBox(height: 8),
-                    _colorRow(
-                      label: 'Color',
-                      argb: keyTileDataModel.style.idleCounterFontColor,
-                      onChanged: (v) => setState(() =>
-                      keyTileDataModel = keyTileDataModel.copyWith.style(idleCounterFontColor: v)),
-                    ),
-                  ]),
-
-                  _section('Counter Font (pressed)', children: [
-                    _row2('Size', _doubleField(
-                      value: keyTileDataModel.style.pressedCounterFontSize,
-                      onChanged: (v) => setState(() =>
-                      keyTileDataModel = keyTileDataModel.copyWith.style(pressedCounterFontSize: v)),
-                      min: 6, max: 96, hint: '6~96',
-                    )),
-                    const SizedBox(height: 8),
-                    _weightDropdown(
-                      label: 'Weight',
-                      value: keyTileDataModel.style.pressedCounterFontWeight,
-                      onChanged: (w) => setState(() =>
-                      keyTileDataModel = keyTileDataModel.copyWith.style(pressedCounterFontWeight: w)),
-                    ),
-                    const SizedBox(height: 8),
-                    _colorRow(
-                      label: 'Color',
-                      argb: keyTileDataModel.style.pressedCounterFontColor,
-                      onChanged: (v) => setState(() =>
-                      keyTileDataModel = keyTileDataModel.copyWith.style(pressedCounterFontColor: v)),
-                    ),
-                  ]),
-
-                  const SizedBox(height: 20),
-
-                  // 액션
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextButton(onPressed: () => Navigator.pop(context), child: const Text('취소')),
-                      const SizedBox(width: 8),
-                      FilledButton(onPressed: _saveAndClose, child: const Text('저장')),
-                    ],
-                  ),
-                ],
-              ),
+                // 액션
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('취소')),
+                    const SizedBox(width: 8),
+                    FilledButton(
+                        onPressed: _saveAndClose,
+                        child: const Text('저장')),
+                  ],
+                ),
+              ],
             ),
           ),
         ),
       );
     });
   }
+}
 
-  // 섹션 헬퍼
-  Widget _section(String title, {required List<Widget> children}) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(title,
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.white70)),
-          const SizedBox(height: 8),
-          ...children,
-          const SizedBox(height: 8),
-        ],
+// ───────────────── 미리보기 ─────────────────
+class _PreviewBox extends StatelessWidget {
+  const _PreviewBox({
+    required this.model,
+    required this.pressed,
+    this.cellPx,
+    this.gapPx,
+  });
+
+  final KeyTileDataModel model;
+  final bool pressed;
+  final double? cellPx;
+  final double? gapPx;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 160,
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.04),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withOpacity(0.10)),
       ),
-    );
-  }
+      padding: const EdgeInsets.all(12),
+      child: LayoutBuilder(
+        builder: (context, c) {
+          // 에디터 px 모드: 제공 시 그 값대로
+          if (cellPx != null) {
+            final gw = math.max(1, model.gw);
+            final gh = math.max(1, model.gh);
+            final gp = (gapPx ?? 0);
+            final w = gw * cellPx! + (gw - 1) * gp;
+            final h = gh * cellPx! + (gh - 1) * gp;
 
-  Widget _row2(String label, Widget right) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [Text(label, style: _cap), const SizedBox(width: 16), right],
+            return Center(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: c.maxWidth,
+                  maxHeight: c.maxHeight,
+                ),
+                child: SizedBox(
+                  width: w,
+                  height: h,
+                  child: SizedBox.expand(
+                    child: KeyTile(
+                      pressed: pressed,
+                      keyTileDataModel: model,
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }
+
+          // 비율 모드(기본): 영역 안에서 gw:gh 유지하며 최대화
+          final gw = (model.gw <= 0 ? 1 : model.gw).toDouble();
+          final gh = (model.gh <= 0 ? 1 : model.gh).toDouble();
+          final ratio = gw / gh;
+          final maxW = c.maxWidth, maxH = c.maxHeight;
+          double w = maxW, h = w / ratio;
+          if (h > maxH) {
+            h = maxH;
+            w = h * ratio;
+          }
+
+          return Center(
+            child: SizedBox(
+              width: w,
+              height: h,
+              child: FittedBox(
+                fit: BoxFit.contain,
+                child: KeyTile(
+                  pressed: pressed,
+                  keyTileDataModel: model,
+                ),
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }
