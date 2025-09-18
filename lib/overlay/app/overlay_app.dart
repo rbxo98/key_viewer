@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:key_viewer_v2/core/model/multi_window_option/multi_window_option_model.dart';
+import 'package:key_viewer_v2/core/model/config/multi_window_option_model.dart';
 import 'package:key_viewer_v2/overlay/page/key_viewer_overlay_page.dart';
 
 
