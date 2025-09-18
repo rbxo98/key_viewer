@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:desktop_multi_window/desktop_multi_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:key_viewer_v2/core/model/config/multi_window_option_model.dart';
 import 'package:key_viewer_v2/core/model/key/key_tile_data_model.dart';
-import 'package:key_viewer_v2/core/model/multi_window_option/multi_window_option_model.dart';
 import 'package:key_viewer_v2/settings/page/model/settings_model.dart';
 import 'package:window_manager_plus/window_manager_plus.dart';
 

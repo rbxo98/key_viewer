@@ -2,11 +2,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:key_viewer_v2/core/lib/key_input_monitor.dart';
+import 'package:key_viewer_v2/core/model/key/key_tile_data_model.dart';
 
 import 'package:key_viewer_v2/core/widget/key_tile_widget.dart';
-import 'package:key_viewer_v2/core/model/key/key_info_model.dart';
-// ↓ KeyInputMonitor 경로는 프로젝트 구조에 맞게 조정
-import 'package:key_viewer_v2/core/input/key_input_monitor.dart';
 
 
 class _KeyMappingDialog extends StatefulWidget {
@@ -161,8 +160,7 @@ class _KeyMappingDialogState extends State<_KeyMappingDialog> {
 
   void _confirm() {
     if (_vk == null) return;
-    final name = _nameCtrl.text.trim().isNotEmpty ? _nameCtrl.text.trim() : (_label ?? 'Key');
-    Navigator.pop(context, KeyMappingResult(_vk!, name));
+    Navigator.pop(context, _vk);
   }
 
   @override
@@ -266,12 +264,12 @@ class _KeyMappingDialogState extends State<_KeyMappingDialog> {
 }
 
 class KeyTileSettingDialog extends StatefulWidget {
-  final KeyTileDataModel keyTileData;
+  final KeyTileDataModel? keyTileData;
   final double width; // dialog width (height = auto)
 
   const KeyTileSettingDialog({
     super.key,
-    required this.keyTileData,
+    this.keyTileData,
     this.width = 560,
   });
 
@@ -293,7 +291,7 @@ class _KeyTileSettingDialogState extends State<KeyTileSettingDialog> {
   @override
   void initState() {
     super.initState();
-    keyTileDataModel = widget.keyTileData;
+    keyTileDataModel = widget.keyTileData ?? KeyTileDataModel.empty();
     _nameCtrl.text = keyTileDataModel.label;
     _gwCtrl.text = keyTileDataModel.gw.toString();
     _ghCtrl.text = keyTileDataModel.gh.toString();
@@ -344,7 +342,7 @@ class _KeyTileSettingDialogState extends State<KeyTileSettingDialog> {
       child: TextField(
         controller: controller,
         keyboardType: TextInputType.number,
-        inputFormatters: const [
+        inputFormatters: [
           FilteringTextInputFormatter.digitsOnly,
           LengthLimitingTextInputFormatter(2),
         ],
@@ -520,13 +518,13 @@ class _KeyTileSettingDialogState extends State<KeyTileSettingDialog> {
 
   // 키 매핑 호출
   Future<void> _openKeyMapping() async {
-    final res = await showKeyMappingDialog(context, width: 520);
-    if (res == null) return;
-    setState(() {
-      // VK 코드/이름 반영 (모델 필드명 맞춰 수정)
-      keyTileDataModel = keyTileDataModel.copyWith(key: res.vk, label: res.name);
-      if (_nameCtrl.text.trim().isEmpty) _nameCtrl.text = res.name;
-    });
+    // final res = await showKeyMappingDialog(context, width: 520);
+    // if (res == null) return;
+    // setState(() {
+    //   // VK 코드/이름 반영 (모델 필드명 맞춰 수정)
+    //   keyTileDataModel = keyTileDataModel.copyWith(key: res.vk, label: res.name);
+    //   if (_nameCtrl.text.trim().isEmpty) _nameCtrl.text = res.name;
+    // });
   }
 
   @override
@@ -576,9 +574,8 @@ class _KeyTileSettingDialogState extends State<KeyTileSettingDialog> {
                       border: Border.all(color: Colors.white.withOpacity(0.10)),
                     ),
                     child: KeyTile(
-                      label: keyTileDataModel.label,
                       pressed: _previewPressed,
-                      keyTileStyleModel: keyTileDataModel.style,
+                      keyTileDataModel: keyTileDataModel,
                     ),
                   ),
 

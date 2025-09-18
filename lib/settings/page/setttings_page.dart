@@ -4,12 +4,12 @@ import 'package:desktop_multi_window/desktop_multi_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:key_viewer_v2/core/model/key/key_tile_data_model.dart';
-import 'package:key_viewer_v2/core/model/multi_window_option/multi_window_option_model.dart';
 import 'package:key_viewer_v2/settings/page/settings_view_model.dart';
-import 'package:key_viewer_v2/settings/page/widget/key_tile_setting_dialog.dart';
-import 'package:key_viewer_v2/core/widget/grid_snap_editor.dart';
+import 'package:key_viewer_v2/settings/page/widget/key_tile_settings_dialog.dart';
 import 'package:win32/win32.dart';
 import 'package:window_manager_plus/window_manager_plus.dart';
+
+import 'widget/grid_snap_editor.dart';
 
 class KeyViewerSettingsPage extends ConsumerStatefulWidget {
   const KeyViewerSettingsPage({Key? key}) : super(key: key);
@@ -83,7 +83,7 @@ class _KeyViewerSettingsPageState extends ConsumerState<KeyViewerSettingsPage> w
 
                   IconButton(
                     onPressed: () async {
-                      final data = await showDialog<KeyTileDataModel>(context: context, builder: (_) => KeyTileSettingDialog(width: 420,));
+                      final data = await showDialog<KeyTileDataModel>(context: context, builder: (_) => KeyTileSettingDialog());
                       print(data);
                       if(data != null){
                         viewModel.addKeyTile(data);

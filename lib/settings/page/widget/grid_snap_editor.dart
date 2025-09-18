@@ -1,6 +1,8 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:key_viewer_v2/core/model/key/key_tile_data_model.dart';
+import 'package:key_viewer_v2/core/widget/key_tile_widget.dart';
+import 'package:key_viewer_v2/settings/page/widget/key_tile_settings_dialog.dart';
 
 /// 격자 사양: 1칸 픽셀(cell) + 구분선(gap) = pitch
 class SnapGridSpec {
@@ -18,7 +20,7 @@ class GridSnapEditor extends StatefulWidget {
   final Set<KeyTileDataModel> targetKeyList;
 
   /// 현재 눌려있는 VK 코드들. 타일의 b.key가 포함되면 pressed로 렌더.
-  final Set<int> pressedVks;
+  final Set<int> pressedKeySet;
 
   /// 격자 스펙
   final SnapGridSpec grid;
@@ -47,7 +49,7 @@ class GridSnapEditor extends StatefulWidget {
     super.key,
     this.areaSize,
     required this.targetKeyList,
-    required this.pressedVks,
+    required this.pressedKeySet,
     this.grid = const SnapGridSpec(),
     this.onChanged,
     this.onPixelSizeChanged,
@@ -209,11 +211,10 @@ class _GridSnapEditorState extends State<GridSnapEditor> {
 
       // 타일 렌더
       for (final b in _tiles) {
-        final pressed = widget.pressedVks.contains(b.key);
+        final pressed = widget.pressedKeySet.contains(b.key);
         final tile = KeyTile(
-          label: b.label,
           pressed: pressed,
-          keyTileStyleModel: b.style,
+          keyTileDataModel: b,
         );
 
         Widget content = tile;
