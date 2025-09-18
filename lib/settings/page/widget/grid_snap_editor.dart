@@ -108,12 +108,47 @@ class _GridSnapEditorState extends State<GridSnapEditor> {
   int _dxToG(double dx) => (dx / _pitch).round();
   int _dyToG(double dy) => (dy / _pitch).round();
 
-  void _clampGrid(KeyTileDataModel b, Size area) {
-    final maxGx = math.max(0, ((area.width  - _wPx(b.gw)) / _pitch).floor());
-    final maxGy = math.max(0, ((area.height - _hPx(b.gh)) / _pitch).floor());
-    b.gx = b.gx.clamp(0, maxGx);
-    b.gy = b.gy.clamp(0, maxGy);
+  /// 개별 타일을 현재 뷰포트(area)에 맞게 이동(클램프)한다.
+  /// 이동이 발생했으면 true 반환.
+  bool _clampGrid(KeyTileDataModel b, Size area) {
+    const double epsilon = 2.0; // 보더/AA 여유
+
+    final usableW = area.width  - _wPx(b.gw) - epsilon;
+    final usableH = area.height - _hPx(b.gh) - epsilon;
+
+    final maxGx = math.max(0, (usableW / _pitch).floor());
+    final maxGy = math.max(0, (usableH / _pitch).floor());
+
+    final newGx = b.gx.clamp(0, maxGx);
+    final newGy = b.gy.clamp(0, maxGy);
+
+    final moved = (newGx != b.gx) || (newGy != b.gy);
+    b.gx = newGx;
+    b.gy = newGy;
+    return moved;
   }
+
+  /// 모든 타일을 현재 뷰포트에 맞춰 이동하고,
+  /// 필요 시 setState + onChanged까지 해주는 헬퍼.
+  void _applyViewportClamp(Size area, {bool notify = false}) {
+    bool movedAny = false;
+    for (final b in _tiles) {
+      if (_clampGrid(b, area)) movedAny = true;
+    }
+    if (movedAny) {
+      // build 중 setState 금지: 다음 프레임에 반영
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        setState(() {});
+        if (notify) {
+          final snapshot = _tiles.map((e) => e.copyWith()).toSet();
+          widget.onChanged?.call(snapshot);
+        }
+      });
+    }
+  }
+
+
 
   void _beginDrag(KeyTileDataModel b, Offset localPos) {
     if (!widget.isEditor) return;
@@ -181,16 +216,16 @@ class _GridSnapEditorState extends State<GridSnapEditor> {
             constraints.hasBoundedHeight ? constraints.maxHeight : 400,
           );
 
-      // 사이즈 변동 시 클램프 + 콜백
+      // 사이즈 변동 시 클램프 + 콜백 + 리빌드 스케줄
       if (effectiveSize != _lastSize) {
-        for (final b in _tiles) {
-          _clampGrid(b, effectiveSize);
-        }
         _lastSize = effectiveSize;
+        _applyViewportClamp(effectiveSize, notify: true); // ★ 좌표 실제 이동 + onChanged 호출
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          widget.onPixelSizeChanged?.call(effectiveSize);
+          if (mounted) widget.onPixelSizeChanged?.call(effectiveSize);
         });
       }
+
+
 
       final children = <Widget>[];
 
@@ -230,17 +265,26 @@ class _GridSnapEditorState extends State<GridSnapEditor> {
               onTap: () async {
                 final data = await showDialog<KeyTileDataModel>(
                   context: context,
-                  builder: (_) => KeyTileSettingDialog(keyTileData: b, cellPx: _pitch,),
+                  builder: (_) => KeyTileSettingDialog(
+                    keyTileData: b,
+                    cellPx: _pitch,
+                  ),
                 );
                 if (data != null) {
                   final idx = _tiles.indexWhere((e) => e.primaryKey == b.primaryKey);
                   if (idx >= 0) {
-                    setState(() => _tiles[idx] = data);
+                    // ★ 현재 에디터 크기에 맞춰 위치를 즉시 클램프
+                    final updated = data.copyWith();
+                    _clampGrid(updated, _lastSize);
+
+                    setState(() => _tiles[idx] = updated);
+
                     final snapshot = _tiles.map((e) => e.copyWith()).toSet();
                     widget.onChanged?.call(snapshot);
                   }
                 }
               },
+
               child: tile,
             ),
           );

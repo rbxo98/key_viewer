@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:desktop_multi_window/desktop_multi_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:key_viewer_v2/core/lib/pref_provider.dart';
 import 'package:key_viewer_v2/core/model/key/key_tile_data_model.dart';
 import 'package:key_viewer_v2/settings/page/settings_view_model.dart';
 import 'package:key_viewer_v2/settings/page/widget/key_tile_settings_dialog.dart';
@@ -25,13 +26,29 @@ class _KeyViewerSettingsPageState extends ConsumerState<KeyViewerSettingsPage> w
   void initState() {
     viewModel = ref.read(settingsViewModelProvider.notifier);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await PrefProvider.init();
+      viewModel.getWindowSizeConfig();
+
+      final globalConfig = ref.read(settingsViewModelProvider).globalConfig;
+
+      viewModel.setWindowSize(Size(globalConfig.windowWidth, globalConfig.windowHeight));
       viewModel.showOverlay();
     });
+    WindowManagerPlus.current.addListener(this);
     super.initState();
   }
 
   double _cell = 4;
   double _gap  = 1;
+
+
+  @override
+  void onWindowResized([int? windowId]) async {
+    final size = await WindowManagerPlus.current.getSize();
+    viewModel.setWindowSizeConfig(size : size);
+  }
+
+
 
   Widget _numSlider({
     required String label,
@@ -81,20 +98,23 @@ class _KeyViewerSettingsPageState extends ConsumerState<KeyViewerSettingsPage> w
                     }, pressedKeySet: {},
                   ),
 
-                  IconButton(
-                    onPressed: () async {
-                      final data = await showDialog<KeyTileDataModel>(
-                          context: context,
-                          builder: (_) => KeyTileSettingDialog(cellPx: _cell, gapPx: _gap,),
-                        barrierDismissible: false
-                      );
-                      print(data);
-                      if(data != null){
-                        viewModel.addKeyTile(data);
-                      }
-                    },
-                    icon: Icon(Icons.add),
-                    color: Colors.white,
+                  Positioned(
+                    bottom: 16,
+                    left: 16,
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        final data = await showDialog<KeyTileDataModel>(
+                            context: context,
+                            builder: (_) => KeyTileSettingDialog(cellPx: _cell, gapPx: _gap,),
+                          barrierDismissible: false
+                        );
+                        print(data);
+                        if(data != null){
+                          viewModel.addKeyTile(data);
+                        }
+                      },
+                      child: Icon(Icons.add),
+                    ),
                   ),
                 ],
               ),

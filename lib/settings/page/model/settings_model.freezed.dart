@@ -16,6 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$SettingsModel {
   WindowManagerPlus? get window;
+  GlobalConfigModel get globalConfig;
   double get overlayWidth;
   double get overlayHeight;
   Set<KeyTileDataModel> get keyTileData;
@@ -34,6 +35,8 @@ mixin _$SettingsModel {
         (other.runtimeType == runtimeType &&
             other is SettingsModel &&
             (identical(other.window, window) || other.window == window) &&
+            (identical(other.globalConfig, globalConfig) ||
+                other.globalConfig == globalConfig) &&
             (identical(other.overlayWidth, overlayWidth) ||
                 other.overlayWidth == overlayWidth) &&
             (identical(other.overlayHeight, overlayHeight) ||
@@ -43,12 +46,17 @@ mixin _$SettingsModel {
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, window, overlayWidth,
-      overlayHeight, const DeepCollectionEquality().hash(keyTileData));
+  int get hashCode => Object.hash(
+      runtimeType,
+      window,
+      globalConfig,
+      overlayWidth,
+      overlayHeight,
+      const DeepCollectionEquality().hash(keyTileData));
 
   @override
   String toString() {
-    return 'SettingsModel(window: $window, overlayWidth: $overlayWidth, overlayHeight: $overlayHeight, keyTileData: $keyTileData)';
+    return 'SettingsModel(window: $window, globalConfig: $globalConfig, overlayWidth: $overlayWidth, overlayHeight: $overlayHeight, keyTileData: $keyTileData)';
   }
 }
 
@@ -60,9 +68,12 @@ abstract mixin class $SettingsModelCopyWith<$Res> {
   @useResult
   $Res call(
       {WindowManagerPlus? window,
+      GlobalConfigModel globalConfig,
       double overlayWidth,
       double overlayHeight,
       Set<KeyTileDataModel> keyTileData});
+
+  $GlobalConfigModelCopyWith<$Res> get globalConfig;
 }
 
 /// @nodoc
@@ -79,6 +90,7 @@ class _$SettingsModelCopyWithImpl<$Res>
   @override
   $Res call({
     Object? window = freezed,
+    Object? globalConfig = null,
     Object? overlayWidth = null,
     Object? overlayHeight = null,
     Object? keyTileData = null,
@@ -88,6 +100,10 @@ class _$SettingsModelCopyWithImpl<$Res>
           ? _self.window
           : window // ignore: cast_nullable_to_non_nullable
               as WindowManagerPlus?,
+      globalConfig: null == globalConfig
+          ? _self.globalConfig
+          : globalConfig // ignore: cast_nullable_to_non_nullable
+              as GlobalConfigModel,
       overlayWidth: null == overlayWidth
           ? _self.overlayWidth
           : overlayWidth // ignore: cast_nullable_to_non_nullable
@@ -102,6 +118,16 @@ class _$SettingsModelCopyWithImpl<$Res>
               as Set<KeyTileDataModel>,
     ));
   }
+
+  /// Create a copy of SettingsModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $GlobalConfigModelCopyWith<$Res> get globalConfig {
+    return $GlobalConfigModelCopyWith<$Res>(_self.globalConfig, (value) {
+      return _then(_self.copyWith(globalConfig: value));
+    });
+  }
 }
 
 /// @nodoc
@@ -109,6 +135,7 @@ class _$SettingsModelCopyWithImpl<$Res>
 class _SettingsModel implements SettingsModel {
   const _SettingsModel(
       {this.window,
+      required this.globalConfig,
       required this.overlayWidth,
       required this.overlayHeight,
       final Set<KeyTileDataModel> keyTileData = const {}})
@@ -116,6 +143,8 @@ class _SettingsModel implements SettingsModel {
 
   @override
   final WindowManagerPlus? window;
+  @override
+  final GlobalConfigModel globalConfig;
   @override
   final double overlayWidth;
   @override
@@ -143,6 +172,8 @@ class _SettingsModel implements SettingsModel {
         (other.runtimeType == runtimeType &&
             other is _SettingsModel &&
             (identical(other.window, window) || other.window == window) &&
+            (identical(other.globalConfig, globalConfig) ||
+                other.globalConfig == globalConfig) &&
             (identical(other.overlayWidth, overlayWidth) ||
                 other.overlayWidth == overlayWidth) &&
             (identical(other.overlayHeight, overlayHeight) ||
@@ -152,12 +183,17 @@ class _SettingsModel implements SettingsModel {
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, window, overlayWidth,
-      overlayHeight, const DeepCollectionEquality().hash(_keyTileData));
+  int get hashCode => Object.hash(
+      runtimeType,
+      window,
+      globalConfig,
+      overlayWidth,
+      overlayHeight,
+      const DeepCollectionEquality().hash(_keyTileData));
 
   @override
   String toString() {
-    return 'SettingsModel(window: $window, overlayWidth: $overlayWidth, overlayHeight: $overlayHeight, keyTileData: $keyTileData)';
+    return 'SettingsModel(window: $window, globalConfig: $globalConfig, overlayWidth: $overlayWidth, overlayHeight: $overlayHeight, keyTileData: $keyTileData)';
   }
 }
 
@@ -171,9 +207,13 @@ abstract mixin class _$SettingsModelCopyWith<$Res>
   @useResult
   $Res call(
       {WindowManagerPlus? window,
+      GlobalConfigModel globalConfig,
       double overlayWidth,
       double overlayHeight,
       Set<KeyTileDataModel> keyTileData});
+
+  @override
+  $GlobalConfigModelCopyWith<$Res> get globalConfig;
 }
 
 /// @nodoc
@@ -190,6 +230,7 @@ class __$SettingsModelCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   $Res call({
     Object? window = freezed,
+    Object? globalConfig = null,
     Object? overlayWidth = null,
     Object? overlayHeight = null,
     Object? keyTileData = null,
@@ -199,6 +240,10 @@ class __$SettingsModelCopyWithImpl<$Res>
           ? _self.window
           : window // ignore: cast_nullable_to_non_nullable
               as WindowManagerPlus?,
+      globalConfig: null == globalConfig
+          ? _self.globalConfig
+          : globalConfig // ignore: cast_nullable_to_non_nullable
+              as GlobalConfigModel,
       overlayWidth: null == overlayWidth
           ? _self.overlayWidth
           : overlayWidth // ignore: cast_nullable_to_non_nullable
@@ -212,6 +257,16 @@ class __$SettingsModelCopyWithImpl<$Res>
           : keyTileData // ignore: cast_nullable_to_non_nullable
               as Set<KeyTileDataModel>,
     ));
+  }
+
+  /// Create a copy of SettingsModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $GlobalConfigModelCopyWith<$Res> get globalConfig {
+    return $GlobalConfigModelCopyWith<$Res>(_self.globalConfig, (value) {
+      return _then(_self.copyWith(globalConfig: value));
+    });
   }
 }
 

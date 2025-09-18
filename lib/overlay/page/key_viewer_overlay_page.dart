@@ -3,7 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:key_viewer_v2/core/lib/key_input_monitor.dart';
-import 'package:key_viewer_v2/core/model/config/multi_window_option_model.dart';
+import 'package:key_viewer_v2/core/model/multi_window_option/multi_window_option_model.dart';
 import 'package:key_viewer_v2/overlay/page/key_viewer_overlay_view_model.dart';
 import 'package:key_viewer_v2/settings/page/widget/grid_snap_editor.dart';
 import 'package:window_manager_plus/window_manager_plus.dart';

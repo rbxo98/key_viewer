@@ -3,7 +3,8 @@ import 'dart:convert';
 import 'package:desktop_multi_window/desktop_multi_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:key_viewer_v2/core/model/config/multi_window_option_model.dart';
+import 'package:key_viewer_v2/core/lib/pref_provider.dart';
+import 'package:key_viewer_v2/core/model/multi_window_option/multi_window_option_model.dart';
 import 'package:key_viewer_v2/core/model/key/key_tile_data_model.dart';
 import 'package:key_viewer_v2/settings/page/model/settings_model.dart';
 import 'package:window_manager_plus/window_manager_plus.dart';
@@ -21,6 +22,11 @@ class SettingsViewModel extends StateNotifier<SettingsModel> {
           return null;
       }
     });
+  }
+  
+  Future<void> setWindowSize(Size? size) async {
+    if(size != null) WindowManagerPlus.current.setSize(size);
+    WindowManagerPlus.current.setMinimumSize(Size(600,600));
   }
 
   Future<WindowManagerPlus?> showOverlay() async {
@@ -74,4 +80,15 @@ class SettingsViewModel extends StateNotifier<SettingsModel> {
   }
 
   void setEditorSize(Size size) => state = state.copyWith(overlayWidth: size.width, overlayHeight: size.height);
+
+  void setWindowSizeConfig({required Size size}) {
+    final globalConfig = state.globalConfig;
+    PrefProvider.setGlobalConfig(globalConfig.copyWith(windowWidth: size.width, windowHeight: size.height));
+  }
+
+  void getWindowSizeConfig() async {
+    final globalConfig = await PrefProvider.getGlobalConfig();
+    state = state.copyWith(globalConfig: globalConfig);
+  }
+
 }

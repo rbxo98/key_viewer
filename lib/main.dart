@@ -3,7 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:key_viewer_v2/core/model/config/multi_window_option_model.dart';
+import 'package:key_viewer_v2/core/model/multi_window_option/multi_window_option_model.dart';
 import 'package:key_viewer_v2/overlay/app/overlay_app.dart';
 import 'package:key_viewer_v2/settings/app/setting_app.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart' as acrylic;

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:key_viewer_v2/core/model/config/multi_window_option_model.dart';
+import 'package:key_viewer_v2/core/model/multi_window_option/multi_window_option_model.dart';
 import 'package:key_viewer_v2/settings/page/setttings_page.dart';
 import 'package:key_viewer_v2/sub_window/page/sub_window_page.dart';
 

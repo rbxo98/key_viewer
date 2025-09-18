@@ -341,13 +341,22 @@ class _KeyTileSettingDialogState extends State<KeyTileSettingDialog> {
                 const SizedBox(height: 12),
 
                 // ── 미리보기(고정)
-                _PreviewBox(
-                  model: keyTileDataModel,
-                  pressed: _previewPressed,
-                  cellPx: widget.cellPx,
-                  gapPx: widget.gapPx,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('미리보기', style: _cap),
+                    Align(
+                      alignment: AlignmentDirectional.centerStart,
+                      child: _PreviewBox(
+                        model: keyTileDataModel,
+                        pressed: _previewPressed,
+                        cellPx: widget.cellPx,
+                        gapPx: widget.gapPx,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: 28),
 
                 // ── 스크롤 영역
                 Expanded(
@@ -673,61 +682,25 @@ class _PreviewBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 160,
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.04),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.10)),
-      ),
-      padding: const EdgeInsets.all(12),
-      child: LayoutBuilder(
-        builder: (context, c) {
-          // 에디터 px 모드: 제공 시 그 값대로
-          if (cellPx != null) {
-            final gw = math.max(1, model.gw);
-            final gh = math.max(1, model.gh);
-            final gp = (gapPx ?? 0);
-            final w = gw * cellPx! + (gw - 1) * gp;
-            final h = gh * cellPx! + (gh - 1) * gp;
+    return LayoutBuilder(
+      builder: (context, c) {
+        // 에디터 px 모드: 제공 시 그 값대로
+        if (cellPx != null) {
+          final gw = math.max(1, model.gw);
+          final gh = math.max(1, model.gh);
+          final gp = (gapPx ?? 0);
+          final w = gw * cellPx! + (gw - 1) * gp;
+          final h = gh * cellPx! + (gh - 1) * gp;
 
-            return Center(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxWidth: c.maxWidth,
-                  maxHeight: c.maxHeight,
-                ),
-                child: SizedBox(
-                  width: w,
-                  height: h,
-                  child: SizedBox.expand(
-                    child: KeyTile(
-                      pressed: pressed,
-                      keyTileDataModel: model,
-                    ),
-                  ),
-                ),
-              ),
-            );
-          }
-
-          // 비율 모드(기본): 영역 안에서 gw:gh 유지하며 최대화
-          final gw = (model.gw <= 0 ? 1 : model.gw).toDouble();
-          final gh = (model.gh <= 0 ? 1 : model.gh).toDouble();
-          final ratio = gw / gh;
-          final maxW = c.maxWidth, maxH = c.maxHeight;
-          double w = maxW, h = w / ratio;
-          if (h > maxH) {
-            h = maxH;
-            w = h * ratio;
-          }
-
-          return Center(
+          return ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: c.maxWidth,
+              maxHeight: c.maxHeight,
+            ),
             child: SizedBox(
               width: w,
               height: h,
-              child: FittedBox(
-                fit: BoxFit.contain,
+              child: SizedBox.expand(
                 child: KeyTile(
                   pressed: pressed,
                   keyTileDataModel: model,
@@ -735,8 +708,33 @@ class _PreviewBox extends StatelessWidget {
               ),
             ),
           );
-        },
-      ),
+        }
+
+        // 비율 모드(기본): 영역 안에서 gw:gh 유지하며 최대화
+        final gw = (model.gw <= 0 ? 1 : model.gw).toDouble();
+        final gh = (model.gh <= 0 ? 1 : model.gh).toDouble();
+        final ratio = gw / gh;
+        final maxW = c.maxWidth, maxH = c.maxHeight;
+        double w = maxW, h = w / ratio;
+        if (h > maxH) {
+          h = maxH;
+          w = h * ratio;
+        }
+
+        return Center(
+          child: SizedBox(
+            width: w,
+            height: h,
+            child: FittedBox(
+              fit: BoxFit.contain,
+              child: KeyTile(
+                pressed: pressed,
+                keyTileDataModel: model,
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
