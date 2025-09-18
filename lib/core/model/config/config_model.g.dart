@@ -10,10 +10,14 @@ _GlobalConfigModel _$GlobalConfigModelFromJson(Map<String, dynamic> json) =>
     _GlobalConfigModel(
       windowWidth: (json['windowWidth'] as num).toDouble(),
       windowHeight: (json['windowHeight'] as num).toDouble(),
+      windowX: (json['windowX'] as num).toDouble(),
+      windowY: (json['windowY'] as num).toDouble(),
     );
 
 Map<String, dynamic> _$GlobalConfigModelToJson(_GlobalConfigModel instance) =>
     <String, dynamic>{
       'windowWidth': instance.windowWidth,
       'windowHeight': instance.windowHeight,
+      'windowX': instance.windowX,
+      'windowY': instance.windowY,
     };

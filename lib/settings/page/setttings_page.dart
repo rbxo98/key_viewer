@@ -27,11 +27,10 @@ class _KeyViewerSettingsPageState extends ConsumerState<KeyViewerSettingsPage> w
     viewModel = ref.read(settingsViewModelProvider.notifier);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await PrefProvider.init();
-      viewModel.getWindowSizeConfig();
-
+      await viewModel.getGlobalConfig();
       final globalConfig = ref.read(settingsViewModelProvider).globalConfig;
-
       viewModel.setWindowSize(Size(globalConfig.windowWidth, globalConfig.windowHeight));
+      viewModel.setWindowPosition(pos: Offset(globalConfig.windowX, globalConfig.windowY));
       viewModel.showOverlay();
     });
     WindowManagerPlus.current.addListener(this);
@@ -49,6 +48,11 @@ class _KeyViewerSettingsPageState extends ConsumerState<KeyViewerSettingsPage> w
   }
 
 
+  @override
+  void onWindowMove([int? windowId]) async {
+    final pos = await WindowManagerPlus.current.getPosition();
+    viewModel.setWindowPositionConfig(pos : pos);
+  }
 
   Widget _numSlider({
     required String label,

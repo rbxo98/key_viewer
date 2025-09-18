@@ -29,6 +29,11 @@ class SettingsViewModel extends StateNotifier<SettingsModel> {
     WindowManagerPlus.current.setMinimumSize(Size(600,600));
   }
 
+
+  void setWindowPosition({Offset? pos}) {
+    if(pos != null) WindowManagerPlus.current.setPosition(pos);
+  }
+
   Future<WindowManagerPlus?> showOverlay() async {
     if (state.window != null) return state.window!;
     final window = await WindowManagerPlus.createWindow(
@@ -81,14 +86,21 @@ class SettingsViewModel extends StateNotifier<SettingsModel> {
 
   void setEditorSize(Size size) => state = state.copyWith(overlayWidth: size.width, overlayHeight: size.height);
 
+  Future<void> getGlobalConfig() async {
+    final globalConfig = await PrefProvider.getGlobalConfig();
+    state = state.copyWith(globalConfig: globalConfig);
+  }
+
   void setWindowSizeConfig({required Size size}) {
     final globalConfig = state.globalConfig;
     PrefProvider.setGlobalConfig(globalConfig.copyWith(windowWidth: size.width, windowHeight: size.height));
   }
 
-  void getWindowSizeConfig() async {
-    final globalConfig = await PrefProvider.getGlobalConfig();
-    state = state.copyWith(globalConfig: globalConfig);
+
+  void setWindowPositionConfig({required Offset pos}) async  {
+    final globalConfig = state.globalConfig;
+    PrefProvider.setGlobalConfig(globalConfig.copyWith(windowX: pos.dx, windowY: pos.dy));
   }
+
 
 }

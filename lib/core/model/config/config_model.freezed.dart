@@ -19,6 +19,10 @@ mixin _$GlobalConfigModel {
   set windowWidth(double value);
   double get windowHeight;
   set windowHeight(double value);
+  double get windowX;
+  set windowX(double value);
+  double get windowY;
+  set windowY(double value);
 
   /// Create a copy of GlobalConfigModel
   /// with the given fields replaced by the non-null parameter values.
@@ -33,7 +37,7 @@ mixin _$GlobalConfigModel {
 
   @override
   String toString() {
-    return 'GlobalConfigModel(windowWidth: $windowWidth, windowHeight: $windowHeight)';
+    return 'GlobalConfigModel(windowWidth: $windowWidth, windowHeight: $windowHeight, windowX: $windowX, windowY: $windowY)';
   }
 }
 
@@ -43,7 +47,11 @@ abstract mixin class $GlobalConfigModelCopyWith<$Res> {
           GlobalConfigModel value, $Res Function(GlobalConfigModel) _then) =
       _$GlobalConfigModelCopyWithImpl;
   @useResult
-  $Res call({double windowWidth, double windowHeight});
+  $Res call(
+      {double windowWidth,
+      double windowHeight,
+      double windowX,
+      double windowY});
 }
 
 /// @nodoc
@@ -61,6 +69,8 @@ class _$GlobalConfigModelCopyWithImpl<$Res>
   $Res call({
     Object? windowWidth = null,
     Object? windowHeight = null,
+    Object? windowX = null,
+    Object? windowY = null,
   }) {
     return _then(_self.copyWith(
       windowWidth: null == windowWidth
@@ -71,6 +81,14 @@ class _$GlobalConfigModelCopyWithImpl<$Res>
           ? _self.windowHeight
           : windowHeight // ignore: cast_nullable_to_non_nullable
               as double,
+      windowX: null == windowX
+          ? _self.windowX
+          : windowX // ignore: cast_nullable_to_non_nullable
+              as double,
+      windowY: null == windowY
+          ? _self.windowY
+          : windowY // ignore: cast_nullable_to_non_nullable
+              as double,
     ));
   }
 }
@@ -78,7 +96,11 @@ class _$GlobalConfigModelCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _GlobalConfigModel implements GlobalConfigModel {
-  _GlobalConfigModel({required this.windowWidth, required this.windowHeight});
+  _GlobalConfigModel(
+      {required this.windowWidth,
+      required this.windowHeight,
+      required this.windowX,
+      required this.windowY});
   factory _GlobalConfigModel.fromJson(Map<String, dynamic> json) =>
       _$GlobalConfigModelFromJson(json);
 
@@ -86,6 +108,10 @@ class _GlobalConfigModel implements GlobalConfigModel {
   double windowWidth;
   @override
   double windowHeight;
+  @override
+  double windowX;
+  @override
+  double windowY;
 
   /// Create a copy of GlobalConfigModel
   /// with the given fields replaced by the non-null parameter values.
@@ -104,7 +130,7 @@ class _GlobalConfigModel implements GlobalConfigModel {
 
   @override
   String toString() {
-    return 'GlobalConfigModel(windowWidth: $windowWidth, windowHeight: $windowHeight)';
+    return 'GlobalConfigModel(windowWidth: $windowWidth, windowHeight: $windowHeight, windowX: $windowX, windowY: $windowY)';
   }
 }
 
@@ -116,7 +142,11 @@ abstract mixin class _$GlobalConfigModelCopyWith<$Res>
       __$GlobalConfigModelCopyWithImpl;
   @override
   @useResult
-  $Res call({double windowWidth, double windowHeight});
+  $Res call(
+      {double windowWidth,
+      double windowHeight,
+      double windowX,
+      double windowY});
 }
 
 /// @nodoc
@@ -134,6 +164,8 @@ class __$GlobalConfigModelCopyWithImpl<$Res>
   $Res call({
     Object? windowWidth = null,
     Object? windowHeight = null,
+    Object? windowX = null,
+    Object? windowY = null,
   }) {
     return _then(_GlobalConfigModel(
       windowWidth: null == windowWidth
@@ -143,6 +175,14 @@ class __$GlobalConfigModelCopyWithImpl<$Res>
       windowHeight: null == windowHeight
           ? _self.windowHeight
           : windowHeight // ignore: cast_nullable_to_non_nullable
+              as double,
+      windowX: null == windowX
+          ? _self.windowX
+          : windowX // ignore: cast_nullable_to_non_nullable
+              as double,
+      windowY: null == windowY
+          ? _self.windowY
+          : windowY // ignore: cast_nullable_to_non_nullable
               as double,
     ));
   }
