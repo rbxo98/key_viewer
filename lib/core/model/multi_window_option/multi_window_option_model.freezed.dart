@@ -16,6 +16,12 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$MultiWindowOptionModel {
   String get windowName;
+  double? get windowWidth;
+  double? get windowHeight;
+  double? get windowX;
+  double? get windowY;
+  bool? get isFrameless;
+  int? get backgroundColor;
 
   /// Create a copy of MultiWindowOptionModel
   /// with the given fields replaced by the non-null parameter values.
@@ -34,16 +40,27 @@ mixin _$MultiWindowOptionModel {
         (other.runtimeType == runtimeType &&
             other is MultiWindowOptionModel &&
             (identical(other.windowName, windowName) ||
-                other.windowName == windowName));
+                other.windowName == windowName) &&
+            (identical(other.windowWidth, windowWidth) ||
+                other.windowWidth == windowWidth) &&
+            (identical(other.windowHeight, windowHeight) ||
+                other.windowHeight == windowHeight) &&
+            (identical(other.windowX, windowX) || other.windowX == windowX) &&
+            (identical(other.windowY, windowY) || other.windowY == windowY) &&
+            (identical(other.isFrameless, isFrameless) ||
+                other.isFrameless == isFrameless) &&
+            (identical(other.backgroundColor, backgroundColor) ||
+                other.backgroundColor == backgroundColor));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, windowName);
+  int get hashCode => Object.hash(runtimeType, windowName, windowWidth,
+      windowHeight, windowX, windowY, isFrameless, backgroundColor);
 
   @override
   String toString() {
-    return 'MultiWindowOptionModel(windowName: $windowName)';
+    return 'MultiWindowOptionModel(windowName: $windowName, windowWidth: $windowWidth, windowHeight: $windowHeight, windowX: $windowX, windowY: $windowY, isFrameless: $isFrameless, backgroundColor: $backgroundColor)';
   }
 }
 
@@ -53,7 +70,14 @@ abstract mixin class $MultiWindowOptionModelCopyWith<$Res> {
           $Res Function(MultiWindowOptionModel) _then) =
       _$MultiWindowOptionModelCopyWithImpl;
   @useResult
-  $Res call({String windowName});
+  $Res call(
+      {String windowName,
+      double? windowWidth,
+      double? windowHeight,
+      double? windowX,
+      double? windowY,
+      bool? isFrameless,
+      int? backgroundColor});
 }
 
 /// @nodoc
@@ -70,12 +94,42 @@ class _$MultiWindowOptionModelCopyWithImpl<$Res>
   @override
   $Res call({
     Object? windowName = null,
+    Object? windowWidth = freezed,
+    Object? windowHeight = freezed,
+    Object? windowX = freezed,
+    Object? windowY = freezed,
+    Object? isFrameless = freezed,
+    Object? backgroundColor = freezed,
   }) {
     return _then(_self.copyWith(
       windowName: null == windowName
           ? _self.windowName
           : windowName // ignore: cast_nullable_to_non_nullable
               as String,
+      windowWidth: freezed == windowWidth
+          ? _self.windowWidth
+          : windowWidth // ignore: cast_nullable_to_non_nullable
+              as double?,
+      windowHeight: freezed == windowHeight
+          ? _self.windowHeight
+          : windowHeight // ignore: cast_nullable_to_non_nullable
+              as double?,
+      windowX: freezed == windowX
+          ? _self.windowX
+          : windowX // ignore: cast_nullable_to_non_nullable
+              as double?,
+      windowY: freezed == windowY
+          ? _self.windowY
+          : windowY // ignore: cast_nullable_to_non_nullable
+              as double?,
+      isFrameless: freezed == isFrameless
+          ? _self.isFrameless
+          : isFrameless // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      backgroundColor: freezed == backgroundColor
+          ? _self.backgroundColor
+          : backgroundColor // ignore: cast_nullable_to_non_nullable
+              as int?,
     ));
   }
 }
@@ -83,12 +137,31 @@ class _$MultiWindowOptionModelCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _MultiWindowOptionModel implements MultiWindowOptionModel {
-  const _MultiWindowOptionModel({required this.windowName});
+  const _MultiWindowOptionModel(
+      {required this.windowName,
+      this.windowWidth,
+      this.windowHeight,
+      this.windowX,
+      this.windowY,
+      this.isFrameless,
+      this.backgroundColor});
   factory _MultiWindowOptionModel.fromJson(Map<String, dynamic> json) =>
       _$MultiWindowOptionModelFromJson(json);
 
   @override
   final String windowName;
+  @override
+  final double? windowWidth;
+  @override
+  final double? windowHeight;
+  @override
+  final double? windowX;
+  @override
+  final double? windowY;
+  @override
+  final bool? isFrameless;
+  @override
+  final int? backgroundColor;
 
   /// Create a copy of MultiWindowOptionModel
   /// with the given fields replaced by the non-null parameter values.
@@ -112,16 +185,27 @@ class _MultiWindowOptionModel implements MultiWindowOptionModel {
         (other.runtimeType == runtimeType &&
             other is _MultiWindowOptionModel &&
             (identical(other.windowName, windowName) ||
-                other.windowName == windowName));
+                other.windowName == windowName) &&
+            (identical(other.windowWidth, windowWidth) ||
+                other.windowWidth == windowWidth) &&
+            (identical(other.windowHeight, windowHeight) ||
+                other.windowHeight == windowHeight) &&
+            (identical(other.windowX, windowX) || other.windowX == windowX) &&
+            (identical(other.windowY, windowY) || other.windowY == windowY) &&
+            (identical(other.isFrameless, isFrameless) ||
+                other.isFrameless == isFrameless) &&
+            (identical(other.backgroundColor, backgroundColor) ||
+                other.backgroundColor == backgroundColor));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, windowName);
+  int get hashCode => Object.hash(runtimeType, windowName, windowWidth,
+      windowHeight, windowX, windowY, isFrameless, backgroundColor);
 
   @override
   String toString() {
-    return 'MultiWindowOptionModel(windowName: $windowName)';
+    return 'MultiWindowOptionModel(windowName: $windowName, windowWidth: $windowWidth, windowHeight: $windowHeight, windowX: $windowX, windowY: $windowY, isFrameless: $isFrameless, backgroundColor: $backgroundColor)';
   }
 }
 
@@ -133,7 +217,14 @@ abstract mixin class _$MultiWindowOptionModelCopyWith<$Res>
       __$MultiWindowOptionModelCopyWithImpl;
   @override
   @useResult
-  $Res call({String windowName});
+  $Res call(
+      {String windowName,
+      double? windowWidth,
+      double? windowHeight,
+      double? windowX,
+      double? windowY,
+      bool? isFrameless,
+      int? backgroundColor});
 }
 
 /// @nodoc
@@ -150,12 +241,42 @@ class __$MultiWindowOptionModelCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   $Res call({
     Object? windowName = null,
+    Object? windowWidth = freezed,
+    Object? windowHeight = freezed,
+    Object? windowX = freezed,
+    Object? windowY = freezed,
+    Object? isFrameless = freezed,
+    Object? backgroundColor = freezed,
   }) {
     return _then(_MultiWindowOptionModel(
       windowName: null == windowName
           ? _self.windowName
           : windowName // ignore: cast_nullable_to_non_nullable
               as String,
+      windowWidth: freezed == windowWidth
+          ? _self.windowWidth
+          : windowWidth // ignore: cast_nullable_to_non_nullable
+              as double?,
+      windowHeight: freezed == windowHeight
+          ? _self.windowHeight
+          : windowHeight // ignore: cast_nullable_to_non_nullable
+              as double?,
+      windowX: freezed == windowX
+          ? _self.windowX
+          : windowX // ignore: cast_nullable_to_non_nullable
+              as double?,
+      windowY: freezed == windowY
+          ? _self.windowY
+          : windowY // ignore: cast_nullable_to_non_nullable
+              as double?,
+      isFrameless: freezed == isFrameless
+          ? _self.isFrameless
+          : isFrameless // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      backgroundColor: freezed == backgroundColor
+          ? _self.backgroundColor
+          : backgroundColor // ignore: cast_nullable_to_non_nullable
+              as int?,
     ));
   }
 }

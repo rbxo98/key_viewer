@@ -27,12 +27,11 @@ class _KeyViewerSettingsPageState extends ConsumerState<KeyViewerSettingsPage> w
   void initState() {
     viewModel = ref.read(settingsViewModelProvider.notifier);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await PrefProvider.init();
       await viewModel.getGlobalConfig();
-      final globalConfig = ref.read(settingsViewModelProvider).globalConfig;
-      viewModel.setWindowSize(Size(globalConfig.windowWidth, globalConfig.windowHeight));
-      viewModel.setWindowPosition(pos: Offset(globalConfig.windowX, globalConfig.windowY));
-      viewModel.showOverlay();
+      final state = ref.read(settingsViewModelProvider);
+      viewModel.setWindowSize(Size(state.globalConfig.windowWidth, state.globalConfig.windowHeight));
+      viewModel.setWindowPosition(pos: Offset(state.globalConfig.windowX, state.globalConfig.windowY));
+      viewModel.setWindowSizeLock(state.windowSizeLock);
     });
     WindowManagerPlus.current.addListener(this);
     super.initState();
@@ -64,6 +63,9 @@ class _KeyViewerSettingsPageState extends ConsumerState<KeyViewerSettingsPage> w
         viewModel.setOverlayPositionConfig(pos: pos);
         return true;
       }
+      case "overlayClose" : {
+        viewModel.closeOverlay();
+      }
     }
   }
 
@@ -73,11 +75,46 @@ class _KeyViewerSettingsPageState extends ConsumerState<KeyViewerSettingsPage> w
     final state = ref.watch(settingsViewModelProvider);
     return Scaffold(
         body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Wrap(
-              children: [
-                DropdownButton(items: [], onChanged: (v){})
-              ],
+            ElevatedButton(onPressed: (){
+              PrefProvider.instance.clear();
+            }, child: Text("설정 초기화")),
+            Container(
+              padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+              child: Column(
+                spacing: 8,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Wrap(
+                    children: [
+                      ElevatedButton(onPressed: () async {
+                        if(state.window == null){
+                          await viewModel.showOverlay();
+                        }
+                        else{
+                          viewModel.closeOverlay();
+                        }
+                        }, child: Row(
+                        spacing: 8,
+                        mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text("오버레이 ${state.window == null ? "표시" : "닫기"}"),
+                            if(state.isOverlayLoading)
+                              SizedBox(
+                                  width: 14,
+                                  height: 14,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  )),
+                          ],
+                        )),
+                    ],
+                  ),
+
+                  DropdownButton(items: [], onChanged: (v){})
+                ],
+              ),
             ),
             Expanded(
               child: Stack(
@@ -91,7 +128,14 @@ class _KeyViewerSettingsPageState extends ConsumerState<KeyViewerSettingsPage> w
                     onPixelSizeChanged: (size){
                       viewModel.setEditorSize(size);
                       viewModel.resizeOverlay();
-                    }, pressedKeySet: {},
+                    },
+                    pressedKeySet: {},
+                    onInitialize: (size) async {
+                      viewModel.setEditorSize(size);
+                      await viewModel.showOverlay();
+                      await viewModel.resizeOverlay();
+                      await viewModel.updateOverlayKeyTile();
+                    },
                   ),
 
 

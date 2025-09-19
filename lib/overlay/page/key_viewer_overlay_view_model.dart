@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:key_viewer_v2/core/model/key/key_tile_data_model.dart';
 import 'package:key_viewer_v2/overlay/page/model/key_viewer_model.dart';
@@ -9,10 +10,6 @@ final keyViewerOverlayViewModelProvider = StateNotifierProvider<KeyViewerOverlay
 
 class KeyViewerOverlayViewModel extends StateNotifier<KeyViewerModel> {
   KeyViewerOverlayViewModel(super.state);
-
-  void setupWindowByGrid() {
-    WindowManagerPlus.current.setAsFrameless();
-  }
 
   void updatePressedKeySet(Set<int> value) {
     state = state.copyWith(pressedKeySet: value);

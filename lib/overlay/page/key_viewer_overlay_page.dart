@@ -21,13 +21,14 @@ class KeyViewerOverlayPage extends ConsumerStatefulWidget {
 class _KeyViewerOverlayPageState extends ConsumerState<KeyViewerOverlayPage> with WindowListener {
   late final KeyViewerOverlayViewModel viewModel;
   final KeyInputMonitor keyInputMonitor = KeyInputMonitor();
+  bool _windowReady = false;
   @override
   void initState() {
     super.initState();
+    viewModel = ref.read(keyViewerOverlayViewModelProvider.notifier);
     WindowManagerPlus.current.addListener(this);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      viewModel = ref.read(keyViewerOverlayViewModelProvider.notifier);
-      viewModel.setupWindowByGrid();
+      await WindowManagerPlus.current.waitUntilReadyToShow().then((value) {_windowReady = true;});
       keyInputMonitor.pressedKeys.addListener(() {
         viewModel.updatePressedKeySet(keyInputMonitor.pressedKeys.value);
       });
@@ -43,6 +44,9 @@ class _KeyViewerOverlayPageState extends ConsumerState<KeyViewerOverlayPage> wit
 
   @override
   Future<dynamic> onEventFromWindow(String eventName, int fromWindowId, dynamic arguments) async {
+    while(!_windowReady) {
+      await Future.delayed(const Duration(milliseconds: 100));
+    }
     switch (eventName) {
       case "updateKeyTile": {
         viewModel.updateOverlayKeyTile(arguments);
@@ -60,6 +64,8 @@ class _KeyViewerOverlayPageState extends ConsumerState<KeyViewerOverlayPage> wit
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(keyViewerOverlayViewModelProvider);
+    WindowManagerPlus.current.getSize().then((size) => print(size));
+    print("mediaquery size : ${MediaQuery.of(context).size}");
     return Listener(
       behavior: HitTestBehavior.translucent,
       onPointerDown: (event) {

@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:key_viewer_v2/core/lib/pref_provider.dart';
 import 'package:key_viewer_v2/core/model/multi_window_option/multi_window_option_model.dart';
 import 'package:key_viewer_v2/overlay/app/overlay_app.dart';
 import 'package:key_viewer_v2/settings/app/setting_app.dart';
@@ -45,6 +46,7 @@ void main(List<String> args) async {
   }
 
   WidgetsFlutterBinding.ensureInitialized();
+  await PrefProvider.init();
   await WindowManagerPlus.ensureInitialized(0);
   // 기본 메인 윈도우 실행
   runApp(ProviderScope(child: const KeyViewerSettingApp()));

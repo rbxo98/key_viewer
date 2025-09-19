@@ -31,4 +31,8 @@ class PrefProvider {
   Future<void> setGlobalConfig(GlobalConfigModel globalConfig) async {
     await _pref.setString(_CONFIG_KEY, jsonEncode(globalConfig.toJson()));
   }
+
+  Future<void> clear() async {
+    _pref.clear();
+  }
 }

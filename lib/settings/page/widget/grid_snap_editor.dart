@@ -45,6 +45,8 @@ class GridSnapEditor extends StatefulWidget {
   final Color gridLineColor;
   final double gridLineOpacity;
 
+  final ValueChanged<Size>? onInitialize;
+
   const GridSnapEditor({
     super.key,
     this.areaSize,
@@ -53,6 +55,7 @@ class GridSnapEditor extends StatefulWidget {
     this.grid = const SnapGridSpec(),
     this.onChanged,
     this.onPixelSizeChanged,
+    this.onInitialize,
     this.isEditor = true,
     this.showBackground = true,
     this.liveSnap = true,
@@ -78,10 +81,37 @@ class _GridSnapEditorState extends State<GridSnapEditor> {
 
   double get _pitch => widget.grid.pitch;
 
+  bool _didFireInitialize = false;
+  final GlobalKey _rootKey = GlobalKey();
+
   @override
   void initState() {
     super.initState();
     _tiles = widget.targetKeyList.map((e) => e.copyWith()).toList();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _tryFireInitialize();
+    });
+  }
+
+  Future<void> _tryFireInitialize() async {
+    if (_didFireInitialize || !mounted) return;
+
+    // areaSize가 주어졌으면 그걸로 바로 호출
+    if (widget.areaSize != null && widget.areaSize != Size.zero) {
+      _didFireInitialize = true;
+      widget.onInitialize?.call(widget.areaSize!);
+      return;
+    }
+
+    // root 컨텍스트에서 실측 사이즈를 읽음
+    final ctx = _rootKey.currentContext;
+    Size? size = ctx?.size;
+    while(!(size != null && size != Size.zero)){
+      await Future.delayed(Duration(milliseconds: 100));
+      size = ctx?.size;
+    }
+    _didFireInitialize = true;
+    widget.onInitialize?.call(size);
   }
 
   @override
@@ -307,6 +337,7 @@ class _GridSnapEditorState extends State<GridSnapEditor> {
       }
 
       return SizedBox(
+        key: _rootKey,
         width: effectiveSize.width,
         height: effectiveSize.height,
         child: Stack(children: children),

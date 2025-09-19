@@ -21,6 +21,7 @@ mixin _$SettingsModel {
   double get overlayHeight;
   Set<KeyTileDataModel> get keyTileData;
   bool get windowSizeLock;
+  bool get isOverlayLoading;
 
   /// Create a copy of SettingsModel
   /// with the given fields replaced by the non-null parameter values.
@@ -45,7 +46,9 @@ mixin _$SettingsModel {
             const DeepCollectionEquality()
                 .equals(other.keyTileData, keyTileData) &&
             (identical(other.windowSizeLock, windowSizeLock) ||
-                other.windowSizeLock == windowSizeLock));
+                other.windowSizeLock == windowSizeLock) &&
+            (identical(other.isOverlayLoading, isOverlayLoading) ||
+                other.isOverlayLoading == isOverlayLoading));
   }
 
   @override
@@ -56,11 +59,12 @@ mixin _$SettingsModel {
       overlayWidth,
       overlayHeight,
       const DeepCollectionEquality().hash(keyTileData),
-      windowSizeLock);
+      windowSizeLock,
+      isOverlayLoading);
 
   @override
   String toString() {
-    return 'SettingsModel(window: $window, globalConfig: $globalConfig, overlayWidth: $overlayWidth, overlayHeight: $overlayHeight, keyTileData: $keyTileData, windowSizeLock: $windowSizeLock)';
+    return 'SettingsModel(window: $window, globalConfig: $globalConfig, overlayWidth: $overlayWidth, overlayHeight: $overlayHeight, keyTileData: $keyTileData, windowSizeLock: $windowSizeLock, isOverlayLoading: $isOverlayLoading)';
   }
 }
 
@@ -76,7 +80,8 @@ abstract mixin class $SettingsModelCopyWith<$Res> {
       double overlayWidth,
       double overlayHeight,
       Set<KeyTileDataModel> keyTileData,
-      bool windowSizeLock});
+      bool windowSizeLock,
+      bool isOverlayLoading});
 
   $GlobalConfigModelCopyWith<$Res> get globalConfig;
 }
@@ -100,6 +105,7 @@ class _$SettingsModelCopyWithImpl<$Res>
     Object? overlayHeight = null,
     Object? keyTileData = null,
     Object? windowSizeLock = null,
+    Object? isOverlayLoading = null,
   }) {
     return _then(_self.copyWith(
       window: freezed == window
@@ -126,6 +132,10 @@ class _$SettingsModelCopyWithImpl<$Res>
           ? _self.windowSizeLock
           : windowSizeLock // ignore: cast_nullable_to_non_nullable
               as bool,
+      isOverlayLoading: null == isOverlayLoading
+          ? _self.isOverlayLoading
+          : isOverlayLoading // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 
@@ -149,7 +159,8 @@ class _SettingsModel implements SettingsModel {
       required this.overlayWidth,
       required this.overlayHeight,
       final Set<KeyTileDataModel> keyTileData = const {},
-      required this.windowSizeLock})
+      required this.windowSizeLock,
+      required this.isOverlayLoading})
       : _keyTileData = keyTileData;
 
   @override
@@ -171,6 +182,8 @@ class _SettingsModel implements SettingsModel {
 
   @override
   final bool windowSizeLock;
+  @override
+  final bool isOverlayLoading;
 
   /// Create a copy of SettingsModel
   /// with the given fields replaced by the non-null parameter values.
@@ -195,7 +208,9 @@ class _SettingsModel implements SettingsModel {
             const DeepCollectionEquality()
                 .equals(other._keyTileData, _keyTileData) &&
             (identical(other.windowSizeLock, windowSizeLock) ||
-                other.windowSizeLock == windowSizeLock));
+                other.windowSizeLock == windowSizeLock) &&
+            (identical(other.isOverlayLoading, isOverlayLoading) ||
+                other.isOverlayLoading == isOverlayLoading));
   }
 
   @override
@@ -206,11 +221,12 @@ class _SettingsModel implements SettingsModel {
       overlayWidth,
       overlayHeight,
       const DeepCollectionEquality().hash(_keyTileData),
-      windowSizeLock);
+      windowSizeLock,
+      isOverlayLoading);
 
   @override
   String toString() {
-    return 'SettingsModel(window: $window, globalConfig: $globalConfig, overlayWidth: $overlayWidth, overlayHeight: $overlayHeight, keyTileData: $keyTileData, windowSizeLock: $windowSizeLock)';
+    return 'SettingsModel(window: $window, globalConfig: $globalConfig, overlayWidth: $overlayWidth, overlayHeight: $overlayHeight, keyTileData: $keyTileData, windowSizeLock: $windowSizeLock, isOverlayLoading: $isOverlayLoading)';
   }
 }
 
@@ -228,7 +244,8 @@ abstract mixin class _$SettingsModelCopyWith<$Res>
       double overlayWidth,
       double overlayHeight,
       Set<KeyTileDataModel> keyTileData,
-      bool windowSizeLock});
+      bool windowSizeLock,
+      bool isOverlayLoading});
 
   @override
   $GlobalConfigModelCopyWith<$Res> get globalConfig;
@@ -253,6 +270,7 @@ class __$SettingsModelCopyWithImpl<$Res>
     Object? overlayHeight = null,
     Object? keyTileData = null,
     Object? windowSizeLock = null,
+    Object? isOverlayLoading = null,
   }) {
     return _then(_SettingsModel(
       window: freezed == window
@@ -278,6 +296,10 @@ class __$SettingsModelCopyWithImpl<$Res>
       windowSizeLock: null == windowSizeLock
           ? _self.windowSizeLock
           : windowSizeLock // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isOverlayLoading: null == isOverlayLoading
+          ? _self.isOverlayLoading
+          : isOverlayLoading // ignore: cast_nullable_to_non_nullable
               as bool,
     ));
   }

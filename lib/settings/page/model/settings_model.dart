@@ -15,6 +15,7 @@ abstract class SettingsModel with _$SettingsModel {
     @Default({})
     Set<KeyTileDataModel> keyTileData,
     required bool windowSizeLock,
+    required bool isOverlayLoading,
   }) = _SettingsModel;
 
   factory SettingsModel.empty() => SettingsModel(
@@ -24,5 +25,6 @@ abstract class SettingsModel with _$SettingsModel {
       keyTileData: {},
       globalConfig: GlobalConfigModel.empty(),
     windowSizeLock: false,
+    isOverlayLoading: false,
   );
 }

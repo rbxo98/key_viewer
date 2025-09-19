@@ -10,6 +10,8 @@ abstract class GlobalConfigModel with _$GlobalConfigModel {
     required double windowHeight,
     required double windowX,
     required double windowY,
+    required double overlayWith,
+    required double overlayHeight,
     required double overlayX,
     required double overlayY,
     @Default([])
@@ -22,6 +24,8 @@ abstract class GlobalConfigModel with _$GlobalConfigModel {
       windowHeight: 600,
       windowX: 0,
       windowY: 0,
+      overlayWith: 0,
+      overlayHeight: 0,
       overlayX: 0,
       overlayY: 0
   );

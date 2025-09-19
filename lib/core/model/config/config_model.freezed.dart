@@ -23,6 +23,10 @@ mixin _$GlobalConfigModel {
   set windowX(double value);
   double get windowY;
   set windowY(double value);
+  double get overlayWith;
+  set overlayWith(double value);
+  double get overlayHeight;
+  set overlayHeight(double value);
   double get overlayX;
   set overlayX(double value);
   double get overlayY;
@@ -43,7 +47,7 @@ mixin _$GlobalConfigModel {
 
   @override
   String toString() {
-    return 'GlobalConfigModel(windowWidth: $windowWidth, windowHeight: $windowHeight, windowX: $windowX, windowY: $windowY, overlayX: $overlayX, overlayY: $overlayY, keyTileData: $keyTileData)';
+    return 'GlobalConfigModel(windowWidth: $windowWidth, windowHeight: $windowHeight, windowX: $windowX, windowY: $windowY, overlayWith: $overlayWith, overlayHeight: $overlayHeight, overlayX: $overlayX, overlayY: $overlayY, keyTileData: $keyTileData)';
   }
 }
 
@@ -58,6 +62,8 @@ abstract mixin class $GlobalConfigModelCopyWith<$Res> {
       double windowHeight,
       double windowX,
       double windowY,
+      double overlayWith,
+      double overlayHeight,
       double overlayX,
       double overlayY,
       List<KeyTileDataModel> keyTileData});
@@ -80,6 +86,8 @@ class _$GlobalConfigModelCopyWithImpl<$Res>
     Object? windowHeight = null,
     Object? windowX = null,
     Object? windowY = null,
+    Object? overlayWith = null,
+    Object? overlayHeight = null,
     Object? overlayX = null,
     Object? overlayY = null,
     Object? keyTileData = null,
@@ -100,6 +108,14 @@ class _$GlobalConfigModelCopyWithImpl<$Res>
       windowY: null == windowY
           ? _self.windowY
           : windowY // ignore: cast_nullable_to_non_nullable
+              as double,
+      overlayWith: null == overlayWith
+          ? _self.overlayWith
+          : overlayWith // ignore: cast_nullable_to_non_nullable
+              as double,
+      overlayHeight: null == overlayHeight
+          ? _self.overlayHeight
+          : overlayHeight // ignore: cast_nullable_to_non_nullable
               as double,
       overlayX: null == overlayX
           ? _self.overlayX
@@ -125,6 +141,8 @@ class _GlobalConfigModel implements GlobalConfigModel {
       required this.windowHeight,
       required this.windowX,
       required this.windowY,
+      required this.overlayWith,
+      required this.overlayHeight,
       required this.overlayX,
       required this.overlayY,
       this.keyTileData = const []});
@@ -139,6 +157,10 @@ class _GlobalConfigModel implements GlobalConfigModel {
   double windowX;
   @override
   double windowY;
+  @override
+  double overlayWith;
+  @override
+  double overlayHeight;
   @override
   double overlayX;
   @override
@@ -164,7 +186,7 @@ class _GlobalConfigModel implements GlobalConfigModel {
 
   @override
   String toString() {
-    return 'GlobalConfigModel(windowWidth: $windowWidth, windowHeight: $windowHeight, windowX: $windowX, windowY: $windowY, overlayX: $overlayX, overlayY: $overlayY, keyTileData: $keyTileData)';
+    return 'GlobalConfigModel(windowWidth: $windowWidth, windowHeight: $windowHeight, windowX: $windowX, windowY: $windowY, overlayWith: $overlayWith, overlayHeight: $overlayHeight, overlayX: $overlayX, overlayY: $overlayY, keyTileData: $keyTileData)';
   }
 }
 
@@ -181,6 +203,8 @@ abstract mixin class _$GlobalConfigModelCopyWith<$Res>
       double windowHeight,
       double windowX,
       double windowY,
+      double overlayWith,
+      double overlayHeight,
       double overlayX,
       double overlayY,
       List<KeyTileDataModel> keyTileData});
@@ -203,6 +227,8 @@ class __$GlobalConfigModelCopyWithImpl<$Res>
     Object? windowHeight = null,
     Object? windowX = null,
     Object? windowY = null,
+    Object? overlayWith = null,
+    Object? overlayHeight = null,
     Object? overlayX = null,
     Object? overlayY = null,
     Object? keyTileData = null,
@@ -223,6 +249,14 @@ class __$GlobalConfigModelCopyWithImpl<$Res>
       windowY: null == windowY
           ? _self.windowY
           : windowY // ignore: cast_nullable_to_non_nullable
+              as double,
+      overlayWith: null == overlayWith
+          ? _self.overlayWith
+          : overlayWith // ignore: cast_nullable_to_non_nullable
+              as double,
+      overlayHeight: null == overlayHeight
+          ? _self.overlayHeight
+          : overlayHeight // ignore: cast_nullable_to_non_nullable
               as double,
       overlayX: null == overlayX
           ? _self.overlayX

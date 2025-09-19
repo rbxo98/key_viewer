@@ -35,23 +35,31 @@ class SettingsViewModel extends StateNotifier<SettingsModel> {
   }
 
   Future<WindowManagerPlus?> showOverlay() async {
-    if (state.window != null) return state.window!;
+    if(state.isOverlayLoading) return null;
+    state = state.copyWith(isOverlayLoading : true);
     final window = await WindowManagerPlus.createWindow(
-      [ jsonEncode(MultiWindowOptionModel(
+      [jsonEncode(MultiWindowOptionModel(
         windowName : "KeyViewerOverlay",
+        windowWidth: state.overlayWidth,
+        windowHeight: state.overlayHeight,
+        windowX: state.globalConfig.overlayX,
+        windowY: state.globalConfig.overlayY,
+        isFrameless: true
       ).toJson())],
     );
-    window?.setBackgroundColor(Color(0x00000000));
-    window?.setSize(Size(state.overlayWidth, state.overlayHeight));
-    window?.setPosition(Offset(state.globalConfig.overlayX, state.globalConfig.overlayY));
-    window?.show();
+    await window?.setSize(Size(state.overlayWidth, state.overlayHeight));
+    await window?.setPosition(Offset(state.globalConfig.overlayX, state.globalConfig.overlayY));
+    await window?.setAsFrameless();
+    await window?.show();
     state = state.copyWith(window: window);
+    await updateOverlayKeyTile();
+    state = state.copyWith(isOverlayLoading : false);
     return window;
   }
 
-  void resizeOverlay() {
+  Future<void> resizeOverlay() async {
     final window = state.window;
-    window?.setSize(Size(state.overlayWidth, state.overlayHeight));
+    await window?.setSize(Size(state.overlayWidth, state.overlayHeight));
     state = state.copyWith(window: window);
   }
 
@@ -91,7 +99,11 @@ class SettingsViewModel extends StateNotifier<SettingsModel> {
     await PrefProvider.instance.setGlobalConfig(state.globalConfig);
   }
 
-  void setEditorSize(Size size) => state = state.copyWith(overlayWidth: size.width, overlayHeight: size.height);
+  Future<void> setEditorSize(Size size) async {
+    state = state.copyWith(overlayWidth: size.width, overlayHeight: size.height)
+        .copyWith.globalConfig(overlayWith: size.width, overlayHeight: size.height);
+    PrefProvider.instance.setGlobalConfig(state.globalConfig);
+  }
 
   Future<void> getGlobalConfig() async {
     final globalConfig = await PrefProvider.instance.getGlobalConfig();
