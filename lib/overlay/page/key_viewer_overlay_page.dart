@@ -65,7 +65,6 @@ class _KeyViewerOverlayPageState extends ConsumerState<KeyViewerOverlayPage> wit
   Widget build(BuildContext context) {
     final state = ref.watch(keyViewerOverlayViewModelProvider);
     WindowManagerPlus.current.getSize().then((size) => print(size));
-    print("mediaquery size : ${MediaQuery.of(context).size}");
     return Listener(
       behavior: HitTestBehavior.translucent,
       onPointerDown: (event) {

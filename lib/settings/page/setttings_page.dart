@@ -6,6 +6,7 @@ import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:key_viewer_v2/core/lib/pref_provider.dart';
 import 'package:key_viewer_v2/core/model/key/key_tile_data_model.dart';
+import 'package:key_viewer_v2/settings/data/preset/djmax/djmax_preset.dart';
 import 'package:key_viewer_v2/settings/page/settings_view_model.dart';
 import 'package:key_viewer_v2/settings/page/widget/key_tile_settings_dialog.dart';
 import 'package:win32/win32.dart';
@@ -112,7 +113,18 @@ class _KeyViewerSettingsPageState extends ConsumerState<KeyViewerSettingsPage> w
                     ],
                   ),
 
-                  DropdownButton(items: [], onChanged: (v){})
+                  DropdownButton(
+                      hint: Text("프리셋 선택"),
+                      items: [
+                        DropdownMenuItem(child: Text("새 프리셋"), value: 0,),
+                        DropdownMenuItem(child: Text("DJ MAX RESPECT V"), value: 1),
+                      ], onChanged: (v){
+                        print(v);
+                        switch(v){
+                          case 0: viewModel.setCurrentKeySet({});
+                          case 1:viewModel.setCurrentKeySet(djmaxPreset.toSet());
+                        }
+                  })
                 ],
               ),
             ),

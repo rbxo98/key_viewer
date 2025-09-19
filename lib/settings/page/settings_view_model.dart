@@ -95,7 +95,7 @@ class SettingsViewModel extends StateNotifier<SettingsModel> {
   }
 
   Future<void> setCurrentKeySet(Set<KeyTileDataModel> keySet) async {
-    state = state.copyWith.globalConfig(keyTileData: keySet.toList());
+    state = state.copyWith.globalConfig(keyTileData: keySet.toList()).copyWith(keyTileData: keySet);
     await PrefProvider.instance.setGlobalConfig(state.globalConfig);
   }
 
