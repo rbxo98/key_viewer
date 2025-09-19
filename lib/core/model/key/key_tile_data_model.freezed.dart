@@ -32,6 +32,8 @@ mixin _$KeyTileDataModel {
   set gh(int value);
   KeyTileStyleModel get style;
   set style(KeyTileStyleModel value);
+  bool get isDeleted;
+  set isDeleted(bool value);
 
   /// Create a copy of KeyTileDataModel
   /// with the given fields replaced by the non-null parameter values.
@@ -46,7 +48,7 @@ mixin _$KeyTileDataModel {
 
   @override
   String toString() {
-    return 'KeyTileDataModel(primaryKey: $primaryKey, key: $key, label: $label, keyCount: $keyCount, gx: $gx, gy: $gy, gw: $gw, gh: $gh, style: $style)';
+    return 'KeyTileDataModel(primaryKey: $primaryKey, key: $key, label: $label, keyCount: $keyCount, gx: $gx, gy: $gy, gw: $gw, gh: $gh, style: $style, isDeleted: $isDeleted)';
   }
 }
 
@@ -65,7 +67,8 @@ abstract mixin class $KeyTileDataModelCopyWith<$Res> {
       int gy,
       int gw,
       int gh,
-      KeyTileStyleModel style});
+      KeyTileStyleModel style,
+      bool isDeleted});
 
   $KeyTileStyleModelCopyWith<$Res> get style;
 }
@@ -92,6 +95,7 @@ class _$KeyTileDataModelCopyWithImpl<$Res>
     Object? gw = null,
     Object? gh = null,
     Object? style = null,
+    Object? isDeleted = null,
   }) {
     return _then(_self.copyWith(
       primaryKey: null == primaryKey
@@ -130,6 +134,10 @@ class _$KeyTileDataModelCopyWithImpl<$Res>
           ? _self.style
           : style // ignore: cast_nullable_to_non_nullable
               as KeyTileStyleModel,
+      isDeleted: null == isDeleted
+          ? _self.isDeleted
+          : isDeleted // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 
@@ -156,7 +164,8 @@ class _KeyTileDataModel implements KeyTileDataModel {
       required this.gy,
       required this.gw,
       required this.gh,
-      required this.style});
+      required this.style,
+      required this.isDeleted});
   factory _KeyTileDataModel.fromJson(Map<String, dynamic> json) =>
       _$KeyTileDataModelFromJson(json);
 
@@ -178,6 +187,8 @@ class _KeyTileDataModel implements KeyTileDataModel {
   int gh;
   @override
   KeyTileStyleModel style;
+  @override
+  bool isDeleted;
 
   /// Create a copy of KeyTileDataModel
   /// with the given fields replaced by the non-null parameter values.
@@ -196,7 +207,7 @@ class _KeyTileDataModel implements KeyTileDataModel {
 
   @override
   String toString() {
-    return 'KeyTileDataModel(primaryKey: $primaryKey, key: $key, label: $label, keyCount: $keyCount, gx: $gx, gy: $gy, gw: $gw, gh: $gh, style: $style)';
+    return 'KeyTileDataModel(primaryKey: $primaryKey, key: $key, label: $label, keyCount: $keyCount, gx: $gx, gy: $gy, gw: $gw, gh: $gh, style: $style, isDeleted: $isDeleted)';
   }
 }
 
@@ -217,7 +228,8 @@ abstract mixin class _$KeyTileDataModelCopyWith<$Res>
       int gy,
       int gw,
       int gh,
-      KeyTileStyleModel style});
+      KeyTileStyleModel style,
+      bool isDeleted});
 
   @override
   $KeyTileStyleModelCopyWith<$Res> get style;
@@ -245,6 +257,7 @@ class __$KeyTileDataModelCopyWithImpl<$Res>
     Object? gw = null,
     Object? gh = null,
     Object? style = null,
+    Object? isDeleted = null,
   }) {
     return _then(_KeyTileDataModel(
       primaryKey: null == primaryKey
@@ -283,6 +296,10 @@ class __$KeyTileDataModelCopyWithImpl<$Res>
           ? _self.style
           : style // ignore: cast_nullable_to_non_nullable
               as KeyTileStyleModel,
+      isDeleted: null == isDeleted
+          ? _self.isDeleted
+          : isDeleted // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 

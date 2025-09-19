@@ -43,6 +43,7 @@ class SettingsViewModel extends StateNotifier<SettingsModel> {
     );
     window?.setBackgroundColor(Color(0x00000000));
     window?.setSize(Size(state.overlayWidth, state.overlayHeight));
+    window?.setPosition(Offset(state.globalConfig.overlayX, state.globalConfig.overlayY));
     window?.show();
     state = state.copyWith(window: window);
     return window;
@@ -76,6 +77,7 @@ class SettingsViewModel extends StateNotifier<SettingsModel> {
   void updateKeyTileData(Set<KeyTileDataModel> data) {
     state = state.copyWith(keyTileData: data);
     updateOverlayKeyTile();
+    setCurrentKeySet(data);
   }
 
   void addKeyTile(KeyTileDataModel model) {
@@ -84,22 +86,37 @@ class SettingsViewModel extends StateNotifier<SettingsModel> {
     updateOverlayKeyTile();
   }
 
+  Future<void> setCurrentKeySet(Set<KeyTileDataModel> keySet) async {
+    state = state.copyWith.globalConfig(keyTileData: keySet.toList());
+    await PrefProvider.instance.setGlobalConfig(state.globalConfig);
+  }
+
   void setEditorSize(Size size) => state = state.copyWith(overlayWidth: size.width, overlayHeight: size.height);
 
   Future<void> getGlobalConfig() async {
-    final globalConfig = await PrefProvider.getGlobalConfig();
-    state = state.copyWith(globalConfig: globalConfig);
+    final globalConfig = await PrefProvider.instance.getGlobalConfig();
+    state = state.copyWith(globalConfig: globalConfig, keyTileData: globalConfig.keyTileData.toSet());
   }
 
   void setWindowSizeConfig({required Size size}) {
-    final globalConfig = state.globalConfig;
-    PrefProvider.setGlobalConfig(globalConfig.copyWith(windowWidth: size.width, windowHeight: size.height));
+    state = state.copyWith.globalConfig(windowWidth: size.width, windowHeight: size.height);
+    PrefProvider.instance.setGlobalConfig(state.globalConfig);
   }
 
 
   void setWindowPositionConfig({required Offset pos}) async  {
-    final globalConfig = state.globalConfig;
-    PrefProvider.setGlobalConfig(globalConfig.copyWith(windowX: pos.dx, windowY: pos.dy));
+    state = state.copyWith.globalConfig(windowX: pos.dx, windowY: pos.dy,);
+    PrefProvider.instance.setGlobalConfig(state.globalConfig);
+  }
+
+  void setOverlayPositionConfig({required Offset pos}) {
+    state = state.copyWith.globalConfig(overlayX: pos.dx, overlayY: pos.dy,);
+    PrefProvider.instance.setGlobalConfig(state.globalConfig);
+  }
+
+  void setWindowSizeLock(bool value) {
+    state = state.copyWith(windowSizeLock: value);
+    WindowManagerPlus.current.setResizable(value);
   }
 
 

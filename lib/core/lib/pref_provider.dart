@@ -7,11 +7,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 class PrefProvider {
   PrefProvider._();
   static final PrefProvider _instance = PrefProvider._();
-  static late final _pref;
+  static late final SharedPreferences _pref;
   static PrefProvider get instance => _instance;
   static bool _isInit = false;
 
-  static const String _CONFIG_KEY = "KR_GAPUR_CONFIG_KEY";
+  static const String _CONFIG_KEY = "KR_GAPUR_GLOBAL_CONFIG_KEY";
 
   static Future<void> init() async {
     if (_isInit) return;
@@ -19,11 +19,16 @@ class PrefProvider {
     _isInit = true;
   }
 
-  static Future<GlobalConfigModel> getGlobalConfig() async {
-    return GlobalConfigModel.fromJson(jsonDecode(_pref.getString(_CONFIG_KEY) ?? "{}"));
+  Future<GlobalConfigModel> getGlobalConfig() async {
+    if(!_pref.containsKey(_CONFIG_KEY)) {
+      final newGlobalConfig = GlobalConfigModel.empty();
+      await setGlobalConfig(newGlobalConfig);
+      return newGlobalConfig;
+    }
+    return GlobalConfigModel.fromJson(jsonDecode(_pref.getString(_CONFIG_KEY)!));
   }
 
-  static Future<void> setGlobalConfig(GlobalConfigModel globalConfig) async {
+  Future<void> setGlobalConfig(GlobalConfigModel globalConfig) async {
     await _pref.setString(_CONFIG_KEY, jsonEncode(globalConfig.toJson()));
   }
 }

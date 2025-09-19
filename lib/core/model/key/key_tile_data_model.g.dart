@@ -17,6 +17,7 @@ _KeyTileDataModel _$KeyTileDataModelFromJson(Map<String, dynamic> json) =>
       gw: (json['gw'] as num).toInt(),
       gh: (json['gh'] as num).toInt(),
       style: KeyTileStyleModel.fromJson(json['style'] as Map<String, dynamic>),
+      isDeleted: json['isDeleted'] as bool,
     );
 
 Map<String, dynamic> _$KeyTileDataModelToJson(_KeyTileDataModel instance) =>
@@ -30,6 +31,7 @@ Map<String, dynamic> _$KeyTileDataModelToJson(_KeyTileDataModel instance) =>
       'gw': instance.gw,
       'gh': instance.gh,
       'style': instance.style,
+      'isDeleted': instance.isDeleted,
     };
 
 _KeyTileStyleModel _$KeyTileStyleModelFromJson(Map<String, dynamic> json) =>

@@ -17,10 +17,11 @@ abstract class KeyTileDataModel with _$KeyTileDataModel {
     required int gw,
     required int gh,
     required KeyTileStyleModel style,
+    required bool isDeleted,
   }) = _KeyTileDataModel;
 
   factory KeyTileDataModel.fromJson(Map<String, dynamic> json) => _$KeyTileDataModelFromJson(json);
-  factory KeyTileDataModel.empty() => KeyTileDataModel(primaryKey: UuidV4().generate(), label: '', key: 0, keyCount: 0, gx: 0, gy: 0, gw: 10, gh: 10, style: KeyTileStyleModel.empty());
+  factory KeyTileDataModel.empty() => KeyTileDataModel(primaryKey: UuidV4().generate(), label: '', key: 0, keyCount: 0, gx: 0, gy: 0, gw: 10, gh: 10, style: KeyTileStyleModel.empty(), isDeleted: false);
 
 }
 

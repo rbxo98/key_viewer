@@ -142,16 +142,15 @@ class _KeyTileSettingDialogState extends State<KeyTileSettingDialog> {
 
   // ───────────────── 저장 ─────────────────
   void _saveAndClose() {
-    final gw = _clampGridValue(_gwCtrl.text);
-    final gh = _clampGridValue(_ghCtrl.text);
-    final label = _nameCtrl.text.trim();
+    Navigator.pop(context, keyTileDataModel);
+  }
 
-    final updated = keyTileDataModel.copyWith(
-      label: label.isEmpty ? keyTileDataModel.label : label,
-      gw: gw,
-      gh: gh,
-    );
-    Navigator.pop(context, updated);
+  void _close() {
+    Navigator.pop(context, widget.keyTileData);
+  }
+
+  void _removeAndClose() {
+    Navigator.pop(context, widget.keyTileData?.copyWith(isDeleted: true));
   }
 
   // ───────────────── 키 매핑: KeyInputMonitor 사용 ─────────────────
@@ -545,7 +544,7 @@ class _KeyTileSettingDialogState extends State<KeyTileSettingDialog> {
                                 value: keyTileDataModel.style.idleKeyFontSize.round(),
                                 onChanged: (v) => setState(() =>
                                 keyTileDataModel = keyTileDataModel.copyWith.style(idleKeyFontSize: v.toDouble())),
-                                min: 6, max: 96, hint: '6~96',
+                                min: 1, max: 96, hint: '1~96',
                               )),
                               const SizedBox(height: 8),
                               _weightDropdown(
@@ -568,7 +567,7 @@ class _KeyTileSettingDialogState extends State<KeyTileSettingDialog> {
                                 value: keyTileDataModel.style.pressedKeyFontSize.round(),
                                 onChanged: (v) => setState(() =>
                                 keyTileDataModel = keyTileDataModel.copyWith.style(pressedKeyFontSize: v.toDouble())),
-                                min: 6, max: 96, hint: '6~96',
+                                min: 1, max: 96, hint: '1~96',
                               )),
                               const SizedBox(height: 8),
                               _weightDropdown(
@@ -592,7 +591,7 @@ class _KeyTileSettingDialogState extends State<KeyTileSettingDialog> {
                                 value: keyTileDataModel.style.idleCounterFontSize.round(),
                                 onChanged: (v) => setState(() =>
                                 keyTileDataModel = keyTileDataModel.copyWith.style(idleCounterFontSize: v.toDouble())),
-                                min: 6, max: 96, hint: '6~96',
+                                min: 1, max: 96, hint: '1~96',
                               )),
                               const SizedBox(height: 8),
                               _weightDropdown(
@@ -615,7 +614,7 @@ class _KeyTileSettingDialogState extends State<KeyTileSettingDialog> {
                                 value: keyTileDataModel.style.pressedCounterFontSize.round(),
                                 onChanged: (v) => setState(() =>
                                 keyTileDataModel = keyTileDataModel.copyWith.style(pressedCounterFontSize: v.toDouble())),
-                                min: 6, max: 96, hint: '6~96',
+                                min: 1, max: 96, hint: '1~96',
                               )),
                               const SizedBox(height: 8),
                               _weightDropdown(
@@ -646,15 +645,34 @@ class _KeyTileSettingDialogState extends State<KeyTileSettingDialog> {
 
                 // 액션
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisAlignment: widget.keyTileData == null ? MainAxisAlignment.end : MainAxisAlignment.spaceBetween,
                   children: [
-                    TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text('취소')),
-                    const SizedBox(width: 8),
-                    FilledButton(
-                        onPressed: _saveAndClose,
-                        child: const Text('저장')),
+                    if(widget.keyTileData != null)
+                    OutlinedButton(
+                        onPressed: _removeAndClose,
+                        style: OutlinedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          side: const BorderSide(color: Colors.red),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.delete_outline, color: Colors.red,),
+                            SizedBox(width: 8,),
+                            const Text('삭제', style: TextStyle(color: Colors.red),),
+                          ],
+                        )),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                            onPressed: () => _close(),
+                            child: const Text('취소')),
+                        const SizedBox(width: 8),
+                        FilledButton(
+                            onPressed: _saveAndClose,
+                            child: const Text('저장')),
+                      ],
+                    ),
                   ],
                 ),
               ],

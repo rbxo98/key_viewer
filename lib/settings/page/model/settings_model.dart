@@ -14,7 +14,15 @@ abstract class SettingsModel with _$SettingsModel {
     required double overlayHeight,
     @Default({})
     Set<KeyTileDataModel> keyTileData,
+    required bool windowSizeLock,
   }) = _SettingsModel;
 
-  factory SettingsModel.empty() => SettingsModel(window: null, overlayWidth: 0, overlayHeight: 0, keyTileData: {}, globalConfig: GlobalConfigModel.empty());
+  factory SettingsModel.empty() => SettingsModel(
+      window: null,
+      overlayWidth: 0,
+      overlayHeight: 0,
+      keyTileData: {},
+      globalConfig: GlobalConfigModel.empty(),
+    windowSizeLock: false,
+  );
 }

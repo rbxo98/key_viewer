@@ -23,6 +23,12 @@ mixin _$GlobalConfigModel {
   set windowX(double value);
   double get windowY;
   set windowY(double value);
+  double get overlayX;
+  set overlayX(double value);
+  double get overlayY;
+  set overlayY(double value);
+  List<KeyTileDataModel> get keyTileData;
+  set keyTileData(List<KeyTileDataModel> value);
 
   /// Create a copy of GlobalConfigModel
   /// with the given fields replaced by the non-null parameter values.
@@ -37,7 +43,7 @@ mixin _$GlobalConfigModel {
 
   @override
   String toString() {
-    return 'GlobalConfigModel(windowWidth: $windowWidth, windowHeight: $windowHeight, windowX: $windowX, windowY: $windowY)';
+    return 'GlobalConfigModel(windowWidth: $windowWidth, windowHeight: $windowHeight, windowX: $windowX, windowY: $windowY, overlayX: $overlayX, overlayY: $overlayY, keyTileData: $keyTileData)';
   }
 }
 
@@ -51,7 +57,10 @@ abstract mixin class $GlobalConfigModelCopyWith<$Res> {
       {double windowWidth,
       double windowHeight,
       double windowX,
-      double windowY});
+      double windowY,
+      double overlayX,
+      double overlayY,
+      List<KeyTileDataModel> keyTileData});
 }
 
 /// @nodoc
@@ -71,6 +80,9 @@ class _$GlobalConfigModelCopyWithImpl<$Res>
     Object? windowHeight = null,
     Object? windowX = null,
     Object? windowY = null,
+    Object? overlayX = null,
+    Object? overlayY = null,
+    Object? keyTileData = null,
   }) {
     return _then(_self.copyWith(
       windowWidth: null == windowWidth
@@ -89,6 +101,18 @@ class _$GlobalConfigModelCopyWithImpl<$Res>
           ? _self.windowY
           : windowY // ignore: cast_nullable_to_non_nullable
               as double,
+      overlayX: null == overlayX
+          ? _self.overlayX
+          : overlayX // ignore: cast_nullable_to_non_nullable
+              as double,
+      overlayY: null == overlayY
+          ? _self.overlayY
+          : overlayY // ignore: cast_nullable_to_non_nullable
+              as double,
+      keyTileData: null == keyTileData
+          ? _self.keyTileData
+          : keyTileData // ignore: cast_nullable_to_non_nullable
+              as List<KeyTileDataModel>,
     ));
   }
 }
@@ -100,7 +124,10 @@ class _GlobalConfigModel implements GlobalConfigModel {
       {required this.windowWidth,
       required this.windowHeight,
       required this.windowX,
-      required this.windowY});
+      required this.windowY,
+      required this.overlayX,
+      required this.overlayY,
+      this.keyTileData = const []});
   factory _GlobalConfigModel.fromJson(Map<String, dynamic> json) =>
       _$GlobalConfigModelFromJson(json);
 
@@ -112,6 +139,13 @@ class _GlobalConfigModel implements GlobalConfigModel {
   double windowX;
   @override
   double windowY;
+  @override
+  double overlayX;
+  @override
+  double overlayY;
+  @override
+  @JsonKey()
+  List<KeyTileDataModel> keyTileData;
 
   /// Create a copy of GlobalConfigModel
   /// with the given fields replaced by the non-null parameter values.
@@ -130,7 +164,7 @@ class _GlobalConfigModel implements GlobalConfigModel {
 
   @override
   String toString() {
-    return 'GlobalConfigModel(windowWidth: $windowWidth, windowHeight: $windowHeight, windowX: $windowX, windowY: $windowY)';
+    return 'GlobalConfigModel(windowWidth: $windowWidth, windowHeight: $windowHeight, windowX: $windowX, windowY: $windowY, overlayX: $overlayX, overlayY: $overlayY, keyTileData: $keyTileData)';
   }
 }
 
@@ -146,7 +180,10 @@ abstract mixin class _$GlobalConfigModelCopyWith<$Res>
       {double windowWidth,
       double windowHeight,
       double windowX,
-      double windowY});
+      double windowY,
+      double overlayX,
+      double overlayY,
+      List<KeyTileDataModel> keyTileData});
 }
 
 /// @nodoc
@@ -166,6 +203,9 @@ class __$GlobalConfigModelCopyWithImpl<$Res>
     Object? windowHeight = null,
     Object? windowX = null,
     Object? windowY = null,
+    Object? overlayX = null,
+    Object? overlayY = null,
+    Object? keyTileData = null,
   }) {
     return _then(_GlobalConfigModel(
       windowWidth: null == windowWidth
@@ -184,6 +224,18 @@ class __$GlobalConfigModelCopyWithImpl<$Res>
           ? _self.windowY
           : windowY // ignore: cast_nullable_to_non_nullable
               as double,
+      overlayX: null == overlayX
+          ? _self.overlayX
+          : overlayX // ignore: cast_nullable_to_non_nullable
+              as double,
+      overlayY: null == overlayY
+          ? _self.overlayY
+          : overlayY // ignore: cast_nullable_to_non_nullable
+              as double,
+      keyTileData: null == keyTileData
+          ? _self.keyTileData
+          : keyTileData // ignore: cast_nullable_to_non_nullable
+              as List<KeyTileDataModel>,
     ));
   }
 }

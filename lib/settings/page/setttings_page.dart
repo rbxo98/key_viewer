@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:desktop_multi_window/desktop_multi_window.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:key_viewer_v2/core/lib/pref_provider.dart';
 import 'package:key_viewer_v2/core/model/key/key_tile_data_model.dart';
@@ -54,32 +55,18 @@ class _KeyViewerSettingsPageState extends ConsumerState<KeyViewerSettingsPage> w
     viewModel.setWindowPositionConfig(pos : pos);
   }
 
-  Widget _numSlider({
-    required String label,
-    required double min,
-    required double max,
-    required double value,
-    int divisions = 100,
-    String suffix = 'px',
-    required ValueChanged<double> onChanged,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(children: [
-          Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
-          const SizedBox(width: 8),
-          Text('${value.toStringAsFixed(0)}$suffix'),
-        ]),
-        Slider(
-          min: min, max: max, divisions: divisions,
-          value: value,
-          label: value.toStringAsFixed(0),
-          onChanged: (v) => setState(() => onChanged(v)),
-        ),
-      ],
-    );
+  @override
+  Future<dynamic> onEventFromWindow(String eventName, int fromWindowId, dynamic arguments) async {
+    switch (eventName) {
+      case "updateOverlayPos": {
+        final arg = arguments as List<dynamic>;
+        final pos = Offset(arg[0] as double, arg[1] as double);
+        viewModel.setOverlayPositionConfig(pos: pos);
+        return true;
+      }
+    }
   }
+
   @override
   Widget build(BuildContext context) {
     final spec = SnapGridSpec(cell: _cell, gap: _gap);
@@ -87,6 +74,11 @@ class _KeyViewerSettingsPageState extends ConsumerState<KeyViewerSettingsPage> w
     return Scaffold(
         body: Column(
           children: [
+            Wrap(
+              children: [
+                DropdownButton(items: [], onChanged: (v){})
+              ],
+            ),
             Expanded(
               child: Stack(
                 children: [
@@ -102,29 +94,73 @@ class _KeyViewerSettingsPageState extends ConsumerState<KeyViewerSettingsPage> w
                     }, pressedKeySet: {},
                   ),
 
-                  Positioned(
-                    bottom: 16,
-                    left: 16,
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        final data = await showDialog<KeyTileDataModel>(
-                            context: context,
-                            builder: (_) => KeyTileSettingDialog(cellPx: _cell, gapPx: _gap,),
-                          barrierDismissible: false
-                        );
-                        print(data);
-                        if(data != null){
-                          viewModel.addKeyTile(data);
-                        }
-                      },
-                      child: Icon(Icons.add),
-                    ),
-                  ),
+
                 ],
               ),
             ),
           ],
-        )
+        ),
+      floatingActionButtonLocation: ExpandableFab.location,
+      floatingActionButton: ExpandableFab(
+        openButtonBuilder: RotateFloatingActionButtonBuilder(
+          child: Icon(Icons.settings),
+          shape: CircleBorder()
+        ),
+      closeButtonBuilder: RotateFloatingActionButtonBuilder(
+        child: Icon(Icons.close),
+      ),
+      type: ExpandableFabType.up,
+      childrenAnimation: ExpandableFabAnimation.none,
+      distance: 70,
+        children: [
+          Row(
+            children: [
+              Text('키 추가'),
+              SizedBox(width: 20),
+              FloatingActionButton(
+                heroTag: null,
+                onPressed: () async {
+                  final data = await showDialog<KeyTileDataModel>(
+                      context: context,
+                      builder: (_) => KeyTileSettingDialog(cellPx: _cell, gapPx: _gap,),
+                      barrierDismissible: false
+                  );
+                  if(data != null){
+                    viewModel.addKeyTile(data);
+                  }
+                },
+                child: Icon(Icons.add),
+              ),
+            ],
+          ),
+        Row(
+          children: [
+            Text('윈도우 사이즈 잠금'),
+            SizedBox(width: 20),
+            FloatingActionButton(
+              heroTag: null,
+              onPressed: () async {
+                viewModel.setWindowSizeLock(!state.windowSizeLock);
+              },
+              child: state.windowSizeLock?Icon(Icons.lock_open):Icon(Icons.lock),
+            ),
+          ],
+        ),
+
+          Row(
+            children: [
+              Text('전역 환경 설정'),
+              SizedBox(width: 20),
+              FloatingActionButton(
+                heroTag: null,
+                onPressed: () async {
+                },
+                child: Icon(Icons.settings_applications),
+              ),
+            ],
+          ),
+      ],
+    ),
     );
   }
 }

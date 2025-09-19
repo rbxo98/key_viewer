@@ -276,8 +276,12 @@ class _GridSnapEditorState extends State<GridSnapEditor> {
                     // ★ 현재 에디터 크기에 맞춰 위치를 즉시 클램프
                     final updated = data.copyWith();
                     _clampGrid(updated, _lastSize);
-
-                    setState(() => _tiles[idx] = updated);
+                    if(!updated.isDeleted) {
+                      setState(() => _tiles[idx] = updated);
+                    }
+                    else {
+                      setState(() => _tiles.removeAt(idx));
+                    }
 
                     final snapshot = _tiles.map((e) => e.copyWith()).toSet();
                     widget.onChanged?.call(snapshot);

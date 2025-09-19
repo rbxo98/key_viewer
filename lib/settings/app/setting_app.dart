@@ -166,8 +166,8 @@ ThemeData settingsDarkTheme() {
 
     filledButtonTheme: FilledButtonThemeData(
       style: ButtonStyle(
-        padding: const MaterialStatePropertyAll(SettingsTokens.btnPad),
-        shape: MaterialStatePropertyAll(
+        padding: const WidgetStatePropertyAll(SettingsTokens.btnPad),
+        shape: WidgetStatePropertyAll(
           RoundedRectangleBorder(borderRadius: BorderRadius.circular(SettingsTokens.rBtn)),
         ),
       ),
@@ -175,12 +175,12 @@ ThemeData settingsDarkTheme() {
 
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: ButtonStyle(
-        foregroundColor: const MaterialStatePropertyAll(SettingsTokens.onSurface),
-        side: MaterialStatePropertyAll(
+        foregroundColor: const WidgetStatePropertyAll(SettingsTokens.onSurface),
+        side: WidgetStatePropertyAll(
           BorderSide(color: Colors.white.withOpacity(SettingsTokens.hairlineOpacity * 2), width: SettingsTokens.hairline),
         ),
-        padding: const MaterialStatePropertyAll(SettingsTokens.btnPad),
-        shape: MaterialStatePropertyAll(
+        padding: const WidgetStatePropertyAll(SettingsTokens.btnPad),
+        shape: WidgetStatePropertyAll(
           RoundedRectangleBorder(borderRadius: BorderRadius.circular(SettingsTokens.rBtn)),
         ),
       ),
@@ -188,41 +188,41 @@ ThemeData settingsDarkTheme() {
 
     textButtonTheme: TextButtonThemeData(
       style: ButtonStyle(
-        foregroundColor: const MaterialStatePropertyAll(SettingsTokens.onSurface),
-        padding: const MaterialStatePropertyAll(SettingsTokens.btnText),
-        shape: MaterialStatePropertyAll(
+        foregroundColor: const WidgetStatePropertyAll(SettingsTokens.onSurface),
+        padding: const WidgetStatePropertyAll(SettingsTokens.btnText),
+        shape: WidgetStatePropertyAll(
           RoundedRectangleBorder(borderRadius: BorderRadius.circular(SettingsTokens.rField)),
         ),
       ),
     ),
 
     switchTheme: SwitchThemeData(
-      trackOutlineColor: const MaterialStatePropertyAll(Colors.transparent),
-      trackColor: MaterialStateProperty.resolveWith((s) =>
-      s.contains(MaterialState.selected)
+      trackOutlineColor: const WidgetStatePropertyAll(Colors.transparent),
+      trackColor: WidgetStateProperty.resolveWith((s) =>
+      s.contains(WidgetState.selected)
           ? SettingsTokens.primary.withOpacity(SettingsTokens.switchTrackSelOpacity)
           : Colors.white.withOpacity(SettingsTokens.hairlineOpacity)),
-      thumbColor: MaterialStateProperty.resolveWith((s) =>
-      s.contains(MaterialState.selected) ? SettingsTokens.primary : Colors.white70),
+      thumbColor: WidgetStateProperty.resolveWith((s) =>
+      s.contains(WidgetState.selected) ? SettingsTokens.primary : Colors.white70),
     ),
 
     checkboxTheme: CheckboxThemeData(
-      fillColor: MaterialStateProperty.resolveWith((s) =>
-      s.contains(MaterialState.selected) ? SettingsTokens.primary : Colors.white.withOpacity(SettingsTokens.checkIdleOpacity)),
+      fillColor: WidgetStateProperty.resolveWith((s) =>
+      s.contains(WidgetState.selected) ? SettingsTokens.primary : Colors.white.withOpacity(SettingsTokens.checkIdleOpacity)),
       side: BorderSide(color: Colors.white.withOpacity(SettingsTokens.hairlineOpacity * 3), width: SettingsTokens.hairline),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
     ),
 
     radioTheme: RadioThemeData(
-      fillColor: MaterialStateProperty.resolveWith((s) =>
-      s.contains(MaterialState.selected) ? SettingsTokens.primary : Colors.white.withOpacity(SettingsTokens.checkIdleOpacity)),
+      fillColor: WidgetStateProperty.resolveWith((s) =>
+      s.contains(WidgetState.selected) ? SettingsTokens.primary : Colors.white.withOpacity(SettingsTokens.checkIdleOpacity)),
     ),
 
     menuTheme: MenuThemeData(
       style: MenuStyle(
-        surfaceTintColor: const MaterialStatePropertyAll(Colors.transparent),
-        backgroundColor: const MaterialStatePropertyAll(SettingsTokens.surface),
-        shape: MaterialStatePropertyAll(
+        surfaceTintColor: const WidgetStatePropertyAll(Colors.transparent),
+        backgroundColor: const WidgetStatePropertyAll(SettingsTokens.surface),
+        shape: WidgetStatePropertyAll(
           RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(SettingsTokens.rCard),
             side: borderSideHairline,

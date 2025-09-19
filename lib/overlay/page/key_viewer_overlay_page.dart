@@ -25,12 +25,14 @@ class _KeyViewerOverlayPageState extends ConsumerState<KeyViewerOverlayPage> wit
   void initState() {
     super.initState();
     WindowManagerPlus.current.addListener(this);
-    viewModel = ref.read(keyViewerOverlayViewModelProvider.notifier);
-    viewModel.setupWindowByGrid();
-    keyInputMonitor.pressedKeys.addListener(() {
-      viewModel.updatePressedKeySet(keyInputMonitor.pressedKeys.value);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      viewModel = ref.read(keyViewerOverlayViewModelProvider.notifier);
+      viewModel.setupWindowByGrid();
+      keyInputMonitor.pressedKeys.addListener(() {
+        viewModel.updatePressedKeySet(keyInputMonitor.pressedKeys.value);
+      });
+      keyInputMonitor.start();
     });
-    keyInputMonitor.start();
   }
 
   @override
@@ -41,7 +43,6 @@ class _KeyViewerOverlayPageState extends ConsumerState<KeyViewerOverlayPage> wit
 
   @override
   Future<dynamic> onEventFromWindow(String eventName, int fromWindowId, dynamic arguments) async {
-    print(eventName);
     switch (eventName) {
       case "updateKeyTile": {
         viewModel.updateOverlayKeyTile(arguments);
@@ -51,9 +52,14 @@ class _KeyViewerOverlayPageState extends ConsumerState<KeyViewerOverlayPage> wit
   }
 
   @override
+  void onWindowMove([int? windowId]) async {
+    final pos = await WindowManagerPlus.current.getPosition();
+    WindowManagerPlus.current.invokeMethodToWindow(0, "updateOverlayPos", [pos.dx, pos.dy]);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final state = ref.watch(keyViewerOverlayViewModelProvider);
-    print(state);
     return Listener(
       behavior: HitTestBehavior.translucent,
       onPointerDown: (event) {
