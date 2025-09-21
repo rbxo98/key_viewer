@@ -2,6 +2,7 @@
 import 'dart:convert';
 
 import 'package:key_viewer_v2/core/model/config/config_model.dart';
+import 'package:key_viewer_v2/core/model/key/key_tile_data_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PrefProvider {

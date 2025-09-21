@@ -8,23 +8,31 @@ part of 'config_model.dart';
 
 _GlobalConfigModel _$GlobalConfigModelFromJson(Map<String, dynamic> json) =>
     _GlobalConfigModel(
-      windowWidth: (json['windowWidth'] as num).toDouble(),
-      windowHeight: (json['windowHeight'] as num).toDouble(),
-      windowX: (json['windowX'] as num).toDouble(),
-      windowY: (json['windowY'] as num).toDouble(),
-      overlayWith: (json['overlayWith'] as num).toDouble(),
-      overlayHeight: (json['overlayHeight'] as num).toDouble(),
-      overlayX: (json['overlayX'] as num).toDouble(),
-      overlayY: (json['overlayY'] as num).toDouble(),
-      isWindowSizeLock: json['isWindowSizeLock'],
-      keyTileData: (json['keyTileData'] as List<dynamic>?)
-              ?.map((e) => KeyTileDataModel.fromJson(e as Map<String, dynamic>))
+      presetList: (json['presetList'] as List<dynamic>?)
+              ?.map((e) => PresetModel.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
+      currentPresetName: json['currentPresetName'] as String?,
+      windowWidth: (json['windowWidth'] as num?)?.toDouble() ?? 600,
+      windowHeight: (json['windowHeight'] as num?)?.toDouble() ?? 600,
+      windowX: (json['windowX'] as num?)?.toDouble() ?? 0,
+      windowY: (json['windowY'] as num?)?.toDouble() ?? 0,
+      overlayWith: (json['overlayWith'] as num?)?.toDouble() ?? 600,
+      overlayHeight: (json['overlayHeight'] as num?)?.toDouble() ?? 600,
+      overlayX: (json['overlayX'] as num?)?.toDouble() ?? 0,
+      overlayY: (json['overlayY'] as num?)?.toDouble() ?? 0,
+      isWindowSizeLock: json['isWindowSizeLock'] ?? 0,
+      showDJMAXPreset: json['showDJMAXPreset'] as bool? ?? true,
+      showCommon4KPreset: json['showCommon4KPreset'] as bool? ?? true,
+      showCommon7KPreset: json['showCommon7KPreset'] as bool? ?? true,
+      showMuseDashPreset: json['showMuseDashPreset'] as bool? ?? true,
+      showSixtaGatePreset: json['showSixtaGatePreset'] as bool? ?? true,
     );
 
 Map<String, dynamic> _$GlobalConfigModelToJson(_GlobalConfigModel instance) =>
     <String, dynamic>{
+      'presetList': instance.presetList,
+      'currentPresetName': instance.currentPresetName,
       'windowWidth': instance.windowWidth,
       'windowHeight': instance.windowHeight,
       'windowX': instance.windowX,
@@ -34,5 +42,9 @@ Map<String, dynamic> _$GlobalConfigModelToJson(_GlobalConfigModel instance) =>
       'overlayX': instance.overlayX,
       'overlayY': instance.overlayY,
       'isWindowSizeLock': instance.isWindowSizeLock,
-      'keyTileData': instance.keyTileData,
+      'showDJMAXPreset': instance.showDJMAXPreset,
+      'showCommon4KPreset': instance.showCommon4KPreset,
+      'showCommon7KPreset': instance.showCommon7KPreset,
+      'showMuseDashPreset': instance.showMuseDashPreset,
+      'showSixtaGatePreset': instance.showSixtaGatePreset,
     };

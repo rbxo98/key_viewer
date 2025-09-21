@@ -20,7 +20,6 @@ class KeyViewerOverlayPage extends ConsumerStatefulWidget {
 
 class _KeyViewerOverlayPageState extends ConsumerState<KeyViewerOverlayPage> with WindowListener {
   late final KeyViewerOverlayViewModel viewModel;
-  final KeyInputMonitor keyInputMonitor = KeyInputMonitor();
   bool _windowReady = false;
   @override
   void initState() {
@@ -29,10 +28,6 @@ class _KeyViewerOverlayPageState extends ConsumerState<KeyViewerOverlayPage> wit
     WindowManagerPlus.current.addListener(this);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await WindowManagerPlus.current.waitUntilReadyToShow().then((value) {_windowReady = true;});
-      keyInputMonitor.pressedKeys.addListener(() {
-        viewModel.updatePressedKeySet(keyInputMonitor.pressedKeys.value);
-      });
-      keyInputMonitor.start();
     });
   }
 
@@ -64,7 +59,6 @@ class _KeyViewerOverlayPageState extends ConsumerState<KeyViewerOverlayPage> wit
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(keyViewerOverlayViewModelProvider);
-    WindowManagerPlus.current.getSize().then((size) => print(size));
     return Listener(
       behavior: HitTestBehavior.translucent,
       onPointerDown: (event) {
@@ -75,7 +69,7 @@ class _KeyViewerOverlayPageState extends ConsumerState<KeyViewerOverlayPage> wit
         }
       },
       child: Scaffold(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.black.withAlpha(1),
         body: Column(
           children: [
             Expanded(
@@ -85,6 +79,7 @@ class _KeyViewerOverlayPageState extends ConsumerState<KeyViewerOverlayPage> wit
                   pressedKeySet: state.pressedKeySet,
                 showBackground: false,
                 isEditor: false,
+                showKeyCount: true,
               ),
             ),
           ],

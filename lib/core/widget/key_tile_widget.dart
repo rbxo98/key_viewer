@@ -4,10 +4,12 @@ import 'package:key_viewer_v2/core/model/key/key_tile_data_model.dart';
 class KeyTile extends StatelessWidget {
   final bool pressed;
   final KeyTileDataModel keyTileDataModel;
+  final bool showKeyCount;
   KeyTile({
     super.key,
     required this.keyTileDataModel,
     required this.pressed,
+    required this.showKeyCount,
   });
 
   @override
@@ -36,6 +38,7 @@ class KeyTile extends StatelessWidget {
                 fontSize: pressed ? keyTileDataModel.style.pressedKeyFontSize : keyTileDataModel.style.idleKeyFontSize,
               ),
             ),
+            if(showKeyCount)
             Text(
               "${keyTileDataModel.keyCount}",
               style: TextStyle(

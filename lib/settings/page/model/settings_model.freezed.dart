@@ -19,7 +19,9 @@ mixin _$SettingsModel {
   GlobalConfigModel get globalConfig;
   double get overlayWidth;
   double get overlayHeight;
-  Set<KeyTileDataModel> get keyTileData;
+  List<PresetModel> get presetList;
+  PresetModel get currentPreset;
+  Set<int> get pressedKeySet;
   bool get windowSizeLock;
   bool get isOverlayLoading;
   double get cell;
@@ -46,7 +48,11 @@ mixin _$SettingsModel {
             (identical(other.overlayHeight, overlayHeight) ||
                 other.overlayHeight == overlayHeight) &&
             const DeepCollectionEquality()
-                .equals(other.keyTileData, keyTileData) &&
+                .equals(other.presetList, presetList) &&
+            (identical(other.currentPreset, currentPreset) ||
+                other.currentPreset == currentPreset) &&
+            const DeepCollectionEquality()
+                .equals(other.pressedKeySet, pressedKeySet) &&
             (identical(other.windowSizeLock, windowSizeLock) ||
                 other.windowSizeLock == windowSizeLock) &&
             (identical(other.isOverlayLoading, isOverlayLoading) ||
@@ -62,7 +68,9 @@ mixin _$SettingsModel {
       globalConfig,
       overlayWidth,
       overlayHeight,
-      const DeepCollectionEquality().hash(keyTileData),
+      const DeepCollectionEquality().hash(presetList),
+      currentPreset,
+      const DeepCollectionEquality().hash(pressedKeySet),
       windowSizeLock,
       isOverlayLoading,
       cell,
@@ -70,7 +78,7 @@ mixin _$SettingsModel {
 
   @override
   String toString() {
-    return 'SettingsModel(window: $window, globalConfig: $globalConfig, overlayWidth: $overlayWidth, overlayHeight: $overlayHeight, keyTileData: $keyTileData, windowSizeLock: $windowSizeLock, isOverlayLoading: $isOverlayLoading, cell: $cell, gap: $gap)';
+    return 'SettingsModel(window: $window, globalConfig: $globalConfig, overlayWidth: $overlayWidth, overlayHeight: $overlayHeight, presetList: $presetList, currentPreset: $currentPreset, pressedKeySet: $pressedKeySet, windowSizeLock: $windowSizeLock, isOverlayLoading: $isOverlayLoading, cell: $cell, gap: $gap)';
   }
 }
 
@@ -85,13 +93,16 @@ abstract mixin class $SettingsModelCopyWith<$Res> {
       GlobalConfigModel globalConfig,
       double overlayWidth,
       double overlayHeight,
-      Set<KeyTileDataModel> keyTileData,
+      List<PresetModel> presetList,
+      PresetModel currentPreset,
+      Set<int> pressedKeySet,
       bool windowSizeLock,
       bool isOverlayLoading,
       double cell,
       double gap});
 
   $GlobalConfigModelCopyWith<$Res> get globalConfig;
+  $PresetModelCopyWith<$Res> get currentPreset;
 }
 
 /// @nodoc
@@ -111,7 +122,9 @@ class _$SettingsModelCopyWithImpl<$Res>
     Object? globalConfig = null,
     Object? overlayWidth = null,
     Object? overlayHeight = null,
-    Object? keyTileData = null,
+    Object? presetList = null,
+    Object? currentPreset = null,
+    Object? pressedKeySet = null,
     Object? windowSizeLock = null,
     Object? isOverlayLoading = null,
     Object? cell = null,
@@ -134,10 +147,18 @@ class _$SettingsModelCopyWithImpl<$Res>
           ? _self.overlayHeight
           : overlayHeight // ignore: cast_nullable_to_non_nullable
               as double,
-      keyTileData: null == keyTileData
-          ? _self.keyTileData
-          : keyTileData // ignore: cast_nullable_to_non_nullable
-              as Set<KeyTileDataModel>,
+      presetList: null == presetList
+          ? _self.presetList
+          : presetList // ignore: cast_nullable_to_non_nullable
+              as List<PresetModel>,
+      currentPreset: null == currentPreset
+          ? _self.currentPreset
+          : currentPreset // ignore: cast_nullable_to_non_nullable
+              as PresetModel,
+      pressedKeySet: null == pressedKeySet
+          ? _self.pressedKeySet
+          : pressedKeySet // ignore: cast_nullable_to_non_nullable
+              as Set<int>,
       windowSizeLock: null == windowSizeLock
           ? _self.windowSizeLock
           : windowSizeLock // ignore: cast_nullable_to_non_nullable
@@ -166,6 +187,16 @@ class _$SettingsModelCopyWithImpl<$Res>
       return _then(_self.copyWith(globalConfig: value));
     });
   }
+
+  /// Create a copy of SettingsModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $PresetModelCopyWith<$Res> get currentPreset {
+    return $PresetModelCopyWith<$Res>(_self.currentPreset, (value) {
+      return _then(_self.copyWith(currentPreset: value));
+    });
+  }
 }
 
 /// @nodoc
@@ -176,12 +207,15 @@ class _SettingsModel implements SettingsModel {
       required this.globalConfig,
       required this.overlayWidth,
       required this.overlayHeight,
-      final Set<KeyTileDataModel> keyTileData = const {},
+      final List<PresetModel> presetList = const [],
+      required this.currentPreset,
+      final Set<int> pressedKeySet = const {},
       required this.windowSizeLock,
       required this.isOverlayLoading,
       required this.cell,
       required this.gap})
-      : _keyTileData = keyTileData;
+      : _presetList = presetList,
+        _pressedKeySet = pressedKeySet;
 
   @override
   final WindowManagerPlus? window;
@@ -191,13 +225,24 @@ class _SettingsModel implements SettingsModel {
   final double overlayWidth;
   @override
   final double overlayHeight;
-  final Set<KeyTileDataModel> _keyTileData;
+  final List<PresetModel> _presetList;
   @override
   @JsonKey()
-  Set<KeyTileDataModel> get keyTileData {
-    if (_keyTileData is EqualUnmodifiableSetView) return _keyTileData;
+  List<PresetModel> get presetList {
+    if (_presetList is EqualUnmodifiableListView) return _presetList;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableSetView(_keyTileData);
+    return EqualUnmodifiableListView(_presetList);
+  }
+
+  @override
+  final PresetModel currentPreset;
+  final Set<int> _pressedKeySet;
+  @override
+  @JsonKey()
+  Set<int> get pressedKeySet {
+    if (_pressedKeySet is EqualUnmodifiableSetView) return _pressedKeySet;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableSetView(_pressedKeySet);
   }
 
   @override
@@ -230,7 +275,11 @@ class _SettingsModel implements SettingsModel {
             (identical(other.overlayHeight, overlayHeight) ||
                 other.overlayHeight == overlayHeight) &&
             const DeepCollectionEquality()
-                .equals(other._keyTileData, _keyTileData) &&
+                .equals(other._presetList, _presetList) &&
+            (identical(other.currentPreset, currentPreset) ||
+                other.currentPreset == currentPreset) &&
+            const DeepCollectionEquality()
+                .equals(other._pressedKeySet, _pressedKeySet) &&
             (identical(other.windowSizeLock, windowSizeLock) ||
                 other.windowSizeLock == windowSizeLock) &&
             (identical(other.isOverlayLoading, isOverlayLoading) ||
@@ -246,7 +295,9 @@ class _SettingsModel implements SettingsModel {
       globalConfig,
       overlayWidth,
       overlayHeight,
-      const DeepCollectionEquality().hash(_keyTileData),
+      const DeepCollectionEquality().hash(_presetList),
+      currentPreset,
+      const DeepCollectionEquality().hash(_pressedKeySet),
       windowSizeLock,
       isOverlayLoading,
       cell,
@@ -254,7 +305,7 @@ class _SettingsModel implements SettingsModel {
 
   @override
   String toString() {
-    return 'SettingsModel(window: $window, globalConfig: $globalConfig, overlayWidth: $overlayWidth, overlayHeight: $overlayHeight, keyTileData: $keyTileData, windowSizeLock: $windowSizeLock, isOverlayLoading: $isOverlayLoading, cell: $cell, gap: $gap)';
+    return 'SettingsModel(window: $window, globalConfig: $globalConfig, overlayWidth: $overlayWidth, overlayHeight: $overlayHeight, presetList: $presetList, currentPreset: $currentPreset, pressedKeySet: $pressedKeySet, windowSizeLock: $windowSizeLock, isOverlayLoading: $isOverlayLoading, cell: $cell, gap: $gap)';
   }
 }
 
@@ -271,7 +322,9 @@ abstract mixin class _$SettingsModelCopyWith<$Res>
       GlobalConfigModel globalConfig,
       double overlayWidth,
       double overlayHeight,
-      Set<KeyTileDataModel> keyTileData,
+      List<PresetModel> presetList,
+      PresetModel currentPreset,
+      Set<int> pressedKeySet,
       bool windowSizeLock,
       bool isOverlayLoading,
       double cell,
@@ -279,6 +332,8 @@ abstract mixin class _$SettingsModelCopyWith<$Res>
 
   @override
   $GlobalConfigModelCopyWith<$Res> get globalConfig;
+  @override
+  $PresetModelCopyWith<$Res> get currentPreset;
 }
 
 /// @nodoc
@@ -298,7 +353,9 @@ class __$SettingsModelCopyWithImpl<$Res>
     Object? globalConfig = null,
     Object? overlayWidth = null,
     Object? overlayHeight = null,
-    Object? keyTileData = null,
+    Object? presetList = null,
+    Object? currentPreset = null,
+    Object? pressedKeySet = null,
     Object? windowSizeLock = null,
     Object? isOverlayLoading = null,
     Object? cell = null,
@@ -321,10 +378,18 @@ class __$SettingsModelCopyWithImpl<$Res>
           ? _self.overlayHeight
           : overlayHeight // ignore: cast_nullable_to_non_nullable
               as double,
-      keyTileData: null == keyTileData
-          ? _self._keyTileData
-          : keyTileData // ignore: cast_nullable_to_non_nullable
-              as Set<KeyTileDataModel>,
+      presetList: null == presetList
+          ? _self._presetList
+          : presetList // ignore: cast_nullable_to_non_nullable
+              as List<PresetModel>,
+      currentPreset: null == currentPreset
+          ? _self.currentPreset
+          : currentPreset // ignore: cast_nullable_to_non_nullable
+              as PresetModel,
+      pressedKeySet: null == pressedKeySet
+          ? _self._pressedKeySet
+          : pressedKeySet // ignore: cast_nullable_to_non_nullable
+              as Set<int>,
       windowSizeLock: null == windowSizeLock
           ? _self.windowSizeLock
           : windowSizeLock // ignore: cast_nullable_to_non_nullable
@@ -351,6 +416,16 @@ class __$SettingsModelCopyWithImpl<$Res>
   $GlobalConfigModelCopyWith<$Res> get globalConfig {
     return $GlobalConfigModelCopyWith<$Res>(_self.globalConfig, (value) {
       return _then(_self.copyWith(globalConfig: value));
+    });
+  }
+
+  /// Create a copy of SettingsModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $PresetModelCopyWith<$Res> get currentPreset {
+    return $PresetModelCopyWith<$Res>(_self.currentPreset, (value) {
+      return _then(_self.copyWith(currentPreset: value));
     });
   }
 }

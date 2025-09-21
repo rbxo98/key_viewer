@@ -722,6 +722,7 @@ class _PreviewBox extends StatelessWidget {
                 child: KeyTile(
                   pressed: pressed,
                   keyTileDataModel: model,
+                  showKeyCount: true,
                 ),
               ),
             ),
@@ -747,7 +748,7 @@ class _PreviewBox extends StatelessWidget {
               fit: BoxFit.contain,
               child: KeyTile(
                 pressed: pressed,
-                keyTileDataModel: model,
+                keyTileDataModel: model, showKeyCount: true,
               ),
             ),
           ),

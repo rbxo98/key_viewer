@@ -15,9 +15,10 @@ T _$identity<T>(T value) => value;
 
 /// @nodoc
 mixin _$PresetModel {
-  double get windowWidth;
-  double get windowHeight;
-  List<KeyTileDataModel> get keyTileData;
+  String get presetName;
+  int get switchKey;
+  List<KeyTileDataGroupModel> get keyTileDataGroup;
+  int get currentGroupIdx;
 
   /// Create a copy of PresetModel
   /// with the given fields replaced by the non-null parameter values.
@@ -34,22 +35,24 @@ mixin _$PresetModel {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is PresetModel &&
-            (identical(other.windowWidth, windowWidth) ||
-                other.windowWidth == windowWidth) &&
-            (identical(other.windowHeight, windowHeight) ||
-                other.windowHeight == windowHeight) &&
+            (identical(other.presetName, presetName) ||
+                other.presetName == presetName) &&
+            (identical(other.switchKey, switchKey) ||
+                other.switchKey == switchKey) &&
             const DeepCollectionEquality()
-                .equals(other.keyTileData, keyTileData));
+                .equals(other.keyTileDataGroup, keyTileDataGroup) &&
+            (identical(other.currentGroupIdx, currentGroupIdx) ||
+                other.currentGroupIdx == currentGroupIdx));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, windowWidth, windowHeight,
-      const DeepCollectionEquality().hash(keyTileData));
+  int get hashCode => Object.hash(runtimeType, presetName, switchKey,
+      const DeepCollectionEquality().hash(keyTileDataGroup), currentGroupIdx);
 
   @override
   String toString() {
-    return 'PresetModel(windowWidth: $windowWidth, windowHeight: $windowHeight, keyTileData: $keyTileData)';
+    return 'PresetModel(presetName: $presetName, switchKey: $switchKey, keyTileDataGroup: $keyTileDataGroup, currentGroupIdx: $currentGroupIdx)';
   }
 }
 
@@ -60,9 +63,10 @@ abstract mixin class $PresetModelCopyWith<$Res> {
       _$PresetModelCopyWithImpl;
   @useResult
   $Res call(
-      {double windowWidth,
-      double windowHeight,
-      List<KeyTileDataModel> keyTileData});
+      {String presetName,
+      int switchKey,
+      List<KeyTileDataGroupModel> keyTileDataGroup,
+      int currentGroupIdx});
 }
 
 /// @nodoc
@@ -77,50 +81,63 @@ class _$PresetModelCopyWithImpl<$Res> implements $PresetModelCopyWith<$Res> {
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? windowWidth = null,
-    Object? windowHeight = null,
-    Object? keyTileData = null,
+    Object? presetName = null,
+    Object? switchKey = null,
+    Object? keyTileDataGroup = null,
+    Object? currentGroupIdx = null,
   }) {
     return _then(_self.copyWith(
-      windowWidth: null == windowWidth
-          ? _self.windowWidth
-          : windowWidth // ignore: cast_nullable_to_non_nullable
-              as double,
-      windowHeight: null == windowHeight
-          ? _self.windowHeight
-          : windowHeight // ignore: cast_nullable_to_non_nullable
-              as double,
-      keyTileData: null == keyTileData
-          ? _self.keyTileData
-          : keyTileData // ignore: cast_nullable_to_non_nullable
-              as List<KeyTileDataModel>,
+      presetName: null == presetName
+          ? _self.presetName
+          : presetName // ignore: cast_nullable_to_non_nullable
+              as String,
+      switchKey: null == switchKey
+          ? _self.switchKey
+          : switchKey // ignore: cast_nullable_to_non_nullable
+              as int,
+      keyTileDataGroup: null == keyTileDataGroup
+          ? _self.keyTileDataGroup
+          : keyTileDataGroup // ignore: cast_nullable_to_non_nullable
+              as List<KeyTileDataGroupModel>,
+      currentGroupIdx: null == currentGroupIdx
+          ? _self.currentGroupIdx
+          : currentGroupIdx // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _PresetModel implements PresetModel {
+class _PresetModel extends PresetModel {
   _PresetModel(
-      {required this.windowWidth,
-      required this.windowHeight,
-      final List<KeyTileDataModel> keyTileData = const []})
-      : _keyTileData = keyTileData;
+      {required this.presetName,
+      this.switchKey = VIRTUAL_KEY.VK_TAB,
+      final List<KeyTileDataGroupModel> keyTileDataGroup = const [],
+      this.currentGroupIdx = 0})
+      : _keyTileDataGroup = keyTileDataGroup,
+        super._();
   factory _PresetModel.fromJson(Map<String, dynamic> json) =>
       _$PresetModelFromJson(json);
 
   @override
-  final double windowWidth;
-  @override
-  final double windowHeight;
-  final List<KeyTileDataModel> _keyTileData;
+  final String presetName;
   @override
   @JsonKey()
-  List<KeyTileDataModel> get keyTileData {
-    if (_keyTileData is EqualUnmodifiableListView) return _keyTileData;
+  final int switchKey;
+  final List<KeyTileDataGroupModel> _keyTileDataGroup;
+  @override
+  @JsonKey()
+  List<KeyTileDataGroupModel> get keyTileDataGroup {
+    if (_keyTileDataGroup is EqualUnmodifiableListView)
+      return _keyTileDataGroup;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_keyTileData);
+    return EqualUnmodifiableListView(_keyTileDataGroup);
   }
+
+  @override
+  @JsonKey()
+  final int currentGroupIdx;
 
   /// Create a copy of PresetModel
   /// with the given fields replaced by the non-null parameter values.
@@ -142,22 +159,24 @@ class _PresetModel implements PresetModel {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _PresetModel &&
-            (identical(other.windowWidth, windowWidth) ||
-                other.windowWidth == windowWidth) &&
-            (identical(other.windowHeight, windowHeight) ||
-                other.windowHeight == windowHeight) &&
+            (identical(other.presetName, presetName) ||
+                other.presetName == presetName) &&
+            (identical(other.switchKey, switchKey) ||
+                other.switchKey == switchKey) &&
             const DeepCollectionEquality()
-                .equals(other._keyTileData, _keyTileData));
+                .equals(other._keyTileDataGroup, _keyTileDataGroup) &&
+            (identical(other.currentGroupIdx, currentGroupIdx) ||
+                other.currentGroupIdx == currentGroupIdx));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, windowWidth, windowHeight,
-      const DeepCollectionEquality().hash(_keyTileData));
+  int get hashCode => Object.hash(runtimeType, presetName, switchKey,
+      const DeepCollectionEquality().hash(_keyTileDataGroup), currentGroupIdx);
 
   @override
   String toString() {
-    return 'PresetModel(windowWidth: $windowWidth, windowHeight: $windowHeight, keyTileData: $keyTileData)';
+    return 'PresetModel(presetName: $presetName, switchKey: $switchKey, keyTileDataGroup: $keyTileDataGroup, currentGroupIdx: $currentGroupIdx)';
   }
 }
 
@@ -170,9 +189,10 @@ abstract mixin class _$PresetModelCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {double windowWidth,
-      double windowHeight,
-      List<KeyTileDataModel> keyTileData});
+      {String presetName,
+      int switchKey,
+      List<KeyTileDataGroupModel> keyTileDataGroup,
+      int currentGroupIdx});
 }
 
 /// @nodoc
@@ -187,19 +207,197 @@ class __$PresetModelCopyWithImpl<$Res> implements _$PresetModelCopyWith<$Res> {
   @override
   @pragma('vm:prefer-inline')
   $Res call({
-    Object? windowWidth = null,
-    Object? windowHeight = null,
-    Object? keyTileData = null,
+    Object? presetName = null,
+    Object? switchKey = null,
+    Object? keyTileDataGroup = null,
+    Object? currentGroupIdx = null,
   }) {
     return _then(_PresetModel(
-      windowWidth: null == windowWidth
-          ? _self.windowWidth
-          : windowWidth // ignore: cast_nullable_to_non_nullable
-              as double,
-      windowHeight: null == windowHeight
-          ? _self.windowHeight
-          : windowHeight // ignore: cast_nullable_to_non_nullable
-              as double,
+      presetName: null == presetName
+          ? _self.presetName
+          : presetName // ignore: cast_nullable_to_non_nullable
+              as String,
+      switchKey: null == switchKey
+          ? _self.switchKey
+          : switchKey // ignore: cast_nullable_to_non_nullable
+              as int,
+      keyTileDataGroup: null == keyTileDataGroup
+          ? _self._keyTileDataGroup
+          : keyTileDataGroup // ignore: cast_nullable_to_non_nullable
+              as List<KeyTileDataGroupModel>,
+      currentGroupIdx: null == currentGroupIdx
+          ? _self.currentGroupIdx
+          : currentGroupIdx // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// @nodoc
+mixin _$KeyTileDataGroupModel {
+  String get name;
+  List<KeyTileDataModel> get keyTileData;
+
+  /// Create a copy of KeyTileDataGroupModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $KeyTileDataGroupModelCopyWith<KeyTileDataGroupModel> get copyWith =>
+      _$KeyTileDataGroupModelCopyWithImpl<KeyTileDataGroupModel>(
+          this as KeyTileDataGroupModel, _$identity);
+
+  /// Serializes this KeyTileDataGroupModel to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is KeyTileDataGroupModel &&
+            (identical(other.name, name) || other.name == name) &&
+            const DeepCollectionEquality()
+                .equals(other.keyTileData, keyTileData));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, name, const DeepCollectionEquality().hash(keyTileData));
+
+  @override
+  String toString() {
+    return 'KeyTileDataGroupModel(name: $name, keyTileData: $keyTileData)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $KeyTileDataGroupModelCopyWith<$Res> {
+  factory $KeyTileDataGroupModelCopyWith(KeyTileDataGroupModel value,
+          $Res Function(KeyTileDataGroupModel) _then) =
+      _$KeyTileDataGroupModelCopyWithImpl;
+  @useResult
+  $Res call({String name, List<KeyTileDataModel> keyTileData});
+}
+
+/// @nodoc
+class _$KeyTileDataGroupModelCopyWithImpl<$Res>
+    implements $KeyTileDataGroupModelCopyWith<$Res> {
+  _$KeyTileDataGroupModelCopyWithImpl(this._self, this._then);
+
+  final KeyTileDataGroupModel _self;
+  final $Res Function(KeyTileDataGroupModel) _then;
+
+  /// Create a copy of KeyTileDataGroupModel
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? name = null,
+    Object? keyTileData = null,
+  }) {
+    return _then(_self.copyWith(
+      name: null == name
+          ? _self.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      keyTileData: null == keyTileData
+          ? _self.keyTileData
+          : keyTileData // ignore: cast_nullable_to_non_nullable
+              as List<KeyTileDataModel>,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _KeyTileDataGroupModel extends KeyTileDataGroupModel {
+  _KeyTileDataGroupModel(
+      {required this.name, final List<KeyTileDataModel> keyTileData = const []})
+      : _keyTileData = keyTileData,
+        super._();
+  factory _KeyTileDataGroupModel.fromJson(Map<String, dynamic> json) =>
+      _$KeyTileDataGroupModelFromJson(json);
+
+  @override
+  final String name;
+  final List<KeyTileDataModel> _keyTileData;
+  @override
+  @JsonKey()
+  List<KeyTileDataModel> get keyTileData {
+    if (_keyTileData is EqualUnmodifiableListView) return _keyTileData;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_keyTileData);
+  }
+
+  /// Create a copy of KeyTileDataGroupModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$KeyTileDataGroupModelCopyWith<_KeyTileDataGroupModel> get copyWith =>
+      __$KeyTileDataGroupModelCopyWithImpl<_KeyTileDataGroupModel>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$KeyTileDataGroupModelToJson(
+      this,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _KeyTileDataGroupModel &&
+            (identical(other.name, name) || other.name == name) &&
+            const DeepCollectionEquality()
+                .equals(other._keyTileData, _keyTileData));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, name, const DeepCollectionEquality().hash(_keyTileData));
+
+  @override
+  String toString() {
+    return 'KeyTileDataGroupModel(name: $name, keyTileData: $keyTileData)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$KeyTileDataGroupModelCopyWith<$Res>
+    implements $KeyTileDataGroupModelCopyWith<$Res> {
+  factory _$KeyTileDataGroupModelCopyWith(_KeyTileDataGroupModel value,
+          $Res Function(_KeyTileDataGroupModel) _then) =
+      __$KeyTileDataGroupModelCopyWithImpl;
+  @override
+  @useResult
+  $Res call({String name, List<KeyTileDataModel> keyTileData});
+}
+
+/// @nodoc
+class __$KeyTileDataGroupModelCopyWithImpl<$Res>
+    implements _$KeyTileDataGroupModelCopyWith<$Res> {
+  __$KeyTileDataGroupModelCopyWithImpl(this._self, this._then);
+
+  final _KeyTileDataGroupModel _self;
+  final $Res Function(_KeyTileDataGroupModel) _then;
+
+  /// Create a copy of KeyTileDataGroupModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? name = null,
+    Object? keyTileData = null,
+  }) {
+    return _then(_KeyTileDataGroupModel(
+      name: null == name
+          ? _self.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
       keyTileData: null == keyTileData
           ? _self._keyTileData
           : keyTileData // ignore: cast_nullable_to_non_nullable

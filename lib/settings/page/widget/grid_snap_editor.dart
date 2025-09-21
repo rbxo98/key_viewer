@@ -67,6 +67,8 @@ class GridSnapEditor extends StatefulWidget {
 
   final double historyBandPx;
 
+  final bool showKeyCount;
+
   const GridSnapEditor({
     super.key,
     this.areaSize,
@@ -83,6 +85,7 @@ class GridSnapEditor extends StatefulWidget {
     this.gridLineColor = Colors.white,
     this.gridLineOpacity = 0.06,
     this.historyBandPx = 120,
+    this.showKeyCount = false,
   });
 
   @override
@@ -183,10 +186,7 @@ class _GridSnapEditorState extends State<GridSnapEditor> with TickerProviderStat
     // 틱커: 히스토리만 계속 리페인트
     _ticker = createTicker((_) {
       _now = DateTime.now();
-      // 완료바가 살아있거나(페이드 중) 라이브바가 있으면 계속 리페인트
-      if (_hasAnyHistoryToPaint()) {
-        if (mounted) setState(() {});
-      }
+      setState(() {});
     });
     _ticker.start();
 
@@ -459,7 +459,7 @@ class _GridSnapEditorState extends State<GridSnapEditor> with TickerProviderStat
       // 키 타일
       for (final b in _tiles) {
         final pressed = widget.pressedKeySet.contains(b.key);
-        final tile = KeyTile(pressed: pressed, keyTileDataModel: b);
+        final tile = KeyTile(pressed: pressed, keyTileDataModel: b, showKeyCount: widget.showKeyCount);
 
         Widget content = tile;
         if (widget.isEditor) {
