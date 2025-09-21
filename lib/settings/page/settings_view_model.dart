@@ -44,7 +44,9 @@ class SettingsViewModel extends StateNotifier<SettingsModel> {
         windowHeight: state.overlayHeight,
         windowX: state.globalConfig.overlayX,
         windowY: state.globalConfig.overlayY,
-        isFrameless: true
+        isFrameless: true,
+        cell: state.cell,
+        gap: state.gap,
       ).toJson())],
     );
     await window?.setSize(Size(state.overlayWidth, state.overlayHeight));
@@ -127,8 +129,9 @@ class SettingsViewModel extends StateNotifier<SettingsModel> {
   }
 
   void setWindowSizeLock(bool value) {
-    state = state.copyWith(windowSizeLock: value);
+    state = state.copyWith(windowSizeLock: value).copyWith.globalConfig(isWindowSizeLock: value);
     WindowManagerPlus.current.setResizable(value);
+    PrefProvider.instance.setGlobalConfig(state.globalConfig);
   }
 
 

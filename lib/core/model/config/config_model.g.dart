@@ -16,6 +16,7 @@ _GlobalConfigModel _$GlobalConfigModelFromJson(Map<String, dynamic> json) =>
       overlayHeight: (json['overlayHeight'] as num).toDouble(),
       overlayX: (json['overlayX'] as num).toDouble(),
       overlayY: (json['overlayY'] as num).toDouble(),
+      isWindowSizeLock: json['isWindowSizeLock'],
       keyTileData: (json['keyTileData'] as List<dynamic>?)
               ?.map((e) => KeyTileDataModel.fromJson(e as Map<String, dynamic>))
               .toList() ??
@@ -32,5 +33,6 @@ Map<String, dynamic> _$GlobalConfigModelToJson(_GlobalConfigModel instance) =>
       'overlayHeight': instance.overlayHeight,
       'overlayX': instance.overlayX,
       'overlayY': instance.overlayY,
+      'isWindowSizeLock': instance.isWindowSizeLock,
       'keyTileData': instance.keyTileData,
     };

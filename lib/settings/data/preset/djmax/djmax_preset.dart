@@ -3,7 +3,7 @@ import 'package:key_viewer_v2/core/model/preset/preset_model.dart';
 import 'package:win32/win32.dart';
 
 final _baseGx = 0;
-final _baseGy = 50;
+final _baseGy = 30;
 final List<KeyTileDataModel> djmaxPreset = [
   KeyTileDataModel(
       primaryKey: "DJMAX_PRESET_KEY_1",

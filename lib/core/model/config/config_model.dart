@@ -14,6 +14,7 @@ abstract class GlobalConfigModel with _$GlobalConfigModel {
     required double overlayHeight,
     required double overlayX,
     required double overlayY,
+    required isWindowSizeLock,
     @Default([])
     List<KeyTileDataModel> keyTileData,
   }) = _GlobalConfigModel;
@@ -27,6 +28,7 @@ abstract class GlobalConfigModel with _$GlobalConfigModel {
       overlayWith: 0,
       overlayHeight: 0,
       overlayX: 0,
-      overlayY: 0
+      overlayY: 0,
+    isWindowSizeLock : false,
   );
 }

@@ -74,6 +74,7 @@ class _KeyViewerSettingsPageState extends ConsumerState<KeyViewerSettingsPage> w
   Widget build(BuildContext context) {
     final spec = SnapGridSpec(cell: _cell, gap: _gap);
     final state = ref.watch(settingsViewModelProvider);
+    WindowManagerPlus.current.getSize().then((size) => print("main $size"));
     return Scaffold(
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -124,6 +125,7 @@ class _KeyViewerSettingsPageState extends ConsumerState<KeyViewerSettingsPage> w
                           case 0: viewModel.setCurrentKeySet({});
                           case 1:viewModel.setCurrentKeySet(djmaxPreset.toSet());
                         }
+                        viewModel.updateOverlayKeyTile();
                   })
                 ],
               ),
@@ -138,15 +140,19 @@ class _KeyViewerSettingsPageState extends ConsumerState<KeyViewerSettingsPage> w
                       viewModel.updateKeyTileData(updated);
                     },
                     onPixelSizeChanged: (size){
-                      viewModel.setEditorSize(size);
+                      // 1) 논리 px → 물리 px 변환
+                      final dpr = View.of(context).devicePixelRatio; // or MediaQuery.of(context).devicePixelRatio
+                      final physicalSize = Size(size.width * dpr, size.height * dpr);
+
+                      viewModel.setEditorSize(physicalSize);
                       viewModel.resizeOverlay();
                     },
                     pressedKeySet: {},
                     onInitialize: (size) async {
-                      viewModel.setEditorSize(size);
+                      final dpr = View.of(context).devicePixelRatio;
+                      final physicalSize = Size(size.width * dpr, size.height * dpr);
+                      await viewModel.setEditorSize(physicalSize);
                       await viewModel.showOverlay();
-                      await viewModel.resizeOverlay();
-                      await viewModel.updateOverlayKeyTile();
                     },
                   ),
 

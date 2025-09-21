@@ -22,6 +22,8 @@ mixin _$MultiWindowOptionModel {
   double? get windowY;
   bool? get isFrameless;
   int? get backgroundColor;
+  double? get cell;
+  double? get gap;
 
   /// Create a copy of MultiWindowOptionModel
   /// with the given fields replaced by the non-null parameter values.
@@ -50,17 +52,19 @@ mixin _$MultiWindowOptionModel {
             (identical(other.isFrameless, isFrameless) ||
                 other.isFrameless == isFrameless) &&
             (identical(other.backgroundColor, backgroundColor) ||
-                other.backgroundColor == backgroundColor));
+                other.backgroundColor == backgroundColor) &&
+            (identical(other.cell, cell) || other.cell == cell) &&
+            (identical(other.gap, gap) || other.gap == gap));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, windowName, windowWidth,
-      windowHeight, windowX, windowY, isFrameless, backgroundColor);
+      windowHeight, windowX, windowY, isFrameless, backgroundColor, cell, gap);
 
   @override
   String toString() {
-    return 'MultiWindowOptionModel(windowName: $windowName, windowWidth: $windowWidth, windowHeight: $windowHeight, windowX: $windowX, windowY: $windowY, isFrameless: $isFrameless, backgroundColor: $backgroundColor)';
+    return 'MultiWindowOptionModel(windowName: $windowName, windowWidth: $windowWidth, windowHeight: $windowHeight, windowX: $windowX, windowY: $windowY, isFrameless: $isFrameless, backgroundColor: $backgroundColor, cell: $cell, gap: $gap)';
   }
 }
 
@@ -77,7 +81,9 @@ abstract mixin class $MultiWindowOptionModelCopyWith<$Res> {
       double? windowX,
       double? windowY,
       bool? isFrameless,
-      int? backgroundColor});
+      int? backgroundColor,
+      double? cell,
+      double? gap});
 }
 
 /// @nodoc
@@ -100,6 +106,8 @@ class _$MultiWindowOptionModelCopyWithImpl<$Res>
     Object? windowY = freezed,
     Object? isFrameless = freezed,
     Object? backgroundColor = freezed,
+    Object? cell = freezed,
+    Object? gap = freezed,
   }) {
     return _then(_self.copyWith(
       windowName: null == windowName
@@ -130,6 +138,14 @@ class _$MultiWindowOptionModelCopyWithImpl<$Res>
           ? _self.backgroundColor
           : backgroundColor // ignore: cast_nullable_to_non_nullable
               as int?,
+      cell: freezed == cell
+          ? _self.cell
+          : cell // ignore: cast_nullable_to_non_nullable
+              as double?,
+      gap: freezed == gap
+          ? _self.gap
+          : gap // ignore: cast_nullable_to_non_nullable
+              as double?,
     ));
   }
 }
@@ -144,7 +160,9 @@ class _MultiWindowOptionModel implements MultiWindowOptionModel {
       this.windowX,
       this.windowY,
       this.isFrameless,
-      this.backgroundColor});
+      this.backgroundColor,
+      this.cell,
+      this.gap});
   factory _MultiWindowOptionModel.fromJson(Map<String, dynamic> json) =>
       _$MultiWindowOptionModelFromJson(json);
 
@@ -162,6 +180,10 @@ class _MultiWindowOptionModel implements MultiWindowOptionModel {
   final bool? isFrameless;
   @override
   final int? backgroundColor;
+  @override
+  final double? cell;
+  @override
+  final double? gap;
 
   /// Create a copy of MultiWindowOptionModel
   /// with the given fields replaced by the non-null parameter values.
@@ -195,17 +217,19 @@ class _MultiWindowOptionModel implements MultiWindowOptionModel {
             (identical(other.isFrameless, isFrameless) ||
                 other.isFrameless == isFrameless) &&
             (identical(other.backgroundColor, backgroundColor) ||
-                other.backgroundColor == backgroundColor));
+                other.backgroundColor == backgroundColor) &&
+            (identical(other.cell, cell) || other.cell == cell) &&
+            (identical(other.gap, gap) || other.gap == gap));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, windowName, windowWidth,
-      windowHeight, windowX, windowY, isFrameless, backgroundColor);
+      windowHeight, windowX, windowY, isFrameless, backgroundColor, cell, gap);
 
   @override
   String toString() {
-    return 'MultiWindowOptionModel(windowName: $windowName, windowWidth: $windowWidth, windowHeight: $windowHeight, windowX: $windowX, windowY: $windowY, isFrameless: $isFrameless, backgroundColor: $backgroundColor)';
+    return 'MultiWindowOptionModel(windowName: $windowName, windowWidth: $windowWidth, windowHeight: $windowHeight, windowX: $windowX, windowY: $windowY, isFrameless: $isFrameless, backgroundColor: $backgroundColor, cell: $cell, gap: $gap)';
   }
 }
 
@@ -224,7 +248,9 @@ abstract mixin class _$MultiWindowOptionModelCopyWith<$Res>
       double? windowX,
       double? windowY,
       bool? isFrameless,
-      int? backgroundColor});
+      int? backgroundColor,
+      double? cell,
+      double? gap});
 }
 
 /// @nodoc
@@ -247,6 +273,8 @@ class __$MultiWindowOptionModelCopyWithImpl<$Res>
     Object? windowY = freezed,
     Object? isFrameless = freezed,
     Object? backgroundColor = freezed,
+    Object? cell = freezed,
+    Object? gap = freezed,
   }) {
     return _then(_MultiWindowOptionModel(
       windowName: null == windowName
@@ -277,6 +305,14 @@ class __$MultiWindowOptionModelCopyWithImpl<$Res>
           ? _self.backgroundColor
           : backgroundColor // ignore: cast_nullable_to_non_nullable
               as int?,
+      cell: freezed == cell
+          ? _self.cell
+          : cell // ignore: cast_nullable_to_non_nullable
+              as double?,
+      gap: freezed == gap
+          ? _self.gap
+          : gap // ignore: cast_nullable_to_non_nullable
+              as double?,
     ));
   }
 }

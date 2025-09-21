@@ -16,6 +16,8 @@ _MultiWindowOptionModel _$MultiWindowOptionModelFromJson(
       windowY: (json['windowY'] as num?)?.toDouble(),
       isFrameless: json['isFrameless'] as bool?,
       backgroundColor: (json['backgroundColor'] as num?)?.toInt(),
+      cell: (json['cell'] as num?)?.toDouble(),
+      gap: (json['gap'] as num?)?.toDouble(),
     );
 
 Map<String, dynamic> _$MultiWindowOptionModelToJson(
@@ -28,4 +30,6 @@ Map<String, dynamic> _$MultiWindowOptionModelToJson(
       'windowY': instance.windowY,
       'isFrameless': instance.isFrameless,
       'backgroundColor': instance.backgroundColor,
+      'cell': instance.cell,
+      'gap': instance.gap,
     };

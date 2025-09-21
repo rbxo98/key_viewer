@@ -22,6 +22,8 @@ mixin _$SettingsModel {
   Set<KeyTileDataModel> get keyTileData;
   bool get windowSizeLock;
   bool get isOverlayLoading;
+  double get cell;
+  double get gap;
 
   /// Create a copy of SettingsModel
   /// with the given fields replaced by the non-null parameter values.
@@ -48,7 +50,9 @@ mixin _$SettingsModel {
             (identical(other.windowSizeLock, windowSizeLock) ||
                 other.windowSizeLock == windowSizeLock) &&
             (identical(other.isOverlayLoading, isOverlayLoading) ||
-                other.isOverlayLoading == isOverlayLoading));
+                other.isOverlayLoading == isOverlayLoading) &&
+            (identical(other.cell, cell) || other.cell == cell) &&
+            (identical(other.gap, gap) || other.gap == gap));
   }
 
   @override
@@ -60,11 +64,13 @@ mixin _$SettingsModel {
       overlayHeight,
       const DeepCollectionEquality().hash(keyTileData),
       windowSizeLock,
-      isOverlayLoading);
+      isOverlayLoading,
+      cell,
+      gap);
 
   @override
   String toString() {
-    return 'SettingsModel(window: $window, globalConfig: $globalConfig, overlayWidth: $overlayWidth, overlayHeight: $overlayHeight, keyTileData: $keyTileData, windowSizeLock: $windowSizeLock, isOverlayLoading: $isOverlayLoading)';
+    return 'SettingsModel(window: $window, globalConfig: $globalConfig, overlayWidth: $overlayWidth, overlayHeight: $overlayHeight, keyTileData: $keyTileData, windowSizeLock: $windowSizeLock, isOverlayLoading: $isOverlayLoading, cell: $cell, gap: $gap)';
   }
 }
 
@@ -81,7 +87,9 @@ abstract mixin class $SettingsModelCopyWith<$Res> {
       double overlayHeight,
       Set<KeyTileDataModel> keyTileData,
       bool windowSizeLock,
-      bool isOverlayLoading});
+      bool isOverlayLoading,
+      double cell,
+      double gap});
 
   $GlobalConfigModelCopyWith<$Res> get globalConfig;
 }
@@ -106,6 +114,8 @@ class _$SettingsModelCopyWithImpl<$Res>
     Object? keyTileData = null,
     Object? windowSizeLock = null,
     Object? isOverlayLoading = null,
+    Object? cell = null,
+    Object? gap = null,
   }) {
     return _then(_self.copyWith(
       window: freezed == window
@@ -136,6 +146,14 @@ class _$SettingsModelCopyWithImpl<$Res>
           ? _self.isOverlayLoading
           : isOverlayLoading // ignore: cast_nullable_to_non_nullable
               as bool,
+      cell: null == cell
+          ? _self.cell
+          : cell // ignore: cast_nullable_to_non_nullable
+              as double,
+      gap: null == gap
+          ? _self.gap
+          : gap // ignore: cast_nullable_to_non_nullable
+              as double,
     ));
   }
 
@@ -160,7 +178,9 @@ class _SettingsModel implements SettingsModel {
       required this.overlayHeight,
       final Set<KeyTileDataModel> keyTileData = const {},
       required this.windowSizeLock,
-      required this.isOverlayLoading})
+      required this.isOverlayLoading,
+      required this.cell,
+      required this.gap})
       : _keyTileData = keyTileData;
 
   @override
@@ -184,6 +204,10 @@ class _SettingsModel implements SettingsModel {
   final bool windowSizeLock;
   @override
   final bool isOverlayLoading;
+  @override
+  final double cell;
+  @override
+  final double gap;
 
   /// Create a copy of SettingsModel
   /// with the given fields replaced by the non-null parameter values.
@@ -210,7 +234,9 @@ class _SettingsModel implements SettingsModel {
             (identical(other.windowSizeLock, windowSizeLock) ||
                 other.windowSizeLock == windowSizeLock) &&
             (identical(other.isOverlayLoading, isOverlayLoading) ||
-                other.isOverlayLoading == isOverlayLoading));
+                other.isOverlayLoading == isOverlayLoading) &&
+            (identical(other.cell, cell) || other.cell == cell) &&
+            (identical(other.gap, gap) || other.gap == gap));
   }
 
   @override
@@ -222,11 +248,13 @@ class _SettingsModel implements SettingsModel {
       overlayHeight,
       const DeepCollectionEquality().hash(_keyTileData),
       windowSizeLock,
-      isOverlayLoading);
+      isOverlayLoading,
+      cell,
+      gap);
 
   @override
   String toString() {
-    return 'SettingsModel(window: $window, globalConfig: $globalConfig, overlayWidth: $overlayWidth, overlayHeight: $overlayHeight, keyTileData: $keyTileData, windowSizeLock: $windowSizeLock, isOverlayLoading: $isOverlayLoading)';
+    return 'SettingsModel(window: $window, globalConfig: $globalConfig, overlayWidth: $overlayWidth, overlayHeight: $overlayHeight, keyTileData: $keyTileData, windowSizeLock: $windowSizeLock, isOverlayLoading: $isOverlayLoading, cell: $cell, gap: $gap)';
   }
 }
 
@@ -245,7 +273,9 @@ abstract mixin class _$SettingsModelCopyWith<$Res>
       double overlayHeight,
       Set<KeyTileDataModel> keyTileData,
       bool windowSizeLock,
-      bool isOverlayLoading});
+      bool isOverlayLoading,
+      double cell,
+      double gap});
 
   @override
   $GlobalConfigModelCopyWith<$Res> get globalConfig;
@@ -271,6 +301,8 @@ class __$SettingsModelCopyWithImpl<$Res>
     Object? keyTileData = null,
     Object? windowSizeLock = null,
     Object? isOverlayLoading = null,
+    Object? cell = null,
+    Object? gap = null,
   }) {
     return _then(_SettingsModel(
       window: freezed == window
@@ -301,6 +333,14 @@ class __$SettingsModelCopyWithImpl<$Res>
           ? _self.isOverlayLoading
           : isOverlayLoading // ignore: cast_nullable_to_non_nullable
               as bool,
+      cell: null == cell
+          ? _self.cell
+          : cell // ignore: cast_nullable_to_non_nullable
+              as double,
+      gap: null == gap
+          ? _self.gap
+          : gap // ignore: cast_nullable_to_non_nullable
+              as double,
     ));
   }
 

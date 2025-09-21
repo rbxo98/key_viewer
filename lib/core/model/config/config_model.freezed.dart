@@ -31,6 +31,8 @@ mixin _$GlobalConfigModel {
   set overlayX(double value);
   double get overlayY;
   set overlayY(double value);
+  dynamic get isWindowSizeLock;
+  set isWindowSizeLock(dynamic value);
   List<KeyTileDataModel> get keyTileData;
   set keyTileData(List<KeyTileDataModel> value);
 
@@ -47,7 +49,7 @@ mixin _$GlobalConfigModel {
 
   @override
   String toString() {
-    return 'GlobalConfigModel(windowWidth: $windowWidth, windowHeight: $windowHeight, windowX: $windowX, windowY: $windowY, overlayWith: $overlayWith, overlayHeight: $overlayHeight, overlayX: $overlayX, overlayY: $overlayY, keyTileData: $keyTileData)';
+    return 'GlobalConfigModel(windowWidth: $windowWidth, windowHeight: $windowHeight, windowX: $windowX, windowY: $windowY, overlayWith: $overlayWith, overlayHeight: $overlayHeight, overlayX: $overlayX, overlayY: $overlayY, isWindowSizeLock: $isWindowSizeLock, keyTileData: $keyTileData)';
   }
 }
 
@@ -66,6 +68,7 @@ abstract mixin class $GlobalConfigModelCopyWith<$Res> {
       double overlayHeight,
       double overlayX,
       double overlayY,
+      dynamic isWindowSizeLock,
       List<KeyTileDataModel> keyTileData});
 }
 
@@ -90,6 +93,7 @@ class _$GlobalConfigModelCopyWithImpl<$Res>
     Object? overlayHeight = null,
     Object? overlayX = null,
     Object? overlayY = null,
+    Object? isWindowSizeLock = freezed,
     Object? keyTileData = null,
   }) {
     return _then(_self.copyWith(
@@ -125,6 +129,10 @@ class _$GlobalConfigModelCopyWithImpl<$Res>
           ? _self.overlayY
           : overlayY // ignore: cast_nullable_to_non_nullable
               as double,
+      isWindowSizeLock: freezed == isWindowSizeLock
+          ? _self.isWindowSizeLock
+          : isWindowSizeLock // ignore: cast_nullable_to_non_nullable
+              as dynamic,
       keyTileData: null == keyTileData
           ? _self.keyTileData
           : keyTileData // ignore: cast_nullable_to_non_nullable
@@ -145,6 +153,7 @@ class _GlobalConfigModel implements GlobalConfigModel {
       required this.overlayHeight,
       required this.overlayX,
       required this.overlayY,
+      required this.isWindowSizeLock,
       this.keyTileData = const []});
   factory _GlobalConfigModel.fromJson(Map<String, dynamic> json) =>
       _$GlobalConfigModelFromJson(json);
@@ -166,6 +175,8 @@ class _GlobalConfigModel implements GlobalConfigModel {
   @override
   double overlayY;
   @override
+  dynamic isWindowSizeLock;
+  @override
   @JsonKey()
   List<KeyTileDataModel> keyTileData;
 
@@ -186,7 +197,7 @@ class _GlobalConfigModel implements GlobalConfigModel {
 
   @override
   String toString() {
-    return 'GlobalConfigModel(windowWidth: $windowWidth, windowHeight: $windowHeight, windowX: $windowX, windowY: $windowY, overlayWith: $overlayWith, overlayHeight: $overlayHeight, overlayX: $overlayX, overlayY: $overlayY, keyTileData: $keyTileData)';
+    return 'GlobalConfigModel(windowWidth: $windowWidth, windowHeight: $windowHeight, windowX: $windowX, windowY: $windowY, overlayWith: $overlayWith, overlayHeight: $overlayHeight, overlayX: $overlayX, overlayY: $overlayY, isWindowSizeLock: $isWindowSizeLock, keyTileData: $keyTileData)';
   }
 }
 
@@ -207,6 +218,7 @@ abstract mixin class _$GlobalConfigModelCopyWith<$Res>
       double overlayHeight,
       double overlayX,
       double overlayY,
+      dynamic isWindowSizeLock,
       List<KeyTileDataModel> keyTileData});
 }
 
@@ -231,6 +243,7 @@ class __$GlobalConfigModelCopyWithImpl<$Res>
     Object? overlayHeight = null,
     Object? overlayX = null,
     Object? overlayY = null,
+    Object? isWindowSizeLock = freezed,
     Object? keyTileData = null,
   }) {
     return _then(_GlobalConfigModel(
@@ -266,6 +279,10 @@ class __$GlobalConfigModelCopyWithImpl<$Res>
           ? _self.overlayY
           : overlayY // ignore: cast_nullable_to_non_nullable
               as double,
+      isWindowSizeLock: freezed == isWindowSizeLock
+          ? _self.isWindowSizeLock
+          : isWindowSizeLock // ignore: cast_nullable_to_non_nullable
+              as dynamic,
       keyTileData: null == keyTileData
           ? _self.keyTileData
           : keyTileData // ignore: cast_nullable_to_non_nullable

@@ -12,6 +12,8 @@ abstract class MultiWindowOptionModel with _$MultiWindowOptionModel {
     double? windowY,
     bool? isFrameless,
     int? backgroundColor,
+    double? cell,
+    double? gap,
   }) = _MultiWindowOptionModel;
 
   factory MultiWindowOptionModel.fromJson(Map<String, dynamic> json) => _$MultiWindowOptionModelFromJson(json);
