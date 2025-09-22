@@ -201,8 +201,8 @@ class _$SettingsModelCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _SettingsModel implements SettingsModel {
-  const _SettingsModel(
+class _SettingsModel extends SettingsModel {
+  _SettingsModel(
       {this.window,
       required this.globalConfig,
       required this.overlayWidth,
@@ -215,7 +215,8 @@ class _SettingsModel implements SettingsModel {
       required this.cell,
       required this.gap})
       : _presetList = presetList,
-        _pressedKeySet = pressedKeySet;
+        _pressedKeySet = pressedKeySet,
+        super._();
 
   @override
   final WindowManagerPlus? window;

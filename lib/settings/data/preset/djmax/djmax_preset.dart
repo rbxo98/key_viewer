@@ -5,6 +5,7 @@ import 'package:win32/win32.dart';
 final _baseGx = 0;
 final _baseGy = 30;
 PresetModel DJMAXPresetModel = PresetModel(
+  createdAt: DateTime.now(),
     presetName: "DJMAX RESPECT V",
     keyTileDataGroup: [
       KeyTileDataGroupModel(

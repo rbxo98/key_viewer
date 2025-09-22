@@ -34,6 +34,6 @@ class PrefProvider {
   }
 
   Future<void> clear() async {
-    _pref.clear();
+    await _pref.clear();
   }
 }

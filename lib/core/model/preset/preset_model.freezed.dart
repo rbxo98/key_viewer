@@ -19,6 +19,7 @@ mixin _$PresetModel {
   int get switchKey;
   List<KeyTileDataGroupModel> get keyTileDataGroup;
   int get currentGroupIdx;
+  DateTime get createdAt;
 
   /// Create a copy of PresetModel
   /// with the given fields replaced by the non-null parameter values.
@@ -42,17 +43,24 @@ mixin _$PresetModel {
             const DeepCollectionEquality()
                 .equals(other.keyTileDataGroup, keyTileDataGroup) &&
             (identical(other.currentGroupIdx, currentGroupIdx) ||
-                other.currentGroupIdx == currentGroupIdx));
+                other.currentGroupIdx == currentGroupIdx) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, presetName, switchKey,
-      const DeepCollectionEquality().hash(keyTileDataGroup), currentGroupIdx);
+  int get hashCode => Object.hash(
+      runtimeType,
+      presetName,
+      switchKey,
+      const DeepCollectionEquality().hash(keyTileDataGroup),
+      currentGroupIdx,
+      createdAt);
 
   @override
   String toString() {
-    return 'PresetModel(presetName: $presetName, switchKey: $switchKey, keyTileDataGroup: $keyTileDataGroup, currentGroupIdx: $currentGroupIdx)';
+    return 'PresetModel(presetName: $presetName, switchKey: $switchKey, keyTileDataGroup: $keyTileDataGroup, currentGroupIdx: $currentGroupIdx, createdAt: $createdAt)';
   }
 }
 
@@ -66,7 +74,8 @@ abstract mixin class $PresetModelCopyWith<$Res> {
       {String presetName,
       int switchKey,
       List<KeyTileDataGroupModel> keyTileDataGroup,
-      int currentGroupIdx});
+      int currentGroupIdx,
+      DateTime createdAt});
 }
 
 /// @nodoc
@@ -85,6 +94,7 @@ class _$PresetModelCopyWithImpl<$Res> implements $PresetModelCopyWith<$Res> {
     Object? switchKey = null,
     Object? keyTileDataGroup = null,
     Object? currentGroupIdx = null,
+    Object? createdAt = null,
   }) {
     return _then(_self.copyWith(
       presetName: null == presetName
@@ -103,6 +113,10 @@ class _$PresetModelCopyWithImpl<$Res> implements $PresetModelCopyWith<$Res> {
           ? _self.currentGroupIdx
           : currentGroupIdx // ignore: cast_nullable_to_non_nullable
               as int,
+      createdAt: null == createdAt
+          ? _self.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
     ));
   }
 }
@@ -114,7 +128,8 @@ class _PresetModel extends PresetModel {
       {required this.presetName,
       this.switchKey = VIRTUAL_KEY.VK_TAB,
       final List<KeyTileDataGroupModel> keyTileDataGroup = const [],
-      this.currentGroupIdx = 0})
+      this.currentGroupIdx = 0,
+      required this.createdAt})
       : _keyTileDataGroup = keyTileDataGroup,
         super._();
   factory _PresetModel.fromJson(Map<String, dynamic> json) =>
@@ -138,6 +153,8 @@ class _PresetModel extends PresetModel {
   @override
   @JsonKey()
   final int currentGroupIdx;
+  @override
+  final DateTime createdAt;
 
   /// Create a copy of PresetModel
   /// with the given fields replaced by the non-null parameter values.
@@ -166,17 +183,24 @@ class _PresetModel extends PresetModel {
             const DeepCollectionEquality()
                 .equals(other._keyTileDataGroup, _keyTileDataGroup) &&
             (identical(other.currentGroupIdx, currentGroupIdx) ||
-                other.currentGroupIdx == currentGroupIdx));
+                other.currentGroupIdx == currentGroupIdx) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, presetName, switchKey,
-      const DeepCollectionEquality().hash(_keyTileDataGroup), currentGroupIdx);
+  int get hashCode => Object.hash(
+      runtimeType,
+      presetName,
+      switchKey,
+      const DeepCollectionEquality().hash(_keyTileDataGroup),
+      currentGroupIdx,
+      createdAt);
 
   @override
   String toString() {
-    return 'PresetModel(presetName: $presetName, switchKey: $switchKey, keyTileDataGroup: $keyTileDataGroup, currentGroupIdx: $currentGroupIdx)';
+    return 'PresetModel(presetName: $presetName, switchKey: $switchKey, keyTileDataGroup: $keyTileDataGroup, currentGroupIdx: $currentGroupIdx, createdAt: $createdAt)';
   }
 }
 
@@ -192,7 +216,8 @@ abstract mixin class _$PresetModelCopyWith<$Res>
       {String presetName,
       int switchKey,
       List<KeyTileDataGroupModel> keyTileDataGroup,
-      int currentGroupIdx});
+      int currentGroupIdx,
+      DateTime createdAt});
 }
 
 /// @nodoc
@@ -211,6 +236,7 @@ class __$PresetModelCopyWithImpl<$Res> implements _$PresetModelCopyWith<$Res> {
     Object? switchKey = null,
     Object? keyTileDataGroup = null,
     Object? currentGroupIdx = null,
+    Object? createdAt = null,
   }) {
     return _then(_PresetModel(
       presetName: null == presetName
@@ -229,6 +255,10 @@ class __$PresetModelCopyWithImpl<$Res> implements _$PresetModelCopyWith<$Res> {
           ? _self.currentGroupIdx
           : currentGroupIdx // ignore: cast_nullable_to_non_nullable
               as int,
+      createdAt: null == createdAt
+          ? _self.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
     ));
   }
 }

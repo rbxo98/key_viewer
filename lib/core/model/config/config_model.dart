@@ -41,5 +41,11 @@ abstract class GlobalConfigModel with _$GlobalConfigModel {
   }) = _GlobalConfigModel;
 
   factory GlobalConfigModel.fromJson(Map<String, dynamic> json) => _$GlobalConfigModelFromJson(json);
-  factory GlobalConfigModel.empty() => GlobalConfigModel();
+  factory GlobalConfigModel.empty() {
+    final preset = PresetModel.empty();
+    return GlobalConfigModel(
+        presetList: [preset],
+      currentPresetName: preset.presetName
+    );
+  }
 }

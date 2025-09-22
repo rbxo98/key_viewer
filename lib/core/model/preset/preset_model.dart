@@ -8,18 +8,21 @@ part 'preset_model.g.dart';
 abstract class PresetModel with _$PresetModel {
   PresetModel._();
   factory PresetModel({
-    required String presetName,
-    @Default(VIRTUAL_KEY.VK_TAB)
-    int switchKey,
-    @Default([])
-    List<KeyTileDataGroupModel> keyTileDataGroup,
-    @Default(0)
-    int currentGroupIdx,
+  required String presetName,
+  @Default(VIRTUAL_KEY.VK_TAB)
+  int switchKey,
+  @Default([])
+  List<KeyTileDataGroupModel> keyTileDataGroup,
+  @Default(0)
+  int currentGroupIdx,
+  required DateTime createdAt,
   }) = _PresetModel;
 
   factory PresetModel.fromJson(Map<String, dynamic> json) => _$PresetModelFromJson(json);
   factory PresetModel.empty() => PresetModel(
       presetName: "새 프리셋",
+    keyTileDataGroup: [KeyTileDataGroupModel.empty()],
+    createdAt: DateTime.now(),
   );
 
   KeyTileDataGroupModel get getCurrentGroup => keyTileDataGroup[currentGroupIdx];
@@ -37,6 +40,6 @@ abstract class KeyTileDataGroupModel with _$KeyTileDataGroupModel {
 
   factory KeyTileDataGroupModel.fromJson(Map<String, dynamic> json) => _$KeyTileDataGroupModelFromJson(json);
   factory KeyTileDataGroupModel.empty() => KeyTileDataGroupModel(
-      name: "",
+      name: "새 그룹",
   );
 }

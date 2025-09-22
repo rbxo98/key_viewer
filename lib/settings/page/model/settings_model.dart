@@ -8,7 +8,8 @@ part 'settings_model.freezed.dart';
 
 @freezed
 abstract class SettingsModel with _$SettingsModel {
-  const factory SettingsModel({
+  SettingsModel._();
+  factory SettingsModel({
     WindowManagerPlus? window,
     required GlobalConfigModel globalConfig,
     required double overlayWidth,
@@ -24,16 +25,22 @@ abstract class SettingsModel with _$SettingsModel {
     required double gap,
   }) = _SettingsModel;
 
-  factory SettingsModel.empty() => SettingsModel(
-      window: null,
-      overlayWidth: 0,
-      overlayHeight: 0,
-      currentPreset: PresetModel.empty(),
-      presetList: [],
-      globalConfig: GlobalConfigModel.empty(),
-    windowSizeLock: false,
-    isOverlayLoading: false,
-    cell: 4,
-    gap: 1,
-  );
+  int get getCurrentPresetIndex => presetList.indexOf(currentPreset);
+
+  factory SettingsModel.empty()
+      {
+        final preset = PresetModel.empty();
+        return SettingsModel(
+          window: null,
+          overlayWidth: 0,
+          overlayHeight: 0,
+          currentPreset: preset,
+          presetList: [preset],
+          globalConfig: GlobalConfigModel.empty(),
+          windowSizeLock: false,
+          isOverlayLoading: false,
+          cell: 4,
+          gap: 1,
+        );
+      }
 }

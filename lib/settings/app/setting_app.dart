@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:key_viewer_v2/settings/page/setttings_page.dart';
+import 'package:key_viewer_v2/settings/page/settings_page.dart';
 
 class KeyViewerSettingApp extends StatelessWidget {
   const KeyViewerSettingApp({super.key});

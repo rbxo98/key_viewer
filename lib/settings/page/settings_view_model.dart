@@ -8,6 +8,7 @@ import 'package:key_viewer_v2/core/lib/key_input_monitor.dart';
 import 'package:key_viewer_v2/core/lib/pref_provider.dart';
 import 'package:key_viewer_v2/core/model/multi_window_option/multi_window_option_model.dart';
 import 'package:key_viewer_v2/core/model/key/key_tile_data_model.dart';
+import 'package:key_viewer_v2/core/model/preset/preset_model.dart';
 import 'package:key_viewer_v2/settings/data/preset/djmax/djmax_preset.dart';
 import 'package:key_viewer_v2/settings/page/model/settings_model.dart';
 import 'package:win32/win32.dart';
@@ -30,6 +31,8 @@ class SettingsViewModel extends StateNotifier<SettingsModel> {
       }
     });
   }
+
+
 
 
   void initKeyMonitoring() {
@@ -177,12 +180,10 @@ class SettingsViewModel extends StateNotifier<SettingsModel> {
     final globalConfig = (await PrefProvider.instance.getGlobalConfig());
     state = state.copyWith(
         globalConfig: globalConfig,
-        presetList: [
-          ...globalConfig.presetList,
-          if(globalConfig.showDJMAXPreset) DJMAXPresetModel,
-        ],
+        presetList: globalConfig.presetList,
         currentPreset: globalConfig.presetList
-            .firstWhereOrNull((e) => e.presetName == globalConfig.currentPresetName) ?? globalConfig.presetList[0]);
+            .firstWhereOrNull((e) => e.presetName == globalConfig.currentPresetName) ?? PresetModel.empty());
+
   }
 
   void setWindowSizeConfig({required Size size}) {
@@ -208,14 +209,68 @@ class SettingsViewModel extends StateNotifier<SettingsModel> {
     PrefProvider.instance.setGlobalConfig(state.globalConfig);
   }
 
-  void setPreset(String? presetName) {
-    final preset = state.globalConfig.presetList.firstWhereOrNull((e) => e.presetName == presetName);
+  void setPreset(PresetModel? preset) {
     if(preset == null) return;
     
     state = state
-        .copyWith.globalConfig(currentPresetName: presetName)
+        .copyWith.globalConfig(currentPresetName: preset.presetName)
         .copyWith(currentPreset: preset);
     PrefProvider.instance.setGlobalConfig(state.globalConfig);
+  }
+
+  void addPreset(PresetModel data) {
+    final presetList = [...state.presetList, data];
+    state = state
+        .copyWith.globalConfig(presetList: presetList, currentPresetName: data.presetName)
+        .copyWith(presetList: presetList, currentPreset: data);
+    PrefProvider.instance.setGlobalConfig(state.globalConfig);
+  }
+
+  void addKeyTileDataGroup(KeyTileDataGroupModel data) {
+    final currentGroupList = [...state.currentPreset.keyTileDataGroup, data];
+    final currentPresetList = [...state.presetList];
+    final targetPresetIdx = state.getCurrentPresetIndex;
+
+    final updatedPreset = currentPresetList[targetPresetIdx].copyWith(keyTileDataGroup: currentGroupList);
+    currentPresetList[targetPresetIdx] = updatedPreset;
+
+    state = state
+        .copyWith.globalConfig(presetList: currentPresetList)
+        .copyWith(
+      presetList: currentPresetList,
+      currentPreset: updatedPreset,
+    );
+    PrefProvider.instance.setGlobalConfig(state.globalConfig);
+  }
+
+  void setCurrentKeyTileDataGroup(int groupIndex) {
+    if (groupIndex < 0 || groupIndex >= state.currentPreset.keyTileDataGroup.length) {
+      return; // 범위 벗어남
+    }
+
+    // 1. currentPreset의 currentGroupIdx 업데이트
+    final updatedCurrentPreset = state.currentPreset.copyWith(currentGroupIdx: groupIndex);
+
+    // 2. presetList에서 해당 preset도 동일하게 업데이트
+    final updatedPresetList = [...state.presetList];
+    final targetPresetIdx = state.getCurrentPresetIndex;
+    updatedPresetList[targetPresetIdx] = updatedCurrentPreset;
+
+    // 3. state와 globalConfig 모두 업데이트
+    state = state
+        .copyWith.globalConfig(presetList: updatedPresetList)
+        .copyWith(
+      presetList: updatedPresetList,
+      currentPreset: updatedCurrentPreset,
+    );
+
+    // 4. 설정 저장
+    PrefProvider.instance.setGlobalConfig(state.globalConfig);
+
+    // 5. 오버레이가 열려있다면 새 그룹 데이터로 업데이트
+    if (state.window != null) {
+      updateOverlayKeyTile();
+    }
   }
 
 
