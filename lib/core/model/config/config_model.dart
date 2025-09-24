@@ -1,7 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:key_viewer_v2/core/model/key/key_tile_data_model.dart';
 import 'package:key_viewer_v2/core/model/preset/preset_model.dart';
-
+import 'config_model_extension.dart';
 part 'config_model.freezed.dart';
 part 'config_model.g.dart';
 @unfreezed

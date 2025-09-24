@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:key_viewer_v2/core/model/key/key_tile_data_model.dart';
+import 'package:key_viewer_v2/settings/data/preset/base/observer_group.dart';
 import 'package:win32/win32.dart';
 
 part 'preset_model.freezed.dart';
@@ -16,6 +17,8 @@ abstract class PresetModel with _$PresetModel {
   @Default(0)
   int currentGroupIdx,
   required DateTime createdAt,
+    @Default(false)
+    bool isObserver,
   }) = _PresetModel;
 
   factory PresetModel.fromJson(Map<String, dynamic> json) => _$PresetModelFromJson(json);
@@ -23,10 +26,11 @@ abstract class PresetModel with _$PresetModel {
       presetName: "새 프리셋",
     keyTileDataGroup: [KeyTileDataGroupModel.empty()],
     createdAt: DateTime.now(),
+    isObserver: false,
   );
 
-  KeyTileDataGroupModel get getCurrentGroup => keyTileDataGroup[currentGroupIdx];
-  List<KeyTileDataModel> get getCurrentKeyTileData => keyTileDataGroup[currentGroupIdx].keyTileData;
+  KeyTileDataGroupModel get getCurrentGroup => currentGroupIdx >= 0 ? keyTileDataGroup[currentGroupIdx] : observerGroup;
+  List<KeyTileDataModel> get getCurrentKeyTileData =>  currentGroupIdx >= 0 ? keyTileDataGroup[currentGroupIdx].keyTileData : [];
 }
 
 @freezed

@@ -1,16 +1,21 @@
 import 'dart:convert';
 
+import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:desktop_multi_window/desktop_multi_window.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:key_viewer_v2/core/lib/pref_provider.dart';
 import 'package:key_viewer_v2/core/model/key/key_tile_data_model.dart';
+import 'package:key_viewer_v2/core/model/preset/preset_model.dart';
+import 'package:key_viewer_v2/settings/app/setting_app.dart';
 import 'package:key_viewer_v2/settings/data/preset/djmax/djmax_preset.dart';
 import 'package:key_viewer_v2/settings/page/settings_view_model.dart';
-import 'package:key_viewer_v2/settings/page/widget/key_tile_group_settings_dialog.dart';
-import 'package:key_viewer_v2/settings/page/widget/key_tile_preset_settings_dialog.dart';
+import 'package:key_viewer_v2/settings/page/widget/key_tile_group/group_button.dart';
+import 'package:key_viewer_v2/settings/page/widget/key_tile_group/key_tile_group_settings_dialog.dart';
+import 'package:key_viewer_v2/settings/page/widget/key_tile_preset/key_tile_preset_settings_dialog.dart';
 import 'package:key_viewer_v2/settings/page/widget/key_tile_settings_dialog.dart';
 import 'package:win32/win32.dart';
 import 'package:window_manager_plus/window_manager_plus.dart';
@@ -78,75 +83,81 @@ class _KeyViewerSettingsPageState extends ConsumerState<KeyViewerSettingsPage> w
   Widget build(BuildContext context) {
     final spec = SnapGridSpec(cell: _cell, gap: _gap);
     final state = ref.watch(settingsViewModelProvider);
-    print(state.presetList);
     return Scaffold(
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ElevatedButton(onPressed: (){
-              PrefProvider.instance.clear();
-            }, child: Text("설정 초기화")),
             Container(
               padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
               child: Column(
                 spacing: 8,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Wrap(
-                    children: [
-                      ElevatedButton(onPressed: () async {
-                        if(state.window == null){
-                          await viewModel.showOverlay();
-                        }
-                        else{
-                          viewModel.closeOverlay();
-                        }
-                      }, child: Row(
-                        spacing: 8,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text("오버레이 ${state.window == null ? "표시" : "닫기"}"),
-                          if(state.isOverlayLoading)
-                            SizedBox(
-                                width: 14,
-                                height: 14,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                )),
-                        ],
-                      )),
-                    ],
-                  ),
-
                   Row(
                     spacing: 8,
                     children: [
                       DropdownButton(
                         value: state.currentPreset,
+                          padding: EdgeInsets.zero,
                           hint: Text("프리셋 선택"),
                           items: [
                             ...state.presetList.map((e) =>
                                 DropdownMenuItem(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(e.presetName),
-                                      IconButton(onPressed: (){
-
-                                      }, icon: Icon(Icons.edit))
-                                    ],
-                                  ),
+                                  child: Text(e.presetName),
                                   value: e,)),
-                          ], onChanged: (v){
-                        viewModel.setPreset(v);
-                        viewModel.updateOverlayKeyTile();
+                            DropdownMenuItem(child: Text("프리셋 추가"), value: null,)
+                          ], onChanged: (v) async {
+                          if(v == null){
+                            final data = await showDialog(context: context, builder: (_) => KeyTilePreSetSettingsDialog());
+                            if(data != null) viewModel.addPreset(data);
+                          }
+                          else{
+                            viewModel.setPreset(v);
+                            viewModel.updateOverlayKeyTile();
+                          }
                       }),
 
-                      FilledButton(onPressed: () async {
-                        final data = await showDialog(context: context, builder: (_) => KeyTilePreSetSettingsDialog());
-                        if(data != null) viewModel.addPreset(data);
-                      }, child: Icon(Icons.add))
+                      InkWell(
+                        onTap: () async {
+                          final data = await showDialog(context: context, builder: (_) => KeyTilePreSetSettingsDialog(
+                            presetModel: state.currentPreset,
+                          ));
+                          viewModel.setPreset(data);
+                        },
+                        customBorder: CircleBorder(),
+                        child: Container(
+                          padding: EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: SettingsTokens.primary
+                          ),
+                          child: Icon(Icons.edit),
+                        ),
+                      )
                     ],
+                  ),
+
+                  SizedBox(height: 8,),
+
+                  SizedBox(
+                    height: 32,
+                    width: 120,
+                    child: AnimatedToggleSwitch<bool>.dual(
+                        current: state.currentPreset.isObserver,
+                        first: true,
+                        second: false,
+                      onChanged: (v) => viewModel.setCurrentPresetObserver(v),
+                      styleBuilder: (b) => ToggleStyle(
+                        borderColor: SettingsTokens.primary,
+                        indicatorColor: SettingsTokens.primary
+                      ),
+                      iconBuilder: (value) => value
+                          ? const Icon(Icons.coronavirus_rounded)
+                          : const Icon(Icons.tag_faces_rounded),
+                      textBuilder: (value) => value
+                          ? const Center(child: Text('관전O'))
+                          : const Center(child: Text('관전X')),
+                    ),
                   ),
 
                   SizedBox(height: 8,),
@@ -155,14 +166,29 @@ class _KeyViewerSettingsPageState extends ConsumerState<KeyViewerSettingsPage> w
                     spacing: 8,
                     runSpacing: 8,
                     children: [
+                      if(state.currentPreset.isObserver)
+                        KeyTileGroupButton(
+                            isSelected: state.currentPreset.currentGroupIdx==-1,
+                            group: KeyTileDataGroupModel(name: "Observer"),
+                            onTap: (){
+                              print("index : ${state.getCurrentPresetIndex}");
+                              viewModel.setCurrentKeyTileDataGroup(-1);
+                            },
+                            onRemove: (group) {},
+                        ),
                       ...state.currentPreset.keyTileDataGroup.map((e) =>
-                          FilledButton(
-                              onPressed: (){
+                          KeyTileGroupButton(
+                            group: e,
+                              isSelected: state.currentPreset.keyTileDataGroup.indexOf(e) == state.currentPreset.currentGroupIdx,
+                              onTap: (){
                                 viewModel.setCurrentKeyTileDataGroup(
                                   state.currentPreset.keyTileDataGroup.indexOf(e)
                                 );
                               },
-                              child: Text(e.name))),
+                            onRemove: (group) {
+                              viewModel.removeKeyTileDataGroup(group);
+                            },
+                          )),
                       IconButton(onPressed: () async {
                         final data = await showDialog(context: context, builder: (_) => KeyTileGroupSettingsDialog());
                         if(data != null) viewModel.addKeyTileDataGroup(data);
@@ -237,6 +263,20 @@ class _KeyViewerSettingsPageState extends ConsumerState<KeyViewerSettingsPage> w
               ),
             ],
           ),
+          Row(
+            children: [
+              Text('프리셋 관리'),
+              SizedBox(width: 20),
+              FloatingActionButton(
+                heroTag: null,
+                onPressed: () async {
+
+                },
+                child: Icon(Icons.menu_book),
+              ),
+            ],
+          ),
+
           Row(
             children: [
               Text('윈도우 사이즈 잠금'),

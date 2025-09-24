@@ -16,6 +16,7 @@ _PresetModel _$PresetModelFromJson(Map<String, dynamic> json) => _PresetModel(
           const [],
       currentGroupIdx: (json['currentGroupIdx'] as num?)?.toInt() ?? 0,
       createdAt: DateTime.parse(json['createdAt'] as String),
+      isObserver: json['isObserver'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$PresetModelToJson(_PresetModel instance) =>
@@ -25,6 +26,7 @@ Map<String, dynamic> _$PresetModelToJson(_PresetModel instance) =>
       'keyTileDataGroup': instance.keyTileDataGroup,
       'currentGroupIdx': instance.currentGroupIdx,
       'createdAt': instance.createdAt.toIso8601String(),
+      'isObserver': instance.isObserver,
     };
 
 _KeyTileDataGroupModel _$KeyTileDataGroupModelFromJson(

@@ -12,7 +12,7 @@ PresetModel DJMAXPresetModel = PresetModel(
           name: "8B",
         keyTileData: djmaxPreset
       ),
-    ]);
+    ], isObserver: false);
 final List<KeyTileDataModel> djmaxPreset = [
   KeyTileDataModel(
       primaryKey: "DJMAX_PRESET_KEY_1",

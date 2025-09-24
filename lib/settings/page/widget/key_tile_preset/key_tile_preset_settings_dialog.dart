@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:key_viewer_v2/core/lib/key_input_monitor.dart';
 import 'package:key_viewer_v2/core/model/preset/preset_model.dart';
 
 class KeyTilePreSetSettingsDialog extends StatefulWidget {
@@ -11,6 +12,7 @@ class KeyTilePreSetSettingsDialog extends StatefulWidget {
 }
 
 class _KeyTilePreSetSettingsDialogState extends State<KeyTilePreSetSettingsDialog> {
+  final KeyInputMonitor keyInputMonitor = KeyInputMonitor();
   late PresetModel presetModel;
   final TextEditingController _nameCtrl = TextEditingController();
 
@@ -41,7 +43,21 @@ class _KeyTilePreSetSettingsDialogState extends State<KeyTilePreSetSettingsDialo
   void initState() {
     presetModel = widget.presetModel ?? PresetModel.empty();
     _nameCtrl.text = presetModel.presetName;
+    keyInputMonitor.pressedKeys.addListener((){
+      setState(() {
+        presetModel = presetModel.copyWith(
+          switchKey: keyInputMonitor.pressedKeys.value.first
+        );
+      });
+    });
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    keyInputMonitor.stop();
+    keyInputMonitor.dispose();
+    super.dispose();
   }
 
   @override
@@ -51,7 +67,6 @@ class _KeyTilePreSetSettingsDialogState extends State<KeyTilePreSetSettingsDialo
 
     return LayoutBuilder(builder: (context, c) {
       final w = 560.clamp(360.0, c.maxWidth - 48.0).toDouble();
-      final maxH = 160;
       return Dialog(
         backgroundColor: bg,
         insetPadding:
@@ -60,10 +75,10 @@ class _KeyTilePreSetSettingsDialogState extends State<KeyTilePreSetSettingsDialo
             borderRadius: BorderRadius.circular(12)),
         child: SizedBox(
           width: w,
-          height: maxH.toDouble(),
           child: Padding(
             padding: const EdgeInsets.fromLTRB(20, 18, 20, 12),
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -106,6 +121,28 @@ class _KeyTilePreSetSettingsDialogState extends State<KeyTilePreSetSettingsDialo
                       ),
                     ),
                   ],
+                ),
+
+                const SizedBox(height: 18,),
+
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: presetModel.keyTileDataGroup.length,
+                  itemBuilder: (context, index) {
+                    final group = presetModel.keyTileDataGroup[index];
+                    return ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(group.name),
+                      subtitle: Text('Group ${index + 1}'),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.edit),
+                        onPressed: () {
+                          // Handle edit action
+                        },
+                      ),
+                    );
+                  },
                 ),
 
                 const SizedBox(height: 18,),

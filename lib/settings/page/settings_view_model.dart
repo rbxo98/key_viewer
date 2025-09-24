@@ -11,8 +11,10 @@ import 'package:key_viewer_v2/core/model/key/key_tile_data_model.dart';
 import 'package:key_viewer_v2/core/model/preset/preset_model.dart';
 import 'package:key_viewer_v2/settings/data/preset/djmax/djmax_preset.dart';
 import 'package:key_viewer_v2/settings/page/model/settings_model.dart';
+import 'package:key_viewer_v2/settings/page/model/settings_model_extension.dart';
 import 'package:win32/win32.dart';
 import 'package:window_manager_plus/window_manager_plus.dart';
+import 'package:key_viewer_v2/core/model/config/config_model_extension.dart';
 
 final settingsViewModelProvider = StateNotifierProvider<SettingsViewModel, SettingsModel>((ref) => SettingsViewModel());
 
@@ -32,12 +34,145 @@ class SettingsViewModel extends StateNotifier<SettingsModel> {
     });
   }
 
+  void _updateKeyCount(Set<int> currentKeys) {
+    final newlyPressed = currentKeys.difference(_previousPressedKeys);
+    state = state.updateKeyCountSync(currentKeys, newlyPressed);
+  }
+
+  void updateKeyTileData(Set<KeyTileDataModel> data) {
+    state = state.updateKeyTileDataSync(data);
+    PrefProvider.instance.setGlobalConfig(state.globalConfig);
+    updateOverlayKeyTile();
+  }
+
+  void addKeyTile(KeyTileDataModel model) {
+    state = state.addKeyTileSync(model);
+    PrefProvider.instance.setGlobalConfig(state.globalConfig);
+    updateOverlayKeyTile();
+  }
+
+  void addPreset(PresetModel data) {
+    state = state.addPresetSync(data);
+    PrefProvider.instance.setGlobalConfig(state.globalConfig);
+  }
+
+  void setPreset(PresetModel? preset) {
+    if (preset == null) return;
+    state = state.setPresetSync(preset);
+    PrefProvider.instance.setGlobalConfig(state.globalConfig);
+  }
+
+  void updatePresetInfo(PresetModel preset) {
+    state = state.updatePresetInfoSync(preset);
+    PrefProvider.instance.setGlobalConfig(state.globalConfig);
+  }
+
+  void addKeyTileDataGroup(KeyTileDataGroupModel data) {
+    state = state.addKeyTileDataGroupSync(data);
+    PrefProvider.instance.setGlobalConfig(state.globalConfig);
+  }
+
+
+  void removeKeyTileDataGroup(KeyTileDataGroupModel group) {
+    state = state.removeKeyTileDataGroupSync(group);
+    PrefProvider.instance.setGlobalConfig(state.globalConfig);
+  }
+
+
+
+  void setCurrentKeyTileDataGroup(int groupIndex) {
+    state = state.setCurrentKeyTileDataGroupSync(groupIndex);
+    PrefProvider.instance.setGlobalConfig(state.globalConfig);
+
+    // 오버레이가 열려있다면 새 그룹 데이터로 업데이트
+    if (state.window != null) {
+      updateOverlayKeyTile();
+    }
+  }
+
+  /// 현재 프리셋의 isObserver 값을 설정하는 메소드
+  void setCurrentPresetObserver(bool isObserver) {
+    state = state.setCurrentPresetObserverSync(isObserver);
+    PrefProvider.instance.setGlobalConfig(state.globalConfig);
+
+    // 옵션: 오버레이가 열려있다면 업데이트
+    if (state.window != null) {
+      updateOverlayKeyTile();
+    }
+  }
+
+  void setWindowSizeConfig({required Size size}) {
+    final updatedGlobalConfig = state.globalConfig.updateWindowSettings(
+        windowWidth: size.width,
+        windowHeight: size.height
+    );
+    state = state.copyWith(globalConfig: updatedGlobalConfig);
+    PrefProvider.instance.setGlobalConfig(state.globalConfig);
+  }
+
+  void setWindowPositionConfig({required Offset pos}) {
+    final updatedGlobalConfig = state.globalConfig.updateWindowSettings(
+        windowX: pos.dx,
+        windowY: pos.dy
+    );
+    state = state.copyWith(globalConfig: updatedGlobalConfig);
+    PrefProvider.instance.setGlobalConfig(state.globalConfig);
+  }
+
+  void setOverlayPositionConfig({required Offset pos}) {
+    final updatedGlobalConfig = state.globalConfig.updateOverlaySettings(
+        overlayX: pos.dx,
+        overlayY: pos.dy
+    );
+    state = state.copyWith(globalConfig: updatedGlobalConfig);
+    PrefProvider.instance.setGlobalConfig(state.globalConfig);
+  }
+
+  Future<void> setEditorSize(Size size) async {
+    final updatedGlobalConfig = state.globalConfig.updateOverlaySettings(
+        overlayWidth: size.width,
+        overlayHeight: size.height
+    );
+    state = state.copyWith(
+        overlayWidth: size.width,
+        overlayHeight: size.height,
+        globalConfig: updatedGlobalConfig
+    );
+    PrefProvider.instance.setGlobalConfig(state.globalConfig);
+  }
+
+  void toggleWindowSizeLock() {
+    final value = !state.windowSizeLock;
+    final updatedGlobalConfig = state.globalConfig.updateWindowSettings(isWindowSizeLock: value);
+    state = state.copyWith(
+        windowSizeLock: value,
+        globalConfig: updatedGlobalConfig
+    );
+    WindowManagerPlus.current.setResizable(value);
+    PrefProvider.instance.setGlobalConfig(state.globalConfig);
+  }
+
+
 
 
 
   void initKeyMonitoring() {
     keyInputMonitor.pressedKeys.addListener(_onKeyPressed);
+    keyInputMonitor.pressedKeys.addListener(_onGroupSwitchKeyPressed);
     keyInputMonitor.start();
+  }
+
+  void _onGroupSwitchKeyPressed() {
+    final targetKey = state.currentPreset.switchKey;
+    final currentKeys = keyInputMonitor.pressedKeys.value;
+    final currentPreset = state.currentPreset;
+    if (currentKeys.length == 1 && currentKeys.contains(targetKey)) {
+      int idx = currentPreset.currentGroupIdx+1;
+      if(idx >= currentPreset.keyTileDataGroup.length){
+        idx = state.currentPreset.isObserver ? -1 : 0;
+      }
+      setCurrentKeyTileDataGroup(idx);
+    }
   }
 
   void _onKeyPressed() {
@@ -49,25 +184,6 @@ class SettingsViewModel extends StateNotifier<SettingsModel> {
       updateOverlayKeyTile(); // 오버레이 동기화
     }
     _previousPressedKeys = Set.from(currentKeys);
-  }
-
-  void _updateKeyCount(Set<int> currentKeys) {
-    final currentPreset = state.currentPreset;
-
-    final newlyPressed = currentKeys.difference(_previousPressedKeys);
-    final updatedData = state.currentPreset.getCurrentGroup.keyTileData.map((tile) {
-      if (newlyPressed.contains(tile.key)) {
-        return tile.copyWith(keyCount: tile.keyCount + 1);
-      }
-      return tile;
-    }).toSet();
-
-    final updatedKeySetGroup = [...currentPreset.keyTileDataGroup];
-    updatedKeySetGroup[state.currentPreset.currentGroupIdx] = updatedKeySetGroup[state.currentPreset.currentGroupIdx].copyWith(keyTileData: updatedData.toList());
-
-    state = state
-        .copyWith(pressedKeySet: currentKeys)
-        .copyWith.currentPreset(keyTileDataGroup: updatedKeySetGroup);
   }
 
   void _saveToPreferences() {
@@ -124,11 +240,12 @@ class SettingsViewModel extends StateNotifier<SettingsModel> {
   Future<void> updateOverlayKeyTile() async {
     final window = state.window;
     if(window == null) return;
+    print(state.currentPreset.keyTileDataGroup);
     await WindowManagerPlus.current.invokeMethodToWindow(
         window.id,
         "updateKeyTile",
         jsonEncode([
-          state.currentPreset.keyTileDataGroup[state.currentPreset.currentGroupIdx].keyTileData.toList(),
+          state.currentPreset.getCurrentGroup.keyTileData.toList(),
           state.pressedKeySet.toList()
         ]));
   }
@@ -146,36 +263,6 @@ class SettingsViewModel extends StateNotifier<SettingsModel> {
     }
   }
 
-  void updateKeyTileData(Set<KeyTileDataModel> data) {
-    final preset = state.currentPreset;
-    final group = preset.getCurrentGroup.copyWith(keyTileData: data.toList());
-    final newGroup = [...preset.keyTileDataGroup];
-    newGroup[preset.currentGroupIdx] = group;
-
-    state = state.copyWith.currentPreset(keyTileDataGroup: newGroup);
-    updateOverlayKeyTile();
-  }
-
-  void addKeyTile(KeyTileDataModel model) {
-    final preset = state.currentPreset;
-    final data = {...preset.getCurrentKeyTileData, model};
-    final group = preset.getCurrentGroup.copyWith(keyTileData: data.toList());
-    final newGroup = [...preset.keyTileDataGroup];
-    newGroup[preset.currentGroupIdx] = group;
-
-    state = state
-        .copyWith.globalConfig(currentPresetName: state.currentPreset.presetName)
-        .copyWith.currentPreset(keyTileDataGroup: newGroup);
-    updateOverlayKeyTile();
-  }
-
-
-  Future<void> setEditorSize(Size size) async {
-    state = state.copyWith(overlayWidth: size.width, overlayHeight: size.height)
-        .copyWith.globalConfig(overlayWith: size.width, overlayHeight: size.height);
-    PrefProvider.instance.setGlobalConfig(state.globalConfig);
-  }
-
   Future<void> getGlobalConfig() async {
     final globalConfig = (await PrefProvider.instance.getGlobalConfig());
     state = state.copyWith(
@@ -185,94 +272,6 @@ class SettingsViewModel extends StateNotifier<SettingsModel> {
             .firstWhereOrNull((e) => e.presetName == globalConfig.currentPresetName) ?? PresetModel.empty());
 
   }
-
-  void setWindowSizeConfig({required Size size}) {
-    state = state.copyWith.globalConfig(windowWidth: size.width, windowHeight: size.height);
-    PrefProvider.instance.setGlobalConfig(state.globalConfig);
-  }
-
-
-  void setWindowPositionConfig({required Offset pos}) async  {
-    state = state.copyWith.globalConfig(windowX: pos.dx, windowY: pos.dy,);
-    PrefProvider.instance.setGlobalConfig(state.globalConfig);
-  }
-
-  void setOverlayPositionConfig({required Offset pos}) {
-    state = state.copyWith.globalConfig(overlayX: pos.dx, overlayY: pos.dy,);
-    PrefProvider.instance.setGlobalConfig(state.globalConfig);
-  }
-
-  void toggleWindowSizeLock() {
-    final value = !state.windowSizeLock;
-    state = state.copyWith(windowSizeLock: value).copyWith.globalConfig(isWindowSizeLock: value);
-    WindowManagerPlus.current.setResizable(value);
-    PrefProvider.instance.setGlobalConfig(state.globalConfig);
-  }
-
-  void setPreset(PresetModel? preset) {
-    if(preset == null) return;
-    
-    state = state
-        .copyWith.globalConfig(currentPresetName: preset.presetName)
-        .copyWith(currentPreset: preset);
-    PrefProvider.instance.setGlobalConfig(state.globalConfig);
-  }
-
-  void addPreset(PresetModel data) {
-    final presetList = [...state.presetList, data];
-    state = state
-        .copyWith.globalConfig(presetList: presetList, currentPresetName: data.presetName)
-        .copyWith(presetList: presetList, currentPreset: data);
-    PrefProvider.instance.setGlobalConfig(state.globalConfig);
-  }
-
-  void addKeyTileDataGroup(KeyTileDataGroupModel data) {
-    final currentGroupList = [...state.currentPreset.keyTileDataGroup, data];
-    final currentPresetList = [...state.presetList];
-    final targetPresetIdx = state.getCurrentPresetIndex;
-
-    final updatedPreset = currentPresetList[targetPresetIdx].copyWith(keyTileDataGroup: currentGroupList);
-    currentPresetList[targetPresetIdx] = updatedPreset;
-
-    state = state
-        .copyWith.globalConfig(presetList: currentPresetList)
-        .copyWith(
-      presetList: currentPresetList,
-      currentPreset: updatedPreset,
-    );
-    PrefProvider.instance.setGlobalConfig(state.globalConfig);
-  }
-
-  void setCurrentKeyTileDataGroup(int groupIndex) {
-    if (groupIndex < 0 || groupIndex >= state.currentPreset.keyTileDataGroup.length) {
-      return; // 범위 벗어남
-    }
-
-    // 1. currentPreset의 currentGroupIdx 업데이트
-    final updatedCurrentPreset = state.currentPreset.copyWith(currentGroupIdx: groupIndex);
-
-    // 2. presetList에서 해당 preset도 동일하게 업데이트
-    final updatedPresetList = [...state.presetList];
-    final targetPresetIdx = state.getCurrentPresetIndex;
-    updatedPresetList[targetPresetIdx] = updatedCurrentPreset;
-
-    // 3. state와 globalConfig 모두 업데이트
-    state = state
-        .copyWith.globalConfig(presetList: updatedPresetList)
-        .copyWith(
-      presetList: updatedPresetList,
-      currentPreset: updatedCurrentPreset,
-    );
-
-    // 4. 설정 저장
-    PrefProvider.instance.setGlobalConfig(state.globalConfig);
-
-    // 5. 오버레이가 열려있다면 새 그룹 데이터로 업데이트
-    if (state.window != null) {
-      updateOverlayKeyTile();
-    }
-  }
-
 
 
 }
