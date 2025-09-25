@@ -58,6 +58,8 @@ _KeyTileStyleModel _$KeyTileStyleModelFromJson(Map<String, dynamic> json) =>
       pressedCounterFontWeight:
           (json['pressedCounterFontWeight'] as num).toInt(),
       pressedCounterFontColor: (json['pressedCounterFontColor'] as num).toInt(),
+      historyBarColor: (json['historyBarColor'] as num).toInt(),
+      historyBarZIndex: (json['historyBarZIndex'] as num).toInt(),
     );
 
 Map<String, dynamic> _$KeyTileStyleModelToJson(_KeyTileStyleModel instance) =>
@@ -82,4 +84,6 @@ Map<String, dynamic> _$KeyTileStyleModelToJson(_KeyTileStyleModel instance) =>
       'pressedCounterFontSize': instance.pressedCounterFontSize,
       'pressedCounterFontWeight': instance.pressedCounterFontWeight,
       'pressedCounterFontColor': instance.pressedCounterFontColor,
+      'historyBarColor': instance.historyBarColor,
+      'historyBarZIndex': instance.historyBarZIndex,
     };

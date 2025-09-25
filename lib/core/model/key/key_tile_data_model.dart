@@ -51,6 +51,10 @@ abstract class KeyTileStyleModel with _$KeyTileStyleModel {
     required int pressedCounterFontWeight,
     required int pressedCounterFontColor,
 
+    required int historyBarColor,
+    required int historyBarZIndex,
+
+
   }) = _KeyTileStyleModel;
 
   factory KeyTileStyleModel.fromJson(Map<String, dynamic> json) =>
@@ -79,5 +83,8 @@ abstract class KeyTileStyleModel with _$KeyTileStyleModel {
     pressedCounterFontSize: 14,
     pressedCounterFontWeight: 6,
     pressedCounterFontColor: 0xFFFFFFFF,
+    historyBarColor: 0xFF00E5FF,
+    historyBarZIndex: 1,
+
   );
 }

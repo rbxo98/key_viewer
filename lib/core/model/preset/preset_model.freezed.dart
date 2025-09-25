@@ -16,11 +16,13 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$PresetModel {
   String get presetName;
+  String get primaryKey;
   int get switchKey;
   List<KeyTileDataGroupModel> get keyTileDataGroup;
   int get currentGroupIdx;
   DateTime get createdAt;
   bool get isObserver;
+  bool get isDeleted;
 
   /// Create a copy of PresetModel
   /// with the given fields replaced by the non-null parameter values.
@@ -39,6 +41,8 @@ mixin _$PresetModel {
             other is PresetModel &&
             (identical(other.presetName, presetName) ||
                 other.presetName == presetName) &&
+            (identical(other.primaryKey, primaryKey) ||
+                other.primaryKey == primaryKey) &&
             (identical(other.switchKey, switchKey) ||
                 other.switchKey == switchKey) &&
             const DeepCollectionEquality()
@@ -48,7 +52,9 @@ mixin _$PresetModel {
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.isObserver, isObserver) ||
-                other.isObserver == isObserver));
+                other.isObserver == isObserver) &&
+            (identical(other.isDeleted, isDeleted) ||
+                other.isDeleted == isDeleted));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -56,15 +62,17 @@ mixin _$PresetModel {
   int get hashCode => Object.hash(
       runtimeType,
       presetName,
+      primaryKey,
       switchKey,
       const DeepCollectionEquality().hash(keyTileDataGroup),
       currentGroupIdx,
       createdAt,
-      isObserver);
+      isObserver,
+      isDeleted);
 
   @override
   String toString() {
-    return 'PresetModel(presetName: $presetName, switchKey: $switchKey, keyTileDataGroup: $keyTileDataGroup, currentGroupIdx: $currentGroupIdx, createdAt: $createdAt, isObserver: $isObserver)';
+    return 'PresetModel(presetName: $presetName, primaryKey: $primaryKey, switchKey: $switchKey, keyTileDataGroup: $keyTileDataGroup, currentGroupIdx: $currentGroupIdx, createdAt: $createdAt, isObserver: $isObserver, isDeleted: $isDeleted)';
   }
 }
 
@@ -76,11 +84,13 @@ abstract mixin class $PresetModelCopyWith<$Res> {
   @useResult
   $Res call(
       {String presetName,
+      String primaryKey,
       int switchKey,
       List<KeyTileDataGroupModel> keyTileDataGroup,
       int currentGroupIdx,
       DateTime createdAt,
-      bool isObserver});
+      bool isObserver,
+      bool isDeleted});
 }
 
 /// @nodoc
@@ -96,16 +106,22 @@ class _$PresetModelCopyWithImpl<$Res> implements $PresetModelCopyWith<$Res> {
   @override
   $Res call({
     Object? presetName = null,
+    Object? primaryKey = null,
     Object? switchKey = null,
     Object? keyTileDataGroup = null,
     Object? currentGroupIdx = null,
     Object? createdAt = null,
     Object? isObserver = null,
+    Object? isDeleted = null,
   }) {
     return _then(_self.copyWith(
       presetName: null == presetName
           ? _self.presetName
           : presetName // ignore: cast_nullable_to_non_nullable
+              as String,
+      primaryKey: null == primaryKey
+          ? _self.primaryKey
+          : primaryKey // ignore: cast_nullable_to_non_nullable
               as String,
       switchKey: null == switchKey
           ? _self.switchKey
@@ -127,6 +143,10 @@ class _$PresetModelCopyWithImpl<$Res> implements $PresetModelCopyWith<$Res> {
           ? _self.isObserver
           : isObserver // ignore: cast_nullable_to_non_nullable
               as bool,
+      isDeleted: null == isDeleted
+          ? _self.isDeleted
+          : isDeleted // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -136,11 +156,13 @@ class _$PresetModelCopyWithImpl<$Res> implements $PresetModelCopyWith<$Res> {
 class _PresetModel extends PresetModel {
   _PresetModel(
       {required this.presetName,
+      required this.primaryKey,
       this.switchKey = VIRTUAL_KEY.VK_TAB,
       final List<KeyTileDataGroupModel> keyTileDataGroup = const [],
       this.currentGroupIdx = 0,
       required this.createdAt,
-      this.isObserver = false})
+      this.isObserver = false,
+      this.isDeleted = false})
       : _keyTileDataGroup = keyTileDataGroup,
         super._();
   factory _PresetModel.fromJson(Map<String, dynamic> json) =>
@@ -148,6 +170,8 @@ class _PresetModel extends PresetModel {
 
   @override
   final String presetName;
+  @override
+  final String primaryKey;
   @override
   @JsonKey()
   final int switchKey;
@@ -169,6 +193,9 @@ class _PresetModel extends PresetModel {
   @override
   @JsonKey()
   final bool isObserver;
+  @override
+  @JsonKey()
+  final bool isDeleted;
 
   /// Create a copy of PresetModel
   /// with the given fields replaced by the non-null parameter values.
@@ -192,6 +219,8 @@ class _PresetModel extends PresetModel {
             other is _PresetModel &&
             (identical(other.presetName, presetName) ||
                 other.presetName == presetName) &&
+            (identical(other.primaryKey, primaryKey) ||
+                other.primaryKey == primaryKey) &&
             (identical(other.switchKey, switchKey) ||
                 other.switchKey == switchKey) &&
             const DeepCollectionEquality()
@@ -201,7 +230,9 @@ class _PresetModel extends PresetModel {
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.isObserver, isObserver) ||
-                other.isObserver == isObserver));
+                other.isObserver == isObserver) &&
+            (identical(other.isDeleted, isDeleted) ||
+                other.isDeleted == isDeleted));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -209,15 +240,17 @@ class _PresetModel extends PresetModel {
   int get hashCode => Object.hash(
       runtimeType,
       presetName,
+      primaryKey,
       switchKey,
       const DeepCollectionEquality().hash(_keyTileDataGroup),
       currentGroupIdx,
       createdAt,
-      isObserver);
+      isObserver,
+      isDeleted);
 
   @override
   String toString() {
-    return 'PresetModel(presetName: $presetName, switchKey: $switchKey, keyTileDataGroup: $keyTileDataGroup, currentGroupIdx: $currentGroupIdx, createdAt: $createdAt, isObserver: $isObserver)';
+    return 'PresetModel(presetName: $presetName, primaryKey: $primaryKey, switchKey: $switchKey, keyTileDataGroup: $keyTileDataGroup, currentGroupIdx: $currentGroupIdx, createdAt: $createdAt, isObserver: $isObserver, isDeleted: $isDeleted)';
   }
 }
 
@@ -231,11 +264,13 @@ abstract mixin class _$PresetModelCopyWith<$Res>
   @useResult
   $Res call(
       {String presetName,
+      String primaryKey,
       int switchKey,
       List<KeyTileDataGroupModel> keyTileDataGroup,
       int currentGroupIdx,
       DateTime createdAt,
-      bool isObserver});
+      bool isObserver,
+      bool isDeleted});
 }
 
 /// @nodoc
@@ -251,16 +286,22 @@ class __$PresetModelCopyWithImpl<$Res> implements _$PresetModelCopyWith<$Res> {
   @pragma('vm:prefer-inline')
   $Res call({
     Object? presetName = null,
+    Object? primaryKey = null,
     Object? switchKey = null,
     Object? keyTileDataGroup = null,
     Object? currentGroupIdx = null,
     Object? createdAt = null,
     Object? isObserver = null,
+    Object? isDeleted = null,
   }) {
     return _then(_PresetModel(
       presetName: null == presetName
           ? _self.presetName
           : presetName // ignore: cast_nullable_to_non_nullable
+              as String,
+      primaryKey: null == primaryKey
+          ? _self.primaryKey
+          : primaryKey // ignore: cast_nullable_to_non_nullable
               as String,
       switchKey: null == switchKey
           ? _self.switchKey
@@ -282,14 +323,20 @@ class __$PresetModelCopyWithImpl<$Res> implements _$PresetModelCopyWith<$Res> {
           ? _self.isObserver
           : isObserver // ignore: cast_nullable_to_non_nullable
               as bool,
+      isDeleted: null == isDeleted
+          ? _self.isDeleted
+          : isDeleted // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
 
 /// @nodoc
 mixin _$KeyTileDataGroupModel {
+  String get primaryKey;
   String get name;
   List<KeyTileDataModel> get keyTileData;
+  bool get isDeleted;
 
   /// Create a copy of KeyTileDataGroupModel
   /// with the given fields replaced by the non-null parameter values.
@@ -307,19 +354,23 @@ mixin _$KeyTileDataGroupModel {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is KeyTileDataGroupModel &&
+            (identical(other.primaryKey, primaryKey) ||
+                other.primaryKey == primaryKey) &&
             (identical(other.name, name) || other.name == name) &&
             const DeepCollectionEquality()
-                .equals(other.keyTileData, keyTileData));
+                .equals(other.keyTileData, keyTileData) &&
+            (identical(other.isDeleted, isDeleted) ||
+                other.isDeleted == isDeleted));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType, name, const DeepCollectionEquality().hash(keyTileData));
+  int get hashCode => Object.hash(runtimeType, primaryKey, name,
+      const DeepCollectionEquality().hash(keyTileData), isDeleted);
 
   @override
   String toString() {
-    return 'KeyTileDataGroupModel(name: $name, keyTileData: $keyTileData)';
+    return 'KeyTileDataGroupModel(primaryKey: $primaryKey, name: $name, keyTileData: $keyTileData, isDeleted: $isDeleted)';
   }
 }
 
@@ -329,7 +380,11 @@ abstract mixin class $KeyTileDataGroupModelCopyWith<$Res> {
           $Res Function(KeyTileDataGroupModel) _then) =
       _$KeyTileDataGroupModelCopyWithImpl;
   @useResult
-  $Res call({String name, List<KeyTileDataModel> keyTileData});
+  $Res call(
+      {String primaryKey,
+      String name,
+      List<KeyTileDataModel> keyTileData,
+      bool isDeleted});
 }
 
 /// @nodoc
@@ -345,10 +400,16 @@ class _$KeyTileDataGroupModelCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? primaryKey = null,
     Object? name = null,
     Object? keyTileData = null,
+    Object? isDeleted = null,
   }) {
     return _then(_self.copyWith(
+      primaryKey: null == primaryKey
+          ? _self.primaryKey
+          : primaryKey // ignore: cast_nullable_to_non_nullable
+              as String,
       name: null == name
           ? _self.name
           : name // ignore: cast_nullable_to_non_nullable
@@ -357,6 +418,10 @@ class _$KeyTileDataGroupModelCopyWithImpl<$Res>
           ? _self.keyTileData
           : keyTileData // ignore: cast_nullable_to_non_nullable
               as List<KeyTileDataModel>,
+      isDeleted: null == isDeleted
+          ? _self.isDeleted
+          : isDeleted // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -365,12 +430,17 @@ class _$KeyTileDataGroupModelCopyWithImpl<$Res>
 @JsonSerializable()
 class _KeyTileDataGroupModel extends KeyTileDataGroupModel {
   _KeyTileDataGroupModel(
-      {required this.name, final List<KeyTileDataModel> keyTileData = const []})
+      {required this.primaryKey,
+      required this.name,
+      final List<KeyTileDataModel> keyTileData = const [],
+      this.isDeleted = false})
       : _keyTileData = keyTileData,
         super._();
   factory _KeyTileDataGroupModel.fromJson(Map<String, dynamic> json) =>
       _$KeyTileDataGroupModelFromJson(json);
 
+  @override
+  final String primaryKey;
   @override
   final String name;
   final List<KeyTileDataModel> _keyTileData;
@@ -381,6 +451,10 @@ class _KeyTileDataGroupModel extends KeyTileDataGroupModel {
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_keyTileData);
   }
+
+  @override
+  @JsonKey()
+  final bool isDeleted;
 
   /// Create a copy of KeyTileDataGroupModel
   /// with the given fields replaced by the non-null parameter values.
@@ -403,19 +477,23 @@ class _KeyTileDataGroupModel extends KeyTileDataGroupModel {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _KeyTileDataGroupModel &&
+            (identical(other.primaryKey, primaryKey) ||
+                other.primaryKey == primaryKey) &&
             (identical(other.name, name) || other.name == name) &&
             const DeepCollectionEquality()
-                .equals(other._keyTileData, _keyTileData));
+                .equals(other._keyTileData, _keyTileData) &&
+            (identical(other.isDeleted, isDeleted) ||
+                other.isDeleted == isDeleted));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType, name, const DeepCollectionEquality().hash(_keyTileData));
+  int get hashCode => Object.hash(runtimeType, primaryKey, name,
+      const DeepCollectionEquality().hash(_keyTileData), isDeleted);
 
   @override
   String toString() {
-    return 'KeyTileDataGroupModel(name: $name, keyTileData: $keyTileData)';
+    return 'KeyTileDataGroupModel(primaryKey: $primaryKey, name: $name, keyTileData: $keyTileData, isDeleted: $isDeleted)';
   }
 }
 
@@ -427,7 +505,11 @@ abstract mixin class _$KeyTileDataGroupModelCopyWith<$Res>
       __$KeyTileDataGroupModelCopyWithImpl;
   @override
   @useResult
-  $Res call({String name, List<KeyTileDataModel> keyTileData});
+  $Res call(
+      {String primaryKey,
+      String name,
+      List<KeyTileDataModel> keyTileData,
+      bool isDeleted});
 }
 
 /// @nodoc
@@ -443,10 +525,16 @@ class __$KeyTileDataGroupModelCopyWithImpl<$Res>
   @override
   @pragma('vm:prefer-inline')
   $Res call({
+    Object? primaryKey = null,
     Object? name = null,
     Object? keyTileData = null,
+    Object? isDeleted = null,
   }) {
     return _then(_KeyTileDataGroupModel(
+      primaryKey: null == primaryKey
+          ? _self.primaryKey
+          : primaryKey // ignore: cast_nullable_to_non_nullable
+              as String,
       name: null == name
           ? _self.name
           : name // ignore: cast_nullable_to_non_nullable
@@ -455,6 +543,10 @@ class __$KeyTileDataGroupModelCopyWithImpl<$Res>
           ? _self._keyTileData
           : keyTileData // ignore: cast_nullable_to_non_nullable
               as List<KeyTileDataModel>,
+      isDeleted: null == isDeleted
+          ? _self.isDeleted
+          : isDeleted // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }

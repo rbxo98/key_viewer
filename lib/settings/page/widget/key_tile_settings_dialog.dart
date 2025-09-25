@@ -15,6 +15,8 @@ class KeyTileSettingDialog extends StatefulWidget {
   // 에디터와 동일한 픽셀 크기 미리보기를 원할 경우 사용 (원치 않으면 null)
   final double? cellPx;
   final double? gapPx;
+  final int? initialHistoryBarColor;
+  final ValueChanged<int>? onHistoryBarColorChanged;
 
   const KeyTileSettingDialog({
     super.key,
@@ -22,6 +24,8 @@ class KeyTileSettingDialog extends StatefulWidget {
     this.width = 560,
     this.cellPx,
     this.gapPx,
+    this.initialHistoryBarColor,
+    this.onHistoryBarColorChanged,
   });
 
   @override
@@ -51,7 +55,7 @@ class _KeyTileSettingDialogState extends State<KeyTileSettingDialog> {
   void initState() {
     super.initState();
     keyTileDataModel =
-        (widget.keyTileData ?? KeyTileDataModel.empty());
+    (widget.keyTileData ?? KeyTileDataModel.empty());
     _nameCtrl.text = keyTileDataModel.label;
     _gwCtrl.text = keyTileDataModel.gw.toString();
     _ghCtrl.text = keyTileDataModel.gh.toString();
@@ -73,7 +77,7 @@ class _KeyTileSettingDialogState extends State<KeyTileSettingDialog> {
   }
 
   TextStyle get _cap =>
-      const TextStyle(color: Colors.white70, fontWeight: FontWeight.w600);
+      const TextStyle(color: Colors.white70, fontWeight: FontWeight.w600, fontSize: 13);
 
   InputDecoration _fieldDeco({String? hint}) => InputDecoration(
     isDense: true,
@@ -168,12 +172,24 @@ class _KeyTileSettingDialogState extends State<KeyTileSettingDialog> {
 
   void _onKey() {
     if (!_isMapping || keyInputMonitor.pressedKeys.value.isEmpty) return;
-    final vk = keyInputMonitor.pressedKeys.value.first;
+
+    final pressedKeys = keyInputMonitor.snapshotPressed();
+    if (pressedKeys.isEmpty) return;
+
+    final vk = pressedKeys.first;
+
+    // 마우스 관련 키 코드 필터링 (102는 마우스 버튼일 가능성)
+    if (vk == 102 || vk == 1 || vk == 2) { // VK_LBUTTON, VK_RBUTTON 등
+      return;
+    }
+
     setState(() {
       keyTileDataModel = keyTileDataModel.copyWith(key: vk);
       _isMapping = false;
     });
 
+    keyInputMonitor.pressedKeys.removeListener(_onKey);
+    keyInputMonitor.stop();
   }
 
   // ───────────────── 섹션 헬퍼 ─────────────────
@@ -272,10 +288,10 @@ class _KeyTileSettingDialogState extends State<KeyTileSettingDialog> {
           value: 4,
           dropdownColor: const Color(0xFF2A2C30),
           items: [
-              DropdownMenuItem(
-                value: 4,
-                child: Text('normal', style: const TextStyle(color: Colors.white)),
-              ),
+            DropdownMenuItem(
+              value: 4,
+              child: Text('normal', style: const TextStyle(color: Colors.white)),
+            ),
             DropdownMenuItem(
               value: 6,
               child: Text('bold', style: const TextStyle(color: Colors.white)),
@@ -316,7 +332,7 @@ class _KeyTileSettingDialogState extends State<KeyTileSettingDialog> {
               children: [
                 // 헤더
                 Row(children: [
-                  Text('KeyTile 설정',
+                  Text('키 ${widget.keyTileData == null ? '추가' : '설정'}',
                       style: TextStyle(
                           color: textColor,
                           fontWeight: FontWeight.w700,
@@ -351,6 +367,7 @@ class _KeyTileSettingDialogState extends State<KeyTileSettingDialog> {
                         pressed: _previewPressed,
                         cellPx: widget.cellPx,
                         gapPx: widget.gapPx,
+                        initialHistoryBarColor: keyTileDataModel.style.historyBarColor,
                       ),
                     ),
                   ],
@@ -472,9 +489,23 @@ class _KeyTileSettingDialogState extends State<KeyTileSettingDialog> {
                           title: Text('기타 설정', style: _cap.copyWith(fontSize: 13)),
                           childrenPadding: EdgeInsets.zero,
                           children: [
-                            // ── Border (idle)
-                            _section('Border (idle)', children: [
-                              _row2('Radius', IntOnlyField(
+                            // ── 히스토리 바
+                            _section('히스토리 바', children: [
+                              _colorRow(
+                                label: '색상',
+                                argb: keyTileDataModel.style.historyBarColor,
+                                onChanged: (v) => setState(() {
+                                  keyTileDataModel = keyTileDataModel.copyWith.style(
+                                      historyBarColor: v
+                                  );
+                                }),
+                              ),
+                            ]),
+                            const SizedBox(height: 8),
+
+                            // ── 테두리(기본)
+                            _section('테두리(기본)', children: [
+                              _row2('반경', IntOnlyField(
                                 value: keyTileDataModel.style.idleBorderRadius.round(),
                                 onChanged: (v) => setState(() =>
                                 keyTileDataModel = keyTileDataModel.copyWith
@@ -482,7 +513,7 @@ class _KeyTileSettingDialogState extends State<KeyTileSettingDialog> {
                                 min: 0, max: 64, hint: '0~64',
                               )),
                               const SizedBox(height: 8),
-                              _row2('Width', IntOnlyField(
+                              _row2('두께', IntOnlyField(
                                 value: keyTileDataModel.style.idleBorderWidth.round(),
                                 onChanged: (v) => setState(() =>
                                 keyTileDataModel = keyTileDataModel.copyWith.style(idleBorderWidth: v.toDouble())),
@@ -490,23 +521,23 @@ class _KeyTileSettingDialogState extends State<KeyTileSettingDialog> {
                               )),
                               const SizedBox(height: 8),
                               _colorRow(
-                                label: 'Color',
+                                label: '색상',
                                 argb: keyTileDataModel.style.idleBorderColor,
                                 onChanged: (v) => setState(() =>
                                 keyTileDataModel = keyTileDataModel.copyWith.style(idleBorderColor: v)),
                               ),
                             ]),
 
-                            // ── Border (pressed)
-                            _section('Border (pressed)', children: [
-                              _row2('Radius', IntOnlyField(
+                            // ── 테두리(눌림)
+                            _section('테두리(눌림)', children: [
+                              _row2('반경', IntOnlyField(
                                 value: keyTileDataModel.style.pressedBorderRadius.round(),
                                 onChanged: (v) => setState(() =>
                                 keyTileDataModel = keyTileDataModel.copyWith.style(pressedBorderRadius: v.toDouble())),
                                 min: 0, max: 64, hint: '0~64',
                               )),
                               const SizedBox(height: 8),
-                              _row2('Width', IntOnlyField(
+                              _row2('두께', IntOnlyField(
                                 value: keyTileDataModel.style.pressedBorderWidth.round(),
                                 onChanged: (v) => setState(() =>
                                 keyTileDataModel = keyTileDataModel.copyWith.style(pressedBorderWidth: v.toDouble())),
@@ -514,15 +545,15 @@ class _KeyTileSettingDialogState extends State<KeyTileSettingDialog> {
                               )),
                               const SizedBox(height: 8),
                               _colorRow(
-                                label: 'Color',
+                                label: '색상',
                                 argb: keyTileDataModel.style.pressedBorderColor,
                                 onChanged: (v) => setState(() =>
                                 keyTileDataModel = keyTileDataModel.copyWith.style(pressedBorderColor: v)),
                               ),
                             ]),
 
-                            // ── Background
-                            _section('Background', children: [
+                            // ── 배경
+                            _section('배경', children: [
                               _colorRow(
                                 label: 'Idle',
                                 argb: keyTileDataModel.style.idleBackgroundColor,
@@ -539,8 +570,8 @@ class _KeyTileSettingDialogState extends State<KeyTileSettingDialog> {
                             ]),
 
                             // ── Key Font
-                            _section('Key Font (idle)', children: [
-                              _row2('Size', IntOnlyField(
+                            _section('키 글꼴(기본)', children: [
+                              _row2('크기', IntOnlyField(
                                 value: keyTileDataModel.style.idleKeyFontSize.round(),
                                 onChanged: (v) => setState(() =>
                                 keyTileDataModel = keyTileDataModel.copyWith.style(idleKeyFontSize: v.toDouble())),
@@ -555,15 +586,15 @@ class _KeyTileSettingDialogState extends State<KeyTileSettingDialog> {
                               ),
                               const SizedBox(height: 8),
                               _colorRow(
-                                label: 'Color',
+                                label: '색상',
                                 argb: keyTileDataModel.style.idleKeyFontColor,
                                 onChanged: (v) => setState(() =>
                                 keyTileDataModel = keyTileDataModel.copyWith.style(idleKeyFontColor: v)),
                               ),
                             ]),
 
-                            _section('Key Font (pressed)', children: [
-                              _row2('Size', IntOnlyField(
+                            _section('키 글꼴(눌림)', children: [
+                              _row2('크기', IntOnlyField(
                                 value: keyTileDataModel.style.pressedKeyFontSize.round(),
                                 onChanged: (v) => setState(() =>
                                 keyTileDataModel = keyTileDataModel.copyWith.style(pressedKeyFontSize: v.toDouble())),
@@ -578,7 +609,7 @@ class _KeyTileSettingDialogState extends State<KeyTileSettingDialog> {
                               ),
                               const SizedBox(height: 8),
                               _colorRow(
-                                label: 'Color',
+                                label: '색상',
                                 argb: keyTileDataModel.style.pressedKeyFontColor,
                                 onChanged: (v) => setState(() =>
                                 keyTileDataModel = keyTileDataModel.copyWith.style(pressedKeyFontColor: v)),
@@ -586,8 +617,8 @@ class _KeyTileSettingDialogState extends State<KeyTileSettingDialog> {
                             ]),
 
                             // ── Counter Font
-                            _section('Counter Font (idle)', children: [
-                              _row2('Size', IntOnlyField(
+                            _section('카운터 글꼴(기본)', children: [
+                              _row2('크기', IntOnlyField(
                                 value: keyTileDataModel.style.idleCounterFontSize.round(),
                                 onChanged: (v) => setState(() =>
                                 keyTileDataModel = keyTileDataModel.copyWith.style(idleCounterFontSize: v.toDouble())),
@@ -602,15 +633,15 @@ class _KeyTileSettingDialogState extends State<KeyTileSettingDialog> {
                               ),
                               const SizedBox(height: 8),
                               _colorRow(
-                                label: 'Color',
+                                label: '색상',
                                 argb: keyTileDataModel.style.idleCounterFontColor,
                                 onChanged: (v) => setState(() =>
                                 keyTileDataModel = keyTileDataModel.copyWith.style(idleCounterFontColor: v)),
                               ),
                             ]),
 
-                            _section('Counter Font (pressed)', children: [
-                              _row2('Size', IntOnlyField(
+                            _section('카운터 글꼴(눌림)', children: [
+                              _row2('크기', IntOnlyField(
                                 value: keyTileDataModel.style.pressedCounterFontSize.round(),
                                 onChanged: (v) => setState(() =>
                                 keyTileDataModel = keyTileDataModel.copyWith.style(pressedCounterFontSize: v.toDouble())),
@@ -625,7 +656,7 @@ class _KeyTileSettingDialogState extends State<KeyTileSettingDialog> {
                               ),
                               const SizedBox(height: 8),
                               _colorRow(
-                                label: 'Color',
+                                label: '색상',
                                 argb: keyTileDataModel.style.pressedCounterFontColor,
                                 onChanged: (v) => setState(() =>
                                 keyTileDataModel = keyTileDataModel.copyWith.style(pressedCounterFontColor: v)),
@@ -648,19 +679,19 @@ class _KeyTileSettingDialogState extends State<KeyTileSettingDialog> {
                   mainAxisAlignment: widget.keyTileData == null ? MainAxisAlignment.end : MainAxisAlignment.spaceBetween,
                   children: [
                     if(widget.keyTileData != null)
-                    OutlinedButton(
-                        onPressed: _removeAndClose,
-                        style: OutlinedButton.styleFrom(
-                          backgroundColor: Colors.transparent,
-                          side: const BorderSide(color: Colors.red),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(Icons.delete_outline, color: Colors.red,),
-                            SizedBox(width: 8,),
-                            const Text('삭제', style: TextStyle(color: Colors.red),),
-                          ],
-                        )),
+                      OutlinedButton(
+                          onPressed: _removeAndClose,
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            side: const BorderSide(color: Colors.red),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.delete_outline, color: Colors.red,),
+                              SizedBox(width: 8,),
+                              const Text('삭제', style: TextStyle(color: Colors.red),),
+                            ],
+                          )),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -691,12 +722,14 @@ class _PreviewBox extends StatelessWidget {
     required this.pressed,
     this.cellPx,
     this.gapPx,
+    required this.initialHistoryBarColor,
   });
 
   final KeyTileDataModel model;
   final bool pressed;
   final double? cellPx;
   final double? gapPx;
+  final int initialHistoryBarColor;
 
   @override
   Widget build(BuildContext context) {

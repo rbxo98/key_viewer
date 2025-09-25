@@ -1,5 +1,7 @@
 import 'package:key_viewer_v2/core/model/key/key_tile_data_model.dart';
 import 'package:key_viewer_v2/core/model/preset/preset_model.dart';
+import 'package:uuid/uuid.dart';
+import 'package:uuid/v4.dart';
 import 'package:win32/win32.dart';
 
 final _baseGx = 0;
@@ -9,10 +11,12 @@ PresetModel DJMAXPresetModel = PresetModel(
     presetName: "DJMAX RESPECT V",
     keyTileDataGroup: [
       KeyTileDataGroupModel(
+          primaryKey: "DJMAX_PRESET_GROUP",
           name: "8B",
         keyTileData: djmaxPreset
       ),
-    ], isObserver: false);
+    ], isObserver: false,
+    primaryKey: UuidV4().generate());
 final List<KeyTileDataModel> djmaxPreset = [
   KeyTileDataModel(
       primaryKey: "DJMAX_PRESET_KEY_1",

@@ -51,19 +51,20 @@ class _KeyTileGroupSettingsDialogState extends State<KeyTileGroupSettingsDialog>
 
     return LayoutBuilder(builder: (context, c) {
       final w = 560.clamp(360.0, c.maxWidth - 48.0).toDouble();
-      final maxH = 160;
+      final maxH = MediaQuery.of(context).size.height*0.8;
       return Dialog(
         backgroundColor: bg,
         insetPadding:
         const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12)),
-        child: SizedBox(
+        child: Container(
           width: w,
-          height: maxH.toDouble(),
+          constraints: BoxConstraints(maxHeight: maxH, minHeight: 160),
           child: Padding(
             padding: const EdgeInsets.fromLTRB(20, 18, 20, 12),
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -111,19 +112,42 @@ class _KeyTileGroupSettingsDialogState extends State<KeyTileGroupSettingsDialog>
                 const SizedBox(height: 18,),
 
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisSize: MainAxisSize.max ,
+                  mainAxisAlignment: widget.keyTileDataGroup == null ? MainAxisAlignment.end : MainAxisAlignment.spaceBetween,
                   children: [
-                    TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text('취소')),
-                    const SizedBox(width: 8),
-                    FilledButton(
-                        onPressed: (){
-                          Navigator.of(context).pop(keyTileDataGroup);
-                        },
-                        child: const Text('완료')),
+                    if(widget.keyTileDataGroup != null)
+                      OutlinedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop(keyTileDataGroup.copyWith(isDeleted: true));
+                          },
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            side: const BorderSide(color: Colors.red),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.delete_outline, color: Colors.red,),
+                              SizedBox(width: 8,),
+                              const Text('삭제', style: TextStyle(color: Colors.red),),
+                            ],
+                          )),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text('취소')),
+                        const SizedBox(width: 8),
+                        FilledButton(
+                            onPressed: (){
+                              Navigator.of(context).pop(keyTileDataGroup);
+                            },
+                            child: const Text('완료')),
+                      ],
+                    ),
                   ],
                 ),
               ],

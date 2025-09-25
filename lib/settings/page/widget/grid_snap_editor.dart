@@ -202,7 +202,7 @@ class _GridSnapEditorState extends State<GridSnapEditor> with TickerProviderStat
     }
 
     _runtimeTiles = _tiles.map((m) {
-      final rt = _KeyTileRuntime(model: m);
+      final rt = _KeyTileRuntime(model: m, historyColor: Color(m.style.historyBarColor));
       if (preserveHistory) {
         final saved = prev[m.primaryKey];
         if (saved != null) {
@@ -767,7 +767,7 @@ class _KeyTileRuntime {
   _KeyTileRuntime({
     required this.model,
     this.axis = HistoryAxis.verticalUp,
-    this.historyColor = const Color(0xFF00E5FF), // cyan-ish
+    required this.historyColor, // cyan-ish
   });
 }
 

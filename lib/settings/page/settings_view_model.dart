@@ -67,6 +67,16 @@ class SettingsViewModel extends StateNotifier<SettingsModel> {
     PrefProvider.instance.setGlobalConfig(state.globalConfig);
   }
 
+  void updatePresetListInfo(List<PresetModel> data) {
+    state = state.updatePresetListInfoSync(data);
+    PrefProvider.instance.setGlobalConfig(state.globalConfig);
+  }
+
+  void deletePreset(PresetModel data) {
+    state = state.deletePresetSync(data);
+    PrefProvider.instance.setGlobalConfig(state.globalConfig);
+  }
+
   void addKeyTileDataGroup(KeyTileDataGroupModel data) {
     state = state.addKeyTileDataGroupSync(data);
     PrefProvider.instance.setGlobalConfig(state.globalConfig);
@@ -272,6 +282,7 @@ class SettingsViewModel extends StateNotifier<SettingsModel> {
             .firstWhereOrNull((e) => e.presetName == globalConfig.currentPresetName) ?? PresetModel.empty());
 
   }
+
 
 
 }

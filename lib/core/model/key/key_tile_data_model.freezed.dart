@@ -336,6 +336,8 @@ mixin _$KeyTileStyleModel {
   double get pressedCounterFontSize;
   int get pressedCounterFontWeight;
   int get pressedCounterFontColor;
+  int get historyBarColor;
+  int get historyBarZIndex;
 
   /// Create a copy of KeyTileStyleModel
   /// with the given fields replaced by the non-null parameter values.
@@ -394,7 +396,11 @@ mixin _$KeyTileStyleModel {
                 other.pressedCounterFontWeight == pressedCounterFontWeight) &&
             (identical(
                     other.pressedCounterFontColor, pressedCounterFontColor) ||
-                other.pressedCounterFontColor == pressedCounterFontColor));
+                other.pressedCounterFontColor == pressedCounterFontColor) &&
+            (identical(other.historyBarColor, historyBarColor) ||
+                other.historyBarColor == historyBarColor) &&
+            (identical(other.historyBarZIndex, historyBarZIndex) ||
+                other.historyBarZIndex == historyBarZIndex));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -420,12 +426,14 @@ mixin _$KeyTileStyleModel {
         idleCounterFontColor,
         pressedCounterFontSize,
         pressedCounterFontWeight,
-        pressedCounterFontColor
+        pressedCounterFontColor,
+        historyBarColor,
+        historyBarZIndex
       ]);
 
   @override
   String toString() {
-    return 'KeyTileStyleModel(idleBorderRadius: $idleBorderRadius, idleBorderWidth: $idleBorderWidth, idleBorderColor: $idleBorderColor, idleBackgroundColor: $idleBackgroundColor, pressedBorderRadius: $pressedBorderRadius, pressedBorderWidth: $pressedBorderWidth, pressedBorderColor: $pressedBorderColor, pressedBackgroundColor: $pressedBackgroundColor, idleKeyFontSize: $idleKeyFontSize, idleKeyFontWeight: $idleKeyFontWeight, idleKeyFontColor: $idleKeyFontColor, pressedKeyFontSize: $pressedKeyFontSize, pressedKeyFontWeight: $pressedKeyFontWeight, pressedKeyFontColor: $pressedKeyFontColor, idleCounterFontSize: $idleCounterFontSize, idleCounterFontWeight: $idleCounterFontWeight, idleCounterFontColor: $idleCounterFontColor, pressedCounterFontSize: $pressedCounterFontSize, pressedCounterFontWeight: $pressedCounterFontWeight, pressedCounterFontColor: $pressedCounterFontColor)';
+    return 'KeyTileStyleModel(idleBorderRadius: $idleBorderRadius, idleBorderWidth: $idleBorderWidth, idleBorderColor: $idleBorderColor, idleBackgroundColor: $idleBackgroundColor, pressedBorderRadius: $pressedBorderRadius, pressedBorderWidth: $pressedBorderWidth, pressedBorderColor: $pressedBorderColor, pressedBackgroundColor: $pressedBackgroundColor, idleKeyFontSize: $idleKeyFontSize, idleKeyFontWeight: $idleKeyFontWeight, idleKeyFontColor: $idleKeyFontColor, pressedKeyFontSize: $pressedKeyFontSize, pressedKeyFontWeight: $pressedKeyFontWeight, pressedKeyFontColor: $pressedKeyFontColor, idleCounterFontSize: $idleCounterFontSize, idleCounterFontWeight: $idleCounterFontWeight, idleCounterFontColor: $idleCounterFontColor, pressedCounterFontSize: $pressedCounterFontSize, pressedCounterFontWeight: $pressedCounterFontWeight, pressedCounterFontColor: $pressedCounterFontColor, historyBarColor: $historyBarColor, historyBarZIndex: $historyBarZIndex)';
   }
 }
 
@@ -455,7 +463,9 @@ abstract mixin class $KeyTileStyleModelCopyWith<$Res> {
       int idleCounterFontColor,
       double pressedCounterFontSize,
       int pressedCounterFontWeight,
-      int pressedCounterFontColor});
+      int pressedCounterFontColor,
+      int historyBarColor,
+      int historyBarZIndex});
 }
 
 /// @nodoc
@@ -491,6 +501,8 @@ class _$KeyTileStyleModelCopyWithImpl<$Res>
     Object? pressedCounterFontSize = null,
     Object? pressedCounterFontWeight = null,
     Object? pressedCounterFontColor = null,
+    Object? historyBarColor = null,
+    Object? historyBarZIndex = null,
   }) {
     return _then(_self.copyWith(
       idleBorderRadius: null == idleBorderRadius
@@ -573,6 +585,14 @@ class _$KeyTileStyleModelCopyWithImpl<$Res>
           ? _self.pressedCounterFontColor
           : pressedCounterFontColor // ignore: cast_nullable_to_non_nullable
               as int,
+      historyBarColor: null == historyBarColor
+          ? _self.historyBarColor
+          : historyBarColor // ignore: cast_nullable_to_non_nullable
+              as int,
+      historyBarZIndex: null == historyBarZIndex
+          ? _self.historyBarZIndex
+          : historyBarZIndex // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }
@@ -600,7 +620,9 @@ class _KeyTileStyleModel implements KeyTileStyleModel {
       required this.idleCounterFontColor,
       required this.pressedCounterFontSize,
       required this.pressedCounterFontWeight,
-      required this.pressedCounterFontColor});
+      required this.pressedCounterFontColor,
+      required this.historyBarColor,
+      required this.historyBarZIndex});
   factory _KeyTileStyleModel.fromJson(Map<String, dynamic> json) =>
       _$KeyTileStyleModelFromJson(json);
 
@@ -644,6 +666,10 @@ class _KeyTileStyleModel implements KeyTileStyleModel {
   final int pressedCounterFontWeight;
   @override
   final int pressedCounterFontColor;
+  @override
+  final int historyBarColor;
+  @override
+  final int historyBarZIndex;
 
   /// Create a copy of KeyTileStyleModel
   /// with the given fields replaced by the non-null parameter values.
@@ -706,7 +732,11 @@ class _KeyTileStyleModel implements KeyTileStyleModel {
                 other.pressedCounterFontWeight == pressedCounterFontWeight) &&
             (identical(
                     other.pressedCounterFontColor, pressedCounterFontColor) ||
-                other.pressedCounterFontColor == pressedCounterFontColor));
+                other.pressedCounterFontColor == pressedCounterFontColor) &&
+            (identical(other.historyBarColor, historyBarColor) ||
+                other.historyBarColor == historyBarColor) &&
+            (identical(other.historyBarZIndex, historyBarZIndex) ||
+                other.historyBarZIndex == historyBarZIndex));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -732,12 +762,14 @@ class _KeyTileStyleModel implements KeyTileStyleModel {
         idleCounterFontColor,
         pressedCounterFontSize,
         pressedCounterFontWeight,
-        pressedCounterFontColor
+        pressedCounterFontColor,
+        historyBarColor,
+        historyBarZIndex
       ]);
 
   @override
   String toString() {
-    return 'KeyTileStyleModel(idleBorderRadius: $idleBorderRadius, idleBorderWidth: $idleBorderWidth, idleBorderColor: $idleBorderColor, idleBackgroundColor: $idleBackgroundColor, pressedBorderRadius: $pressedBorderRadius, pressedBorderWidth: $pressedBorderWidth, pressedBorderColor: $pressedBorderColor, pressedBackgroundColor: $pressedBackgroundColor, idleKeyFontSize: $idleKeyFontSize, idleKeyFontWeight: $idleKeyFontWeight, idleKeyFontColor: $idleKeyFontColor, pressedKeyFontSize: $pressedKeyFontSize, pressedKeyFontWeight: $pressedKeyFontWeight, pressedKeyFontColor: $pressedKeyFontColor, idleCounterFontSize: $idleCounterFontSize, idleCounterFontWeight: $idleCounterFontWeight, idleCounterFontColor: $idleCounterFontColor, pressedCounterFontSize: $pressedCounterFontSize, pressedCounterFontWeight: $pressedCounterFontWeight, pressedCounterFontColor: $pressedCounterFontColor)';
+    return 'KeyTileStyleModel(idleBorderRadius: $idleBorderRadius, idleBorderWidth: $idleBorderWidth, idleBorderColor: $idleBorderColor, idleBackgroundColor: $idleBackgroundColor, pressedBorderRadius: $pressedBorderRadius, pressedBorderWidth: $pressedBorderWidth, pressedBorderColor: $pressedBorderColor, pressedBackgroundColor: $pressedBackgroundColor, idleKeyFontSize: $idleKeyFontSize, idleKeyFontWeight: $idleKeyFontWeight, idleKeyFontColor: $idleKeyFontColor, pressedKeyFontSize: $pressedKeyFontSize, pressedKeyFontWeight: $pressedKeyFontWeight, pressedKeyFontColor: $pressedKeyFontColor, idleCounterFontSize: $idleCounterFontSize, idleCounterFontWeight: $idleCounterFontWeight, idleCounterFontColor: $idleCounterFontColor, pressedCounterFontSize: $pressedCounterFontSize, pressedCounterFontWeight: $pressedCounterFontWeight, pressedCounterFontColor: $pressedCounterFontColor, historyBarColor: $historyBarColor, historyBarZIndex: $historyBarZIndex)';
   }
 }
 
@@ -769,7 +801,9 @@ abstract mixin class _$KeyTileStyleModelCopyWith<$Res>
       int idleCounterFontColor,
       double pressedCounterFontSize,
       int pressedCounterFontWeight,
-      int pressedCounterFontColor});
+      int pressedCounterFontColor,
+      int historyBarColor,
+      int historyBarZIndex});
 }
 
 /// @nodoc
@@ -805,6 +839,8 @@ class __$KeyTileStyleModelCopyWithImpl<$Res>
     Object? pressedCounterFontSize = null,
     Object? pressedCounterFontWeight = null,
     Object? pressedCounterFontColor = null,
+    Object? historyBarColor = null,
+    Object? historyBarZIndex = null,
   }) {
     return _then(_KeyTileStyleModel(
       idleBorderRadius: null == idleBorderRadius
@@ -886,6 +922,14 @@ class __$KeyTileStyleModelCopyWithImpl<$Res>
       pressedCounterFontColor: null == pressedCounterFontColor
           ? _self.pressedCounterFontColor
           : pressedCounterFontColor // ignore: cast_nullable_to_non_nullable
+              as int,
+      historyBarColor: null == historyBarColor
+          ? _self.historyBarColor
+          : historyBarColor // ignore: cast_nullable_to_non_nullable
+              as int,
+      historyBarZIndex: null == historyBarZIndex
+          ? _self.historyBarZIndex
+          : historyBarZIndex // ignore: cast_nullable_to_non_nullable
               as int,
     ));
   }

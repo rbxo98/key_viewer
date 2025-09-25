@@ -66,7 +66,7 @@ extension SettingsModelExtension on SettingsModel {
   }
 
   SettingsModel removeKeyTileDataGroupSync(KeyTileDataGroupModel group) {
-    final updatedGroups = [...currentPreset.keyTileDataGroup]..removeWhere((e) => e.name == group.name);
+    final updatedGroups = [...currentPreset.keyTileDataGroup]..removeWhere((e) => e.primaryKey == group.primaryKey);
     final updatedPreset = currentPreset.copyWith(
         keyTileDataGroup: updatedGroups,
       currentGroupIdx: currentPreset.currentGroupIdx >= updatedGroups.length ? updatedGroups.length - 1 : currentPreset.currentGroupIdx
@@ -88,9 +88,7 @@ extension SettingsModelExtension on SettingsModel {
   /// 프리셋을 추가하고 현재 프리셋으로 설정하는 메소드
   SettingsModel addPresetSync(PresetModel preset) {
     final updatedPresetList = [...presetList, preset];
-    return copyWith
-        .globalConfig(
-        presetList: updatedPresetList, currentPresetName: preset.presetName)
+    return copyWith.globalConfig(presetList: updatedPresetList, currentPresetName: preset.presetName)
         .copyWith(presetList: updatedPresetList, currentPreset: preset);
   }
 
@@ -107,12 +105,22 @@ extension SettingsModelExtension on SettingsModel {
     if (currentPresetIndex >= 0 && currentPresetIndex < presetList.length) {
       updatedPresetList[currentPresetIndex] = preset;
     }
-    return copyWith
-        .globalConfig(
-        currentPresetName: preset.presetName,
-      presetList: updatedPresetList
-    )
-        .copyWith(currentPreset: preset, presetList: updatedPresetList);
+    return copyWith.globalConfig(
+      presetList: updatedPresetList, currentPresetName: preset.presetName)
+        .copyWith(presetList: updatedPresetList, currentPreset: preset);
+  }
+
+
+  SettingsModel updatePresetListInfoSync(List<PresetModel> presetList) {
+    return copyWith.globalConfig(presetList: presetList)
+        .copyWith(presetList: presetList);
+  }
+
+  SettingsModel deletePresetSync(PresetModel preset) {
+    final updatedPresetList = [...presetList]..removeWhere((e) => e.presetName == preset.presetName);
+    final newIdx = getCurrentPresetIndex >= updatedPresetList.length ? updatedPresetList.length - 1 : getCurrentPresetIndex;
+    return copyWith.globalConfig(presetList: updatedPresetList, currentPresetName: updatedPresetList[newIdx].presetName)
+        .copyWith(presetList: updatedPresetList, currentPreset: updatedPresetList[newIdx]);
   }
 
   /// 현재 프리셋의 isObserver 값을 설정하고 동기화하는 메소드

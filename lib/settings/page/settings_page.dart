@@ -11,7 +11,9 @@ import 'package:key_viewer_v2/core/lib/pref_provider.dart';
 import 'package:key_viewer_v2/core/model/key/key_tile_data_model.dart';
 import 'package:key_viewer_v2/core/model/preset/preset_model.dart';
 import 'package:key_viewer_v2/settings/app/setting_app.dart';
+import 'package:key_viewer_v2/settings/data/preset/base/observer_group.dart';
 import 'package:key_viewer_v2/settings/data/preset/djmax/djmax_preset.dart';
+import 'package:key_viewer_v2/settings/page/settings_preset_management_dialog.dart';
 import 'package:key_viewer_v2/settings/page/settings_view_model.dart';
 import 'package:key_viewer_v2/settings/page/widget/key_tile_group/group_button.dart';
 import 'package:key_viewer_v2/settings/page/widget/key_tile_group/key_tile_group_settings_dialog.dart';
@@ -108,7 +110,10 @@ class _KeyViewerSettingsPageState extends ConsumerState<KeyViewerSettingsPage> w
                             DropdownMenuItem(child: Text("프리셋 추가"), value: null,)
                           ], onChanged: (v) async {
                           if(v == null){
-                            final data = await showDialog(context: context, builder: (_) => KeyTilePreSetSettingsDialog());
+                            final data = await showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (_) => KeyTilePresetSettingsDialog());
                             if(data != null) viewModel.addPreset(data);
                           }
                           else{
@@ -119,10 +124,21 @@ class _KeyViewerSettingsPageState extends ConsumerState<KeyViewerSettingsPage> w
 
                       InkWell(
                         onTap: () async {
-                          final data = await showDialog(context: context, builder: (_) => KeyTilePreSetSettingsDialog(
+                          final data = await showDialog<PresetModel>(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (_) =>
+                              KeyTilePresetSettingsDialog(
                             presetModel: state.currentPreset,
+                                isDeletable: state.presetList.length > 1,
                           ));
-                          viewModel.setPreset(data);
+                          if(data == null) return;
+                          if(data.isDeleted){
+                            viewModel.deletePreset(data);
+                          }
+                          else{
+                            viewModel.updatePresetInfo(data);
+                          }
                         },
                         customBorder: CircleBorder(),
                         child: Container(
@@ -169,7 +185,7 @@ class _KeyViewerSettingsPageState extends ConsumerState<KeyViewerSettingsPage> w
                       if(state.currentPreset.isObserver)
                         KeyTileGroupButton(
                             isSelected: state.currentPreset.currentGroupIdx==-1,
-                            group: KeyTileDataGroupModel(name: "Observer"),
+                            group: observerGroup,
                             onTap: (){
                               print("index : ${state.getCurrentPresetIndex}");
                               viewModel.setCurrentKeyTileDataGroup(-1);
@@ -190,7 +206,10 @@ class _KeyViewerSettingsPageState extends ConsumerState<KeyViewerSettingsPage> w
                             },
                           )),
                       IconButton(onPressed: () async {
-                        final data = await showDialog(context: context, builder: (_) => KeyTileGroupSettingsDialog());
+                        final data = await showDialog(
+                          barrierDismissible: false,
+                            context: context,
+                            builder: (_) => KeyTileGroupSettingsDialog());
                         if(data != null) viewModel.addKeyTileDataGroup(data);
                       }, icon: Icon(Icons.add)),
                     ],
@@ -199,33 +218,45 @@ class _KeyViewerSettingsPageState extends ConsumerState<KeyViewerSettingsPage> w
               ),
             ),
             Expanded(
-              child: Stack(
-                children: [
-                  GridSnapEditor(
-                    grid: spec,
-                    targetKeyList: state.currentPreset.getCurrentKeyTileData.toSet(),
-                    onChanged: (updated) {
-                      viewModel.updateKeyTileData(updated);
-                    },
-                    onPixelSizeChanged: (size){
-                      // 1) 논리 px → 물리 px 변환
-                      final dpr = View.of(context).devicePixelRatio; // or MediaQuery.of(context).devicePixelRatio
-                      final physicalSize = Size(size.width * dpr, size.height * dpr);
+              child: GestureDetector(
+                onSecondaryTap: () async {
+                  final data = await showDialog<KeyTileDataModel>(
+                      context: context,
+                      builder: (_) => KeyTileSettingDialog(cellPx: _cell, gapPx: _gap,),
+                      barrierDismissible: false
+                  );
+                  if(data != null){
+                    viewModel.addKeyTile(data);
+                  }
+                },
+                child: Stack(
+                  children: [
+                    GridSnapEditor(
+                      grid: spec,
+                      targetKeyList: state.currentPreset.getCurrentKeyTileData.toSet(),
+                      onChanged: (updated) {
+                        viewModel.updateKeyTileData(updated);
+                      },
+                      onPixelSizeChanged: (size){
+                        // 1) 논리 px → 물리 px 변환
+                        final dpr = View.of(context).devicePixelRatio; // or MediaQuery.of(context).devicePixelRatio
+                        final physicalSize = Size(size.width * dpr, size.height * dpr);
 
-                      viewModel.setEditorSize(physicalSize);
-                      viewModel.resizeOverlay();
-                    },
-                    pressedKeySet: {},
-                    onInitialize: (size) async {
-                      final dpr = View.of(context).devicePixelRatio;
-                      final physicalSize = Size(size.width * dpr, size.height * dpr);
-                      await viewModel.setEditorSize(physicalSize);
-                      await viewModel.showOverlay();
-                    },
-                  ),
+                        viewModel.setEditorSize(physicalSize);
+                        viewModel.resizeOverlay();
+                      },
+                      pressedKeySet: {},
+                      onInitialize: (size) async {
+                        final dpr = View.of(context).devicePixelRatio;
+                        final physicalSize = Size(size.width * dpr, size.height * dpr);
+                        await viewModel.setEditorSize(physicalSize);
+                        await viewModel.showOverlay();
+                      },
+                    ),
 
 
-                ],
+                  ],
+                ),
               ),
             ),
           ],
@@ -270,7 +301,7 @@ class _KeyViewerSettingsPageState extends ConsumerState<KeyViewerSettingsPage> w
               FloatingActionButton(
                 heroTag: null,
                 onPressed: () async {
-
+                  await showDialog(context: context, builder: (_) => SettingsPresetManagementDialog());
                 },
                 child: Icon(Icons.menu_book),
               ),
