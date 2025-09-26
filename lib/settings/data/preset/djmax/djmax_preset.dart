@@ -178,7 +178,7 @@ final PresetModel DJMAXPresetModel = PresetModel(
           KeyTileDataModel(
               primaryKey: "DJMAX_PRESET_KEY_6",
               key: VIRTUAL_KEY.VK_OEM_7,
-              label: "A",
+              label: "\'",
               keyCount: 0,
               gx: _baseGx+50,
               gy: _baseGy+10,
@@ -295,7 +295,7 @@ final PresetModel DJMAXPresetModel = PresetModel(
           KeyTileDataModel(
               primaryKey: "DJMAX_PRESET_KEY_6",
               key: VIRTUAL_KEY.VK_OEM_7,
-              label: "A",
+              label: "\'",
               keyCount: 0,
               gx: _baseGx+50,
               gy: _baseGy+10,
@@ -412,7 +412,7 @@ final PresetModel DJMAXPresetModel = PresetModel(
           KeyTileDataModel(
               primaryKey: "DJMAX_PRESET_KEY_6",
               key: VIRTUAL_KEY.VK_OEM_7,
-              label: "A",
+              label: "\'",
               keyCount: 0,
               gx: _baseGx+50,
               gy: _baseGy,
