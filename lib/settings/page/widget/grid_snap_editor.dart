@@ -6,6 +6,7 @@ import 'package:key_viewer_v2/core/model/key/key_tile_data_model.dart';
 import 'package:key_viewer_v2/core/widget/key_tile_widget.dart';
 import 'package:key_viewer_v2/settings/page/widget/key_tile_settings_dialog.dart';
 import 'package:flutter/scheduler.dart' show Ticker;
+import 'dart:ui' as ui;
 
 /// 격자 사양: 1칸 픽셀(cell) + 구분선(gap) = pitch
 class SnapGridSpec {
@@ -109,6 +110,12 @@ class _GridSnapEditorState extends State<GridSnapEditor> with TickerProviderStat
 
   bool _didFireInitialize = false;
   final GlobalKey _rootKey = GlobalKey();
+
+// 클래스 필드
+  bool _dragMoved = false;             // 실제 이동 발생 여부
+  bool _suppressTapOnce = false;       // 드래그 끝난 직후 탭 1회만 무시
+  Offset? _downPos;
+  static const double _dragSlop = 3.0; // kTouchSlop 정도
 
   // 히스토리 상태
   final Map<int, DateTime> _pressStartAt = {};                     // keyCode -> 누르기 시작 시간
@@ -216,7 +223,7 @@ class _GridSnapEditorState extends State<GridSnapEditor> with TickerProviderStat
     }).toList();
 
     _byKeyCode
-      .clear();
+        .clear();
     for (final rt in _runtimeTiles) {
       (_byKeyCode[rt.model.key] ??= []).add(rt);
     }
@@ -308,7 +315,7 @@ class _GridSnapEditorState extends State<GridSnapEditor> with TickerProviderStat
         }
       }
 
-      // ★ 최초 입력 프레임에 즉시 그리기
+      // ☆ 최초 입력 프레임에 즉시 그리기
       if (mounted) setState(() {});
     }
   }
@@ -330,7 +337,7 @@ class _GridSnapEditorState extends State<GridSnapEditor> with TickerProviderStat
   bool _clampGrid(KeyTileDataModel b, Size area) {
     const double epsilon = 2.0;
     final usableW = area.width  - _wPx(b.gw) - epsilon;
-    final usableH = area.height - widget.historyBandPx - _hPx(b.gh) - epsilon; // ★
+    final usableH = area.height - widget.historyBandPx - _hPx(b.gh) - epsilon; // ☆
 
     final maxGx = math.max(0, (usableW / _pitch).floor());
     final maxGy = math.max(0, (usableH / _pitch).floor());
@@ -464,13 +471,40 @@ class _GridSnapEditorState extends State<GridSnapEditor> with TickerProviderStat
         Widget content = tile;
         if (widget.isEditor) {
           content = Listener(
-            behavior: HitTestBehavior.opaque,
-            onPointerDown: (e) => _beginDrag(b, e.localPosition),
-            onPointerMove: (e) => _updateDrag(e.localPosition),
-            onPointerUp: (_) => _endDrag(),
-            onPointerCancel: (_) => _endDrag(),
+            behavior: HitTestBehavior.deferToChild, // ← opaque 대신
+            onPointerDown: (e) {
+              _downPos = e.localPosition;
+              _dragMoved = false;
+              _beginDrag(b, e.localPosition);
+            },
+            onPointerMove: (e) {
+              if (_downPos != null &&
+                  (e.localPosition - _downPos!).distance > _dragSlop) {
+                _dragMoved = true;
+              }
+              _updateDrag(e.localPosition);
+            },
+            onPointerUp: (_) {
+              _endDrag();
+              // 실제로 움직였을 때만 다음 탭 1회 차단
+              _suppressTapOnce = _dragMoved;
+              _downPos = null;
+              _dragMoved = false;  // ← 즉시 리셋 (다음 제스처에 영향 X)
+            },
+            onPointerCancel: (_) {
+              _endDrag();
+              _downPos = null;
+              _dragMoved = false;
+              _suppressTapOnce = false;
+            },
             child: GestureDetector(
               onTap: () async {
+                // 드래그 직후 1회만 탭 무시
+                if (_suppressTapOnce) {
+                  _suppressTapOnce = false; // 한 번만 먹이고 해제
+                  return;
+                }
+
                 final data = await showDialog<KeyTileDataModel>(
                   context: context,
                   builder: (_) => KeyTileSettingDialog(
@@ -504,7 +538,7 @@ class _GridSnapEditorState extends State<GridSnapEditor> with TickerProviderStat
         final r = _tileRect(b);
         children.add(Positioned(
           left: _xPx(b.gx),
-          top:  _yPx(b.gy) + widget.historyBandPx, // ★ 상단 밴드만큼 내림
+          top:  _yPx(b.gy) + widget.historyBandPx, // ☆ 상단 밴드만큼 내림
           width: _wPx(b.gw),
           height:_hPx(b.gh),
           child: content,
@@ -523,6 +557,7 @@ class _GridSnapEditorState extends State<GridSnapEditor> with TickerProviderStat
                 tileRectOf: _tileRect,
                 liveColorOf: (rt) => rt.historyColor.withOpacity(0.90),
                 doneColorOf: (rt) => rt.historyColor.withOpacity(0.65),
+                fadeSpanPx: widget.historyBandPx,
                 params: _HistoryParams(
                   barMin: _BAR_MIN,
                   barMax: _BAR_MAX,
@@ -580,8 +615,9 @@ class _GridPainter extends CustomPainter {
 
 class _HistoryParams {
   final double barMin, barMax, fadeSec, fadeStartRatio, barRadius, shadowBlur, shadowOpacity;
-  final double trailSpeed; // ★ 추가
-
+  final double trailSpeed; // ☆ 추가
+  final double outlineWidth;
+  final Color? outlineColor;
   const _HistoryParams({
     required this.barMin,
     required this.barMax,
@@ -591,6 +627,8 @@ class _HistoryParams {
     required this.shadowBlur,
     required this.shadowOpacity,
     this.trailSpeed = 140, // 기본값: 라이브 바 속도와 동일
+    this.outlineWidth = 0.0,
+    this.outlineColor,
   });
 }
 
@@ -604,6 +642,11 @@ class _HistoryPainter extends CustomPainter {
   final Color Function(_KeyTileRuntime) doneColorOf;
   final _HistoryParams params;
 
+  // 화면 바닥에서 페이드 밴드 ‘아랫변’까지 거리(px)
+  final double fadeStartFromBottomPx; // 예: 140
+  // 페이드 밴드 높이(px). 위로 갈수록 투명
+  final double fadeSpanPx;            // 예: 60
+
   const _HistoryPainter({
     required this.now,
     required this.runtimeTiles,
@@ -612,139 +655,205 @@ class _HistoryPainter extends CustomPainter {
     required this.liveColorOf,
     required this.doneColorOf,
     required this.params,
+    this.fadeStartFromBottomPx = 140,
+    this.fadeSpanPx = 60,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
-    // z 정렬(보기 일관성)
-    final sorted = [...runtimeTiles]..sort((a, b) {
-      final r = a.model.gy.compareTo(b.model.gy);
-      if (r != 0) return r;
+    // z-index 수집/정렬
+    final allZIndexes = runtimeTiles
+        .map((rt) => rt.model.style.historyBarZIndex)
+        .toSet()
+        .toList()
+      ..sort();
 
-      final c = a.model.gx.compareTo(b.model.gx);
-      if (c != 0) return c;
+    // z-index별 그룹
+    final Map<int, List<_KeyTileRuntime>> groupsByZIndex = {};
+    for (final rt in runtimeTiles) {
+      (groupsByZIndex[rt.model.style.historyBarZIndex] ??= <_KeyTileRuntime>[]).add(rt);
+    }
+    // 그룹 내부 정렬 (원 좌표/키 기준)
+    for (final z in allZIndexes) {
+      final g = groupsByZIndex[z] ?? [];
+      g.sort((a, b) {
+        final y = a.model.gy.compareTo(b.model.gy);
+        if (y != 0) return y;
+        final x = a.model.gx.compareTo(b.model.gx);
+        if (x != 0) return x;
+        return a.model.primaryKey.compareTo(b.model.primaryKey);
+      });
+    }
 
-      return a.model.primaryKey.compareTo(b.model.primaryKey);
-    });
+    final fadeBottomY = topMostY.clamp(0.0, size.height);
+    final fadeTopY    = (topMostY - fadeSpanPx).clamp(0.0, size.height);
 
-    for (final rt in sorted) {
-      final slot = tileRectOf(rt.model);
+    // z-index 순서대로 렌더
+    for (final z in allZIndexes) {
+      final group = groupsByZIndex[z] ?? [];
+      for (final rt in group) {
+        final slot = tileRectOf(rt.model);
 
-      // 완료바
-      for (final c in rt.history.completed) {
-        final t = now.difference(c.createdAt).inMilliseconds / 1000.0;
-        if (t < 0 || t > params.fadeSec) continue;
+        // 1) 릴리즈 후 부유하는 히스토리바(완료): 같은 규칙으로 그림 (시간 알파 페이드 없음)
+        for (final c in rt.history.completed) {
+          final tSec = now.difference(c.createdAt).inMilliseconds / 1000.0;
+          if (tSec < 0) continue;
 
-        // 알파(뒤쪽 30% 구간에서 페이드)
-        final fadeStart = params.fadeSec * params.fadeStartRatio;
-        final alpha = (t < fadeStart)
-            ? 1.0
-            : ((params.fadeSec - t) / (params.fadeSec - fadeStart)).clamp(0.0, 1.0);
+          final baseY = topMostY - tSec * params.trailSpeed; // 위로 이동
+          if (rt.axis == HistoryAxis.verticalUp && baseY <= fadeTopY) continue; // 밴드 완전 통과
 
-        // ★ 시간에 비례해 위로 이동
-        final travel = t * params.trailSpeed;
+          _drawHistoryBarMasked(
+            canvas, size, slot, rt.axis,
+            magnitude: c.height,       // 릴리즈 순간 높이 고정
+            baseY: baseY,
+            color: doneColorOf(rt),
+            withShadow: true,
+            fadeTopY: fadeTopY,
+            fadeBottomY: fadeBottomY,
+            outlineWidth: params.outlineWidth,
+            outlineColor: params.outlineColor ?? doneColorOf(rt),
+          );
+        }
 
-        _drawBar(
-          canvas,
-          slot,
-          rt.axis,
-          magnitude: c.height,              // 완료 시점 고정 높이
-          baseY: topMostY - travel,         // ★ 기준선을 위로 끌어올림
-          color: doneColorOf(rt).withOpacity(alpha),
-          withShadow: true,
-        );
-      }
+        // 2) 누르는 중(라이브): 높이만 증가. 같은 마스크 규칙 적용
+        final start = rt.history.pressStartAt;
+        if (start != null) {
+          final elapsed = now.difference(start).inMilliseconds / 1000.0;
+          final h = (elapsed * _GridSnapEditorState._BAR_SPEED)
+              .clamp(params.barMin, params.barMax);
 
-
-      // 라이브바
-      final start = rt.history.pressStartAt;
-      if (start != null) {
-        final elapsed = now.difference(start).inMilliseconds / 1000.0;
-        final h = (elapsed * _GridSnapEditorState._BAR_SPEED)
-            .clamp(params.barMin, params.barMax);
-        _drawBar(
-          canvas,
-          slot,
-          rt.axis,
-          magnitude: h,
-          baseY: topMostY,
-          color: liveColorOf(rt),
-          withShadow: false,
-        );
+          _drawHistoryBarMasked(
+            canvas, size, slot, rt.axis,
+            magnitude: h,
+            baseY: topMostY,           // 바닥 고정
+            color: liveColorOf(rt),
+            withShadow: false,
+            fadeTopY: fadeTopY,
+            fadeBottomY: fadeBottomY,
+            outlineWidth: params.outlineWidth,
+            outlineColor: params.outlineColor ?? liveColorOf(rt),
+          );
+        }
       }
     }
   }
 
-  void _drawBar(
+  /// 그림자/본체/테두리를 동일 레이어에 그리고, 레이어 전체에 dstIn 마스크를 적용
+  /// → 상단 페이드존에서 ‘모서리/스트로크/그림자’까지 한꺼번에 사라짐
+  void _drawHistoryBarMasked(
       Canvas canvas,
+      Size size,
       Rect tileRect,
       HistoryAxis axis, {
         required double magnitude,
         required double baseY,
         required Color color,
         required bool withShadow,
+        required double fadeTopY,
+        required double fadeBottomY,
+        double outlineWidth = 0.0,
+        Color? outlineColor,
       }) {
-    late RRect rr;
+    if (magnitude <= 0) return;
 
+    // 막대 기하
+    late RRect rr;
     switch (axis) {
       case HistoryAxis.verticalUp:
-      // 가로폭 = 타일 폭, 위로 성장
-        final left = tileRect.left;
-        final width = tileRect.width;
-        final top = baseY - magnitude;
         rr = RRect.fromRectAndRadius(
-          Rect.fromLTWH(left, top, width, magnitude),
+          Rect.fromLTWH(tileRect.left, baseY - magnitude, tileRect.width, magnitude),
           Radius.circular(params.barRadius),
         );
         break;
-
       case HistoryAxis.verticalDown:
-        final left = tileRect.left;
-        final width = tileRect.width;
-        final top = tileRect.bottom + 8; // (임시) 여백
         rr = RRect.fromRectAndRadius(
-          Rect.fromLTWH(left, top, width, magnitude),
+          Rect.fromLTWH(tileRect.left, tileRect.bottom + 8, tileRect.width, magnitude),
           Radius.circular(params.barRadius),
         );
         break;
-
       case HistoryAxis.horizontalLeft:
-        final top = baseY - params.barMin;
-        final height = params.barMin;
-        final right = tileRect.left;
         rr = RRect.fromRectAndRadius(
-          Rect.fromLTWH(right - magnitude, top, magnitude, height),
+          Rect.fromLTWH(tileRect.left - magnitude, baseY - params.barMin, magnitude, params.barMin),
           Radius.circular(params.barRadius),
         );
         break;
-
       case HistoryAxis.horizontalRight:
-        final top = baseY - params.barMin;
-        final height = params.barMin;
-        final left = tileRect.right;
         rr = RRect.fromRectAndRadius(
-          Rect.fromLTWH(left, top, magnitude, height),
+          Rect.fromLTWH(tileRect.right, baseY - params.barMin, magnitude, params.barMin),
           Radius.circular(params.barRadius),
         );
         break;
     }
 
+    // verticalUp인 경우, 바닥이 밴드 윗변을 넘으면 전부 밴드 위 → 스킵
+    if (axis == HistoryAxis.verticalUp && baseY <= fadeTopY) return;
+
+    // 레이어 경계: 스트로크/그림자까지 포함되도록 살짝 inflate
+    final strokePad = (outlineWidth > 0) ? (outlineWidth / 2.0 + 1.0) : 1.0;
+    final shadowPad = (withShadow ? params.shadowBlur : 0.0) + 2.0;
+    final pad = strokePad > shadowPad ? strokePad : shadowPad;
+    final layerBounds = rr.outerRect.inflate(pad);
+
+    canvas.saveLayer(layerBounds, Paint());
+
+    // 그림자(레이어 안에서)
     if (withShadow) {
       final sp = Paint()
+        ..isAntiAlias = true
         ..color = color.withOpacity(params.shadowOpacity)
         ..maskFilter = MaskFilter.blur(BlurStyle.normal, params.shadowBlur);
       canvas.drawRRect(rr.shift(const Offset(0, 2)), sp);
     }
 
-    final fp = Paint()..color = color;
+    // 본체
+    final fp = Paint()
+      ..isAntiAlias = true
+      ..color = color;
     canvas.drawRRect(rr, fp);
+
+    // 테두리(선택) - 레이어 안에서 마스크 적용받도록
+    if (outlineWidth > 0.0) {
+      final op = Paint()
+        ..isAntiAlias = true
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = outlineWidth
+        ..color = (outlineColor ?? color);
+      canvas.drawRRect(rr, op);
+    }
+
+    // 레이어 전체에 dstIn 마스크 적용 → 그림자/테두리 포함 전부 동일 페이드
+    final stops = <double>[
+      0.0,
+      (fadeTopY / size.height),
+      (fadeBottomY / size.height),
+      1.0,
+    ]..sort();
+
+    final shader = ui.Gradient.linear(
+      const Offset(0, 0),
+      Offset(0, size.height),
+      const [Colors.transparent, Colors.transparent, Colors.white, Colors.white],
+      stops,
+    );
+
+    final mask = Paint()
+      ..isAntiAlias = true
+      ..blendMode = BlendMode.dstIn
+      ..shader = shader;
+
+    canvas.drawRect(layerBounds, mask); // 레이어 내 모든 픽셀에 마스크 적용
+    canvas.restore();
   }
 
   @override
-  bool shouldRepaint(covariant _HistoryPainter old) =>
-      old.now != now ||
-          !identical(old.runtimeTiles, runtimeTiles) ||
-          old.topMostY != topMostY;
+  bool shouldRepaint(covariant _HistoryPainter old) {
+    return old.now != now ||
+        !identical(old.runtimeTiles, runtimeTiles) ||
+        old.topMostY != topMostY ||
+        old.fadeStartFromBottomPx != fadeStartFromBottomPx ||
+        old.fadeSpanPx != fadeSpanPx ||
+        old.params != params;
+  }
 }
 
 /// 타일 1개에 대한 히스토리 상태(런타임 전용)
@@ -770,4 +879,3 @@ class _KeyTileRuntime {
     required this.historyColor, // cyan-ish
   });
 }
-

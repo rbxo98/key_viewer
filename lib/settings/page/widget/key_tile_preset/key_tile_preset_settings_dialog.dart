@@ -5,6 +5,7 @@ import 'package:key_viewer_v2/core/model/preset/preset_model.dart';
 import 'package:key_viewer_v2/settings/data/preset/djmax/djmax_preset.dart';
 import 'package:key_viewer_v2/settings/page/settings_view_model.dart';
 import 'package:key_viewer_v2/settings/page/widget/key_tile_group/key_tile_group_settings_dialog.dart';
+import 'package:uuid/v4.dart';
 
 class KeyTilePresetSettingsDialog extends ConsumerStatefulWidget {
   final PresetModel? presetModel;
@@ -66,10 +67,25 @@ class _KeyTilePresetSettingsDialogState extends ConsumerState<KeyTilePresetSetti
     super.dispose();
   }
 
-  void _presetChanged(PresetModel preset) => setState(() {
-    presetModel = preset;
-    _nameCtrl.text = preset.presetName;
-  });
+  void _presetChanged(PresetModel preset) {
+    final newPreset = presetModel.copyWith(
+        primaryKey: UuidV4().generate(),
+        presetName: "${preset.presetName} copy",
+        switchKey: preset.switchKey,
+        keyTileDataGroup: [...preset.keyTileDataGroup.map((e) =>
+            e.copyWith(
+                primaryKey: UuidV4().generate(),
+              keyTileData: [
+                ...e.keyTileData.map((k) => k.copyWith(primaryKey: UuidV4().generate()))
+              ]
+            ))
+        ]
+    );
+    setState(() {
+      presetModel = newPreset;
+      _nameCtrl.text = newPreset.presetName;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

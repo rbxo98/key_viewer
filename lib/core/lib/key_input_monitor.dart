@@ -10,6 +10,7 @@ import 'package:win32/win32.dart';
 /// final monitor = KeyInputMonitor();
 /// monitor.pressedKeys.addListener(() { print(monitor.pressedKeys.value); });
 /// monitor.start(); ... monitor.dispose();
+///
 class KeyInputMonitor {
   /// 폴링 주기 (기본 16ms)
   final Duration tick;
@@ -22,92 +23,22 @@ class KeyInputMonitor {
   /// 항상 읽기만 하고, 변경은 모니터 내부에서 새 Set으로 교체합니다.
   final ValueNotifier<Set<int>> pressedKeys = ValueNotifier<Set<int>>(<int>{});
 
-  /// 키보드 입력만 포함하는 VK 코드들
-  static final List<int> _keyboardVk = _generateKeyboardVkList();
+  /// 마우스 VK: 전부 제외(키보드만 반환)
+  static const Set<int> _mouseVKs = {
+    VIRTUAL_KEY.VK_LBUTTON,  // 0x01
+    VIRTUAL_KEY.VK_RBUTTON,  // 0x02
+    VIRTUAL_KEY.VK_MBUTTON,  // 0x04
+    VIRTUAL_KEY.VK_XBUTTON1, // 0x05
+    VIRTUAL_KEY.VK_XBUTTON2, // 0x06
+  };
+
+  /// 스캔 범위 (0x01 ~ 0xFE)
+  static const int _vkMin = 0x01;
+  static const int _vkMax = 0xFE; // 0xFF는 정의되지 않음
 
   KeyInputMonitor({this.tick = const Duration(milliseconds: 16)});
 
   bool get isRunning => _timer != null;
-
-  /// 키보드 Virtual Key 코드만 생성
-  static List<int> _generateKeyboardVkList() {
-    final List<int> keyboardKeys = [];
-
-    // 영숫자 키 (0-9, A-Z)
-    for (int i = 0x30; i <= 0x39; i++) keyboardKeys.add(i); // 0-9
-    for (int i = 0x41; i <= 0x5A; i++) keyboardKeys.add(i); // A-Z
-
-    // 기능키 (F1-F24)
-    for (int i = 0x70; i <= 0x87; i++) keyboardKeys.add(i); // F1-F24
-
-    // 숫자 패드
-    for (int i = 0x60; i <= 0x6F; i++) keyboardKeys.add(i); // Numpad 0-9, *, +, separator, -, ., /
-
-    // 기본 제어키들
-    keyboardKeys.addAll([
-      VIRTUAL_KEY.VK_BACK,        // 8 - Backspace
-      VIRTUAL_KEY.VK_TAB,         // 9 - Tab
-      VIRTUAL_KEY.VK_RETURN,      // 13 - Enter
-      VIRTUAL_KEY.VK_SHIFT,       // 16 - Shift
-      VIRTUAL_KEY.VK_CONTROL,     // 17 - Ctrl
-      VIRTUAL_KEY.VK_MENU,        // 18 - Alt
-      VIRTUAL_KEY.VK_PAUSE,       // 19 - Pause
-      VIRTUAL_KEY.VK_CAPITAL,     // 20 - Caps Lock
-      VIRTUAL_KEY.VK_ESCAPE,      // 27 - Esc
-      VIRTUAL_KEY.VK_SPACE,       // 32 - Space
-      VIRTUAL_KEY.VK_PRIOR,       // 33 - Page Up
-      VIRTUAL_KEY.VK_NEXT,        // 34 - Page Down
-      VIRTUAL_KEY.VK_END,         // 35 - End
-      VIRTUAL_KEY.VK_HOME,        // 36 - Home
-      VIRTUAL_KEY.VK_LEFT,        // 37 - Left Arrow
-      VIRTUAL_KEY.VK_UP,          // 38 - Up Arrow
-      VIRTUAL_KEY.VK_RIGHT,       // 39 - Right Arrow
-      VIRTUAL_KEY.VK_DOWN,        // 40 - Down Arrow
-      VIRTUAL_KEY.VK_INSERT,      // 45 - Insert
-      VIRTUAL_KEY.VK_DELETE,      // 46 - Delete
-    ]);
-
-    // 좌우 구분되는 제어키들
-    keyboardKeys.addAll([
-      VIRTUAL_KEY.VK_LSHIFT,      // 160 - Left Shift
-      VIRTUAL_KEY.VK_RSHIFT,      // 161 - Right Shift
-      VIRTUAL_KEY.VK_LCONTROL,    // 162 - Left Control
-      VIRTUAL_KEY.VK_RCONTROL,    // 163 - Right Control
-      VIRTUAL_KEY.VK_LMENU,       // 164 - Left Alt
-      VIRTUAL_KEY.VK_RMENU,       // 165 - Right Alt
-    ]);
-
-    // 특수 기호 키들 (키보드 레이아웃에 따라 다를 수 있음)
-    keyboardKeys.addAll([
-      186, // VK_OEM_1 (;:)
-      187, // VK_OEM_PLUS (=+)
-      188, // VK_OEM_COMMA (,<)
-      189, // VK_OEM_MINUS (-_)
-      190, // VK_OEM_PERIOD (.>)
-      191, // VK_OEM_2 (/?)
-      192, // VK_OEM_3 (`~)
-      219, // VK_OEM_4 ([{)
-      220, // VK_OEM_5 (\|)
-      221, // VK_OEM_6 (]})
-      222, // VK_OEM_7 ('")
-    ]);
-
-    // Windows 키들
-    keyboardKeys.addAll([
-      VIRTUAL_KEY.VK_LWIN,        // 91 - Left Windows
-      VIRTUAL_KEY.VK_RWIN,        // 92 - Right Windows
-      VIRTUAL_KEY.VK_APPS,        // 93 - Applications (Menu)
-    ]);
-
-    // 기타 키보드 키들
-    keyboardKeys.addAll([
-      VIRTUAL_KEY.VK_NUMLOCK,     // 144 - Num Lock
-      VIRTUAL_KEY.VK_SCROLL,      // 145 - Scroll Lock
-      VIRTUAL_KEY.VK_SNAPSHOT,    // 44 - Print Screen
-    ]);
-
-    return keyboardKeys..sort();
-  }
 
   /// 시작
   void start() {
@@ -128,9 +59,12 @@ class KeyInputMonitor {
   }
 
   /// 즉시 스냅샷(한 번만 스캔해서 현재 눌린 키 집합 반환)
+  /// 1) 전체 VK 범위를 순회
+  /// 2) 마우스 VK는 제외
   Set<int> snapshotPressed() {
     final nowPressed = <int>{};
-    for (final vk in _keyboardVk) {
+    for (int vk = _vkMin; vk <= _vkMax; vk++) {
+      if (_mouseVKs.contains(vk)) continue; // 마우스 제외
       final state = GetAsyncKeyState(vk);
       if ((state & 0x8000) != 0) {
         nowPressed.add(vk);
@@ -141,7 +75,8 @@ class KeyInputMonitor {
 
   void _pollOnce() {
     final nowPressed = <int>{};
-    for (final vk in _keyboardVk) {
+    for (int vk = _vkMin; vk <= _vkMax; vk++) {
+      if (_mouseVKs.contains(vk)) continue; // 마우스 제외
       final state = GetAsyncKeyState(vk);
       // 최상위 비트(0x8000): 지금 눌려있음
       if ((state & 0x8000) != 0) {

@@ -126,7 +126,7 @@ class _SettingsPresetManagementDialogState extends ConsumerState<SettingsPresetM
                                       return;
                                     }
                                     showDialog(context: context, builder: (_) => CustomSelectDialog(
-                                        title: "프리셋을 제거합니다.",
+                                        title: "${preset.presetName} 프리셋을 제거합니다.",
                                         confirmText: "확인",
                                         onConfirm: () {
                                           final presetList = [...state.presetList];
@@ -142,7 +142,15 @@ class _SettingsPresetManagementDialogState extends ConsumerState<SettingsPresetM
                                   IconButton(
                                     icon: const Icon(Icons.edit),
                                     onPressed: () async {
-
+                                      final data = await showDialog(context: context, builder: (_) => KeyTilePresetSettingsDialog(presetModel: preset));
+                                      if(data != null) {
+                                        final presetList = [...state.presetList];
+                                        final targetIndex = presetList.indexWhere((p) => p.primaryKey == preset.primaryKey);
+                                        presetList[targetIndex] = data;
+                                        viewModel.updatePresetListInfo(presetList);
+                                        viewModel.setPreset(data);
+                                        viewModel.updateOverlayKeyTile();
+                                      }
                                     },
                                   ),
                                 ],
@@ -157,7 +165,10 @@ class _SettingsPresetManagementDialogState extends ConsumerState<SettingsPresetM
                                   barrierDismissible: false,
                                   context: context,
                                   builder: (_) => KeyTilePresetSettingsDialog());
-                              if(data != null) viewModel.addPreset(data);
+                              if(data != null) {
+                                viewModel.addPreset(data);
+                                viewModel.updateOverlayKeyTile();
+                              }
                             }, child: Icon(Icons.add));
                       },
                       onReorder: (int oldIndex, int newIndex) {

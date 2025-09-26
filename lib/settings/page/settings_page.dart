@@ -139,6 +139,7 @@ class _KeyViewerSettingsPageState extends ConsumerState<KeyViewerSettingsPage> w
                           else{
                             viewModel.updatePresetInfo(data);
                           }
+                          viewModel.updateOverlayKeyTile();
                         },
                         customBorder: CircleBorder(),
                         child: Container(
