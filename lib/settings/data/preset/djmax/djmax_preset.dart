@@ -6,7 +6,7 @@ import 'package:uuid/v4.dart';
 import 'package:win32/win32.dart';
 
 final _baseGx = 0;
-final _baseGy = 30;
+final _baseGy = 10;
 final PresetModel DJMAXPresetModel = PresetModel(
   createdAt: DateTime(2025,1,1),
     presetName: "DJMAX RESPECT V",
