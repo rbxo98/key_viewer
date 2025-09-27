@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:key_viewer_v2/core/lib/key_input_monitor.dart';
 import 'package:key_viewer_v2/core/model/preset/preset_model.dart';
 import 'package:key_viewer_v2/settings/data/preset/djmax/djmax_preset.dart';
+import 'package:key_viewer_v2/settings/data/preset/ez2on/ez2on_preset.dart';
 import 'package:key_viewer_v2/settings/page/settings_view_model.dart';
+import 'package:key_viewer_v2/settings/page/widget/grid_snap_editor.dart';
 import 'package:key_viewer_v2/settings/page/widget/key_tile_group/key_tile_group_settings_dialog.dart';
 import 'package:uuid/v4.dart';
 
@@ -22,6 +24,8 @@ class _KeyTilePresetSettingsDialogState extends ConsumerState<KeyTilePresetSetti
   late PresetModel presetModel;
   final TextEditingController _nameCtrl = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  bool _isMapping = false;
+  bool _advancedOpen = false;
 
   TextStyle get _cap =>
       const TextStyle(color: Colors.white70, fontWeight: FontWeight.w600);
@@ -50,13 +54,6 @@ class _KeyTilePresetSettingsDialogState extends ConsumerState<KeyTilePresetSetti
   void initState() {
     presetModel = widget.presetModel ?? PresetModel.empty();
     _nameCtrl.text = presetModel.presetName;
-    keyInputMonitor.pressedKeys.addListener((){
-      setState(() {
-        presetModel = presetModel.copyWith(
-            switchKey: keyInputMonitor.snapshotPressed().first
-        );
-      });
-    });
     super.initState();
   }
 
@@ -65,6 +62,43 @@ class _KeyTilePresetSettingsDialogState extends ConsumerState<KeyTilePresetSetti
     keyInputMonitor.stop();
     keyInputMonitor.dispose();
     super.dispose();
+  }
+
+  void _toggleMapping() {
+    setState(() => _isMapping = !_isMapping);
+
+    if (_isMapping) {
+      keyInputMonitor.pressedKeys.addListener(_onKey);
+      keyInputMonitor.start();
+    } else {
+      keyInputMonitor.pressedKeys.removeListener(_onKey);
+      keyInputMonitor.stop();
+    }
+  }
+
+  void _onKey() {
+    if (!_isMapping || keyInputMonitor.pressedKeys.value.isEmpty) return;
+
+    final pressedKeys = keyInputMonitor.snapshotPressed();
+    if (pressedKeys.isEmpty) return;
+
+    final vk = pressedKeys.first;
+
+    // 마우스 관련 키 코드 필터링 (102는 마우스 버튼일 가능성)
+    if (vk == 102 || vk == 1 || vk == 2) { // VK_LBUTTON, VK_RBUTTON 등
+      return;
+    }
+
+
+    setState(() {
+      presetModel = presetModel.copyWith(
+          switchKey: keyInputMonitor.snapshotPressed().first
+      );
+      _isMapping = false;
+    });
+
+    keyInputMonitor.pressedKeys.removeListener(_onKey);
+    keyInputMonitor.stop();
   }
 
   void _presetChanged(PresetModel preset) {
@@ -112,7 +146,7 @@ class _KeyTilePresetSettingsDialogState extends ConsumerState<KeyTilePresetSetti
                 Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text('프리셋 설정',
+                      Text('프리셋 ${widget.presetModel == null ? '추가' : '수정'}',
                           style: TextStyle(
                               color: textColor,
                               fontWeight: FontWeight.w700,
@@ -124,6 +158,7 @@ class _KeyTilePresetSettingsDialogState extends ConsumerState<KeyTilePresetSetti
                             size: 18, color: Colors.white70),
                       ),
                     ]),
+                const SizedBox(height: 18,),
                 Row(
                   mainAxisAlignment:
                   MainAxisAlignment.spaceBetween,
@@ -148,6 +183,37 @@ class _KeyTilePresetSettingsDialogState extends ConsumerState<KeyTilePresetSetti
                         ),
                         decoration: _fieldDeco(hint: ''),
                       ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 18,),
+
+                Row(
+                  mainAxisAlignment:
+                  MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('그룹 전환 키', style: _cap),
+                    const SizedBox(width: 16),
+                    Wrap(
+                      crossAxisAlignment:
+                      WrapCrossAlignment.center,
+                      spacing: 8,
+                      children: [
+                        OutlinedButton(
+                          onPressed: _toggleMapping,
+                          child: Text(
+                            _isMapping
+                                ? '아무 키나 누르세요…'
+                                : (presetModel.switchKey != 0
+                                ? "${presetModel.switchKey}"
+                                : '키 설정'),
+                          ),
+                        ),
+                        if (_isMapping)
+                          const Icon(Icons.keyboard,
+                              size: 16, color: Colors.white70),
+                      ],
                     ),
                   ],
                 ),
@@ -254,6 +320,44 @@ class _KeyTilePresetSettingsDialogState extends ConsumerState<KeyTilePresetSetti
 
                 const SizedBox(height: 18,),
 
+                ExpansionTile(
+                  initiallyExpanded: _advancedOpen,
+                  onExpansionChanged: (v) => setState(() => _advancedOpen = v),
+                  tilePadding: EdgeInsets.zero,
+                  collapsedIconColor: Colors.white70,
+                  iconColor: Colors.white70,
+                  title: Text('기타 설정', style: _cap.copyWith(fontSize: 13)),
+                  childrenPadding: EdgeInsets.zero,
+                  children: [
+                  Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("히스토리바 방향", style: _cap),
+                    const SizedBox(width: 16),
+                    DropdownButton<HistoryAxis>(
+                      value: presetModel.historyAxis,
+                      dropdownColor: const Color(0xFF2A2C30),
+                      items: [
+                        ...HistoryAxis.values.map((e) =>
+                            DropdownMenuItem(
+                              value: e,
+                              child: Text(e.optionName, style: const TextStyle(color: Colors.white)),
+                            ),)
+                      ],
+                      onChanged: (v) {
+                        if (v == null) return;
+                        setState(() {
+                          presetModel = presetModel.copyWith(historyAxis: v);
+                        });
+                      },
+                    ),
+                  ],
+                ),
+                  ],
+                ),
+
+                const SizedBox(height: 18,),
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   mainAxisSize: MainAxisSize.max,
@@ -281,6 +385,10 @@ class _KeyTilePresetSettingsDialogState extends ConsumerState<KeyTilePresetSetti
                             PopupMenuItem<PresetModel>(
                               child: Text(DJMAXPresetModel.presetName),
                               value: DJMAXPresetModel,
+                            ),
+                            PopupMenuItem<PresetModel>(
+                                child: Text(EZ2ONPresetModel.presetName),
+                              value: EZ2ONPresetModel,
                             ),
                             ...presetList.map((e) => PopupMenuItem<PresetModel>(
                               child: Text(e.presetName),

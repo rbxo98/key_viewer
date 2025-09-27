@@ -24,7 +24,6 @@ class _KeyTileGroupButtonState extends State<KeyTileGroupButton> {
   bool isHover = false;
   @override
   Widget build(BuildContext context) {
-    print(widget.isSelected);
     return MouseRegion(
       onHover: (v){
         setState(() {

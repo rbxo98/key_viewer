@@ -18,6 +18,9 @@ _MultiWindowOptionModel _$MultiWindowOptionModelFromJson(
       backgroundColor: (json['backgroundColor'] as num?)?.toInt(),
       cell: (json['cell'] as num?)?.toDouble(),
       gap: (json['gap'] as num?)?.toDouble(),
+      historyAxis: json['historyAxis'] == null
+          ? HistoryAxis.verticalUp
+          : HistoryAxis.fromJson(json['historyAxis'] as String),
     );
 
 Map<String, dynamic> _$MultiWindowOptionModelToJson(
@@ -32,4 +35,5 @@ Map<String, dynamic> _$MultiWindowOptionModelToJson(
       'backgroundColor': instance.backgroundColor,
       'cell': instance.cell,
       'gap': instance.gap,
+      'historyAxis': HistoryAxis.toJson(instance.historyAxis),
     };

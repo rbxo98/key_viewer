@@ -19,6 +19,9 @@ _PresetModel _$PresetModelFromJson(Map<String, dynamic> json) => _PresetModel(
       createdAt: DateTime.parse(json['createdAt'] as String),
       isObserver: json['isObserver'] as bool? ?? false,
       isDeleted: json['isDeleted'] as bool? ?? false,
+      historyAxis: json['historyAxis'] == null
+          ? HistoryAxis.verticalUp
+          : HistoryAxis.fromJson(json['historyAxis'] as String),
     );
 
 Map<String, dynamic> _$PresetModelToJson(_PresetModel instance) =>
@@ -31,6 +34,7 @@ Map<String, dynamic> _$PresetModelToJson(_PresetModel instance) =>
       'createdAt': instance.createdAt.toIso8601String(),
       'isObserver': instance.isObserver,
       'isDeleted': instance.isDeleted,
+      'historyAxis': HistoryAxis.toJson(instance.historyAxis),
     };
 
 _KeyTileDataGroupModel _$KeyTileDataGroupModelFromJson(

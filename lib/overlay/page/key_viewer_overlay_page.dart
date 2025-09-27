@@ -69,21 +69,25 @@ class _KeyViewerOverlayPageState extends ConsumerState<KeyViewerOverlayPage> wit
         }
       },
       child: Scaffold(
-        backgroundColor: Colors.black.withAlpha(1),
-        body: Column(
-          children: [
-            Expanded(
-              child: GridSnapEditor(
-                grid: SnapGridSpec(cell: widget.multiWindowOptionModel.cell??4, gap: widget.multiWindowOptionModel.gap??1),
+          backgroundColor: Colors.white.withAlpha(1),
+          body: Column(
+            children: [
+              Expanded(
+                child: GridSnapEditor(
+                  grid: SnapGridSpec(
+                      cell: widget.multiWindowOptionModel.cell??4,
+                      gap: widget.multiWindowOptionModel.gap??1
+                  ),
+                  historyAxis: state.historyAxis,
                   targetKeyList: state.keyTileData,
                   pressedKeySet: state.pressedKeySet,
-                showBackground: false,
-                isEditor: false,
-                showKeyCount: true,
+                  showBackground: false,
+                  isEditor: false,
+                  showKeyCount: true,
+                ),
               ),
-            ),
-          ],
-        )
+            ],
+          )
       ),
     );
   }

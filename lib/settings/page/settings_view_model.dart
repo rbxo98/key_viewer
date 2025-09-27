@@ -34,6 +34,7 @@ class SettingsViewModel extends StateNotifier<SettingsModel> {
     });
   }
 
+
   void _updateKeyCount(Set<int> currentKeys) {
     final newlyPressed = currentKeys.difference(_previousPressedKeys);
     state = state.updateKeyCountSync(currentKeys, newlyPressed);
@@ -176,7 +177,7 @@ class SettingsViewModel extends StateNotifier<SettingsModel> {
     final targetKey = state.currentPreset.switchKey;
     final currentKeys = keyInputMonitor.pressedKeys.value;
     final currentPreset = state.currentPreset;
-    if (currentKeys.length == 1 && currentKeys.contains(targetKey)) {
+    if (currentKeys.contains(targetKey)) {
       int idx = currentPreset.currentGroupIdx+1;
       if(idx >= currentPreset.keyTileDataGroup.length){
         idx = state.currentPreset.isObserver ? -1 : 0;
@@ -224,6 +225,7 @@ class SettingsViewModel extends StateNotifier<SettingsModel> {
         isFrameless: true,
         cell: state.cell,
         gap: state.gap,
+        historyAxis: state.currentPreset.historyAxis,
       ).toJson())],
     );
     await window?.setSize(Size(state.overlayWidth, state.overlayHeight));
@@ -250,13 +252,13 @@ class SettingsViewModel extends StateNotifier<SettingsModel> {
   Future<void> updateOverlayKeyTile() async {
     final window = state.window;
     if(window == null) return;
-    print(state.currentPreset.keyTileDataGroup);
     await WindowManagerPlus.current.invokeMethodToWindow(
         window.id,
         "updateKeyTile",
         jsonEncode([
           state.currentPreset.getCurrentGroup.keyTileData.toList(),
-          state.pressedKeySet.toList()
+          state.pressedKeySet.toList(),
+          state.currentPreset.historyAxis.name,
         ]));
   }
 

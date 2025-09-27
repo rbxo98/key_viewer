@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:key_viewer_v2/core/lib/key_input_monitor.dart';
 import 'package:key_viewer_v2/core/lib/pref_provider.dart';
 import 'package:key_viewer_v2/core/model/key/key_tile_data_model.dart';
 import 'package:key_viewer_v2/core/model/preset/preset_model.dart';
@@ -33,6 +34,7 @@ class KeyViewerSettingsPage extends ConsumerStatefulWidget {
 
 class _KeyViewerSettingsPageState extends ConsumerState<KeyViewerSettingsPage> with WindowListener {
   late final SettingsViewModel viewModel;
+  final KeyInputMonitor keyInputMonitor = KeyInputMonitor();
 
   @override
   void initState() {
@@ -86,182 +88,181 @@ class _KeyViewerSettingsPageState extends ConsumerState<KeyViewerSettingsPage> w
     final spec = SnapGridSpec(cell: _cell, gap: _gap);
     final state = ref.watch(settingsViewModelProvider);
     return Scaffold(
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-              child: Column(
-                spacing: 8,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    spacing: 8,
-                    children: [
-                      DropdownButton(
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+            child: Column(
+              spacing: 8,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  spacing: 8,
+                  children: [
+                    DropdownButton(
                         value: state.currentPreset,
-                          padding: EdgeInsets.zero,
-                          hint: Text("프리셋 선택"),
-                          items: [
-                            ...state.presetList.map((e) =>
-                                DropdownMenuItem(
-                                  child: Text(e.presetName),
-                                  value: e,)),
-                            DropdownMenuItem(child: Text("프리셋 추가"), value: null,)
-                          ], onChanged: (v) async {
-                          if(v == null){
-                            final data = await showDialog(
-                                barrierDismissible: false,
-                                context: context,
-                                builder: (_) => KeyTilePresetSettingsDialog());
-                            if(data != null) viewModel.addPreset(data);
-                          }
-                          else{
-                            viewModel.setPreset(v);
-                            viewModel.updateOverlayKeyTile();
-                          }
-                      }),
+                        padding: EdgeInsets.zero,
+                        hint: Text("프리셋 선택"),
+                        items: [
+                          ...state.presetList.map((e) =>
+                              DropdownMenuItem(
+                                child: Text(e.presetName),
+                                value: e,)),
+                          DropdownMenuItem(child: Text("프리셋 추가"), value: null,)
+                        ], onChanged: (v) async {
+                      if(v == null){
+                        final data = await showDialog(
+                            barrierDismissible: false,
+                            context: context,
+                            builder: (_) => KeyTilePresetSettingsDialog());
+                        if(data != null) viewModel.addPreset(data);
+                      }
+                      else{
+                        viewModel.setPreset(v);
+                        viewModel.updateOverlayKeyTile();
+                      }
+                    }),
 
-                      InkWell(
-                        onTap: () async {
-                          final data = await showDialog<PresetModel>(
-                              barrierDismissible: false,
-                              context: context,
-                              builder: (_) =>
-                              KeyTilePresetSettingsDialog(
-                            presetModel: state.currentPreset,
-                                isDeletable: state.presetList.length > 1,
-                          ));
-                          if(data == null) return;
-                          if(data.isDeleted){
-                            viewModel.deletePreset(data);
-                          }
-                          else{
-                            viewModel.updatePresetInfo(data);
-                          }
-                          viewModel.updateOverlayKeyTile();
-                        },
-                        customBorder: CircleBorder(),
-                        child: Container(
-                          padding: EdgeInsets.all(4),
-                          decoration: BoxDecoration(
+                    InkWell(
+                      onTap: () async {
+                        final data = await showDialog<PresetModel>(
+                            barrierDismissible: false,
+                            context: context,
+                            builder: (_) =>
+                                KeyTilePresetSettingsDialog(
+                                  presetModel: state.currentPreset,
+                                  isDeletable: state.presetList.length > 1,
+                                ));
+                        if(data == null) return;
+                        if(data.isDeleted){
+                          viewModel.deletePreset(data);
+                        }
+                        else{
+                          viewModel.updatePresetInfo(data);
+                        }
+                        viewModel.updateOverlayKeyTile();
+                      },
+                      customBorder: CircleBorder(),
+                      child: Container(
+                        padding: EdgeInsets.all(4),
+                        decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: SettingsTokens.primary
-                          ),
-                          child: Icon(Icons.edit),
                         ),
-                      )
-                    ],
-                  ),
+                        child: Icon(Icons.edit),
+                      ),
+                    )
+                  ],
+                ),
 
-                  SizedBox(height: 8,),
+                SizedBox(height: 8,),
 
-                  SizedBox(
-                    height: 32,
-                    width: 120,
-                    child: AnimatedToggleSwitch<bool>.dual(
-                        current: state.currentPreset.isObserver,
-                        first: true,
-                        second: false,
-                      onChanged: (v) => viewModel.setCurrentPresetObserver(v),
-                      styleBuilder: (b) => ToggleStyle(
+                SizedBox(
+                  height: 32,
+                  width: 120,
+                  child: AnimatedToggleSwitch<bool>.dual(
+                    current: state.currentPreset.isObserver,
+                    first: true,
+                    second: false,
+                    onChanged: (v) => viewModel.setCurrentPresetObserver(v),
+                    styleBuilder: (b) => ToggleStyle(
                         borderColor: SettingsTokens.primary,
                         indicatorColor: SettingsTokens.primary
-                      ),
-                      iconBuilder: (value) => value
-                          ? const Icon(Icons.coronavirus_rounded)
-                          : const Icon(Icons.tag_faces_rounded),
-                      textBuilder: (value) => value
-                          ? const Center(child: Text('관전O'))
-                          : const Center(child: Text('관전X')),
                     ),
+                    iconBuilder: (value) => value
+                        ? const Icon(Icons.coronavirus_rounded)
+                        : const Icon(Icons.tag_faces_rounded),
+                    textBuilder: (value) => value
+                        ? const Center(child: Text('관전O'))
+                        : const Center(child: Text('관전X')),
+                  ),
+                ),
+
+                SizedBox(height: 8,),
+
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    if(state.currentPreset.isObserver)
+                      KeyTileGroupButton(
+                        isSelected: state.currentPreset.currentGroupIdx==-1,
+                        group: observerGroup,
+                        onTap: (){
+                          viewModel.setCurrentKeyTileDataGroup(-1);
+                        },
+                        onRemove: (group) {},
+                      ),
+                    ...state.currentPreset.keyTileDataGroup.map((e) =>
+                        KeyTileGroupButton(
+                          group: e,
+                          isSelected: state.currentPreset.keyTileDataGroup.indexOf(e) == state.currentPreset.currentGroupIdx,
+                          onTap: (){
+                            viewModel.setCurrentKeyTileDataGroup(
+                                state.currentPreset.keyTileDataGroup.indexOf(e)
+                            );
+                          },
+                          onRemove: (group) {
+                            viewModel.removeKeyTileDataGroup(group);
+                          },
+                        )),
+                    IconButton(onPressed: () async {
+                      final data = await showDialog(
+                          barrierDismissible: false,
+                          context: context,
+                          builder: (_) => KeyTileGroupSettingsDialog());
+                      if(data != null) viewModel.addKeyTileDataGroup(data);
+                    }, icon: Icon(Icons.add)),
+                  ],
+                )
+              ],
+            ),
+          ),
+          Expanded(
+            child: GestureDetector(
+              onSecondaryTap: () async {
+                final data = await showDialog<KeyTileDataModel>(
+                    context: context,
+                    builder: (_) => KeyTileSettingDialog(cellPx: _cell, gapPx: _gap,),
+                    barrierDismissible: false
+                );
+                if(data != null){
+                  viewModel.addKeyTile(data);
+                }
+              },
+              child: Stack(
+                children: [
+                  GridSnapEditor(
+                    grid: spec,
+                    targetKeyList: state.currentPreset.getCurrentKeyTileData.toSet(),
+                    onChanged: (updated) {
+                      viewModel.updateKeyTileData(updated);
+                    },
+                    onPixelSizeChanged: (size){
+                      // 1) 논리 px → 물리 px 변환
+                      final dpr = View.of(context).devicePixelRatio; // or MediaQuery.of(context).devicePixelRatio
+                      final physicalSize = Size(size.width * dpr, size.height * dpr);
+
+                      viewModel.setEditorSize(physicalSize);
+                      viewModel.resizeOverlay();
+                    },
+                    pressedKeySet: {},
+                    onInitialize: (size) async {
+                      final dpr = View.of(context).devicePixelRatio;
+                      final physicalSize = Size(size.width * dpr, size.height * dpr);
+                      await viewModel.setEditorSize(physicalSize);
+                      await viewModel.showOverlay();
+                    },
                   ),
 
-                  SizedBox(height: 8,),
 
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [
-                      if(state.currentPreset.isObserver)
-                        KeyTileGroupButton(
-                            isSelected: state.currentPreset.currentGroupIdx==-1,
-                            group: observerGroup,
-                            onTap: (){
-                              print("index : ${state.getCurrentPresetIndex}");
-                              viewModel.setCurrentKeyTileDataGroup(-1);
-                            },
-                            onRemove: (group) {},
-                        ),
-                      ...state.currentPreset.keyTileDataGroup.map((e) =>
-                          KeyTileGroupButton(
-                            group: e,
-                              isSelected: state.currentPreset.keyTileDataGroup.indexOf(e) == state.currentPreset.currentGroupIdx,
-                              onTap: (){
-                                viewModel.setCurrentKeyTileDataGroup(
-                                  state.currentPreset.keyTileDataGroup.indexOf(e)
-                                );
-                              },
-                            onRemove: (group) {
-                              viewModel.removeKeyTileDataGroup(group);
-                            },
-                          )),
-                      IconButton(onPressed: () async {
-                        final data = await showDialog(
-                          barrierDismissible: false,
-                            context: context,
-                            builder: (_) => KeyTileGroupSettingsDialog());
-                        if(data != null) viewModel.addKeyTileDataGroup(data);
-                      }, icon: Icon(Icons.add)),
-                    ],
-                  )
                 ],
               ),
             ),
-            Expanded(
-              child: GestureDetector(
-                onSecondaryTap: () async {
-                  final data = await showDialog<KeyTileDataModel>(
-                      context: context,
-                      builder: (_) => KeyTileSettingDialog(cellPx: _cell, gapPx: _gap,),
-                      barrierDismissible: false
-                  );
-                  if(data != null){
-                    viewModel.addKeyTile(data);
-                  }
-                },
-                child: Stack(
-                  children: [
-                    GridSnapEditor(
-                      grid: spec,
-                      targetKeyList: state.currentPreset.getCurrentKeyTileData.toSet(),
-                      onChanged: (updated) {
-                        viewModel.updateKeyTileData(updated);
-                      },
-                      onPixelSizeChanged: (size){
-                        // 1) 논리 px → 물리 px 변환
-                        final dpr = View.of(context).devicePixelRatio; // or MediaQuery.of(context).devicePixelRatio
-                        final physicalSize = Size(size.width * dpr, size.height * dpr);
-
-                        viewModel.setEditorSize(physicalSize);
-                        viewModel.resizeOverlay();
-                      },
-                      pressedKeySet: {},
-                      onInitialize: (size) async {
-                        final dpr = View.of(context).devicePixelRatio;
-                        final physicalSize = Size(size.width * dpr, size.height * dpr);
-                        await viewModel.setEditorSize(physicalSize);
-                        await viewModel.showOverlay();
-                      },
-                    ),
-
-
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
+      ),
       floatingActionButtonLocation: ExpandableFab.location,
       floatingActionButton: ExpandableFab(
         openButtonBuilder: RotateFloatingActionButtonBuilder(

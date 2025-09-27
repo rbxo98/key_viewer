@@ -17,6 +17,7 @@ T _$identity<T>(T value) => value;
 mixin _$KeyViewerModel {
   Set<KeyTileDataModel> get keyTileData;
   Set<int> get pressedKeySet;
+  HistoryAxis get historyAxis;
 
   /// Create a copy of KeyViewerModel
   /// with the given fields replaced by the non-null parameter values.
@@ -34,18 +35,21 @@ mixin _$KeyViewerModel {
             const DeepCollectionEquality()
                 .equals(other.keyTileData, keyTileData) &&
             const DeepCollectionEquality()
-                .equals(other.pressedKeySet, pressedKeySet));
+                .equals(other.pressedKeySet, pressedKeySet) &&
+            (identical(other.historyAxis, historyAxis) ||
+                other.historyAxis == historyAxis));
   }
 
   @override
   int get hashCode => Object.hash(
       runtimeType,
       const DeepCollectionEquality().hash(keyTileData),
-      const DeepCollectionEquality().hash(pressedKeySet));
+      const DeepCollectionEquality().hash(pressedKeySet),
+      historyAxis);
 
   @override
   String toString() {
-    return 'KeyViewerModel(keyTileData: $keyTileData, pressedKeySet: $pressedKeySet)';
+    return 'KeyViewerModel(keyTileData: $keyTileData, pressedKeySet: $pressedKeySet, historyAxis: $historyAxis)';
   }
 }
 
@@ -55,7 +59,10 @@ abstract mixin class $KeyViewerModelCopyWith<$Res> {
           KeyViewerModel value, $Res Function(KeyViewerModel) _then) =
       _$KeyViewerModelCopyWithImpl;
   @useResult
-  $Res call({Set<KeyTileDataModel> keyTileData, Set<int> pressedKeySet});
+  $Res call(
+      {Set<KeyTileDataModel> keyTileData,
+      Set<int> pressedKeySet,
+      HistoryAxis historyAxis});
 }
 
 /// @nodoc
@@ -73,6 +80,7 @@ class _$KeyViewerModelCopyWithImpl<$Res>
   $Res call({
     Object? keyTileData = null,
     Object? pressedKeySet = null,
+    Object? historyAxis = null,
   }) {
     return _then(_self.copyWith(
       keyTileData: null == keyTileData
@@ -83,6 +91,10 @@ class _$KeyViewerModelCopyWithImpl<$Res>
           ? _self.pressedKeySet
           : pressedKeySet // ignore: cast_nullable_to_non_nullable
               as Set<int>,
+      historyAxis: null == historyAxis
+          ? _self.historyAxis
+          : historyAxis // ignore: cast_nullable_to_non_nullable
+              as HistoryAxis,
     ));
   }
 }
@@ -92,7 +104,8 @@ class _$KeyViewerModelCopyWithImpl<$Res>
 class _KeyViewerModel implements KeyViewerModel {
   _KeyViewerModel(
       {final Set<KeyTileDataModel> keyTileData = const {},
-      final Set<int> pressedKeySet = const {}})
+      final Set<int> pressedKeySet = const {},
+      required this.historyAxis})
       : _keyTileData = keyTileData,
         _pressedKeySet = pressedKeySet;
 
@@ -114,6 +127,9 @@ class _KeyViewerModel implements KeyViewerModel {
     return EqualUnmodifiableSetView(_pressedKeySet);
   }
 
+  @override
+  final HistoryAxis historyAxis;
+
   /// Create a copy of KeyViewerModel
   /// with the given fields replaced by the non-null parameter values.
   @override
@@ -130,18 +146,21 @@ class _KeyViewerModel implements KeyViewerModel {
             const DeepCollectionEquality()
                 .equals(other._keyTileData, _keyTileData) &&
             const DeepCollectionEquality()
-                .equals(other._pressedKeySet, _pressedKeySet));
+                .equals(other._pressedKeySet, _pressedKeySet) &&
+            (identical(other.historyAxis, historyAxis) ||
+                other.historyAxis == historyAxis));
   }
 
   @override
   int get hashCode => Object.hash(
       runtimeType,
       const DeepCollectionEquality().hash(_keyTileData),
-      const DeepCollectionEquality().hash(_pressedKeySet));
+      const DeepCollectionEquality().hash(_pressedKeySet),
+      historyAxis);
 
   @override
   String toString() {
-    return 'KeyViewerModel(keyTileData: $keyTileData, pressedKeySet: $pressedKeySet)';
+    return 'KeyViewerModel(keyTileData: $keyTileData, pressedKeySet: $pressedKeySet, historyAxis: $historyAxis)';
   }
 }
 
@@ -153,7 +172,10 @@ abstract mixin class _$KeyViewerModelCopyWith<$Res>
       __$KeyViewerModelCopyWithImpl;
   @override
   @useResult
-  $Res call({Set<KeyTileDataModel> keyTileData, Set<int> pressedKeySet});
+  $Res call(
+      {Set<KeyTileDataModel> keyTileData,
+      Set<int> pressedKeySet,
+      HistoryAxis historyAxis});
 }
 
 /// @nodoc
@@ -171,6 +193,7 @@ class __$KeyViewerModelCopyWithImpl<$Res>
   $Res call({
     Object? keyTileData = null,
     Object? pressedKeySet = null,
+    Object? historyAxis = null,
   }) {
     return _then(_KeyViewerModel(
       keyTileData: null == keyTileData
@@ -181,6 +204,10 @@ class __$KeyViewerModelCopyWithImpl<$Res>
           ? _self._pressedKeySet
           : pressedKeySet // ignore: cast_nullable_to_non_nullable
               as Set<int>,
+      historyAxis: null == historyAxis
+          ? _self.historyAxis
+          : historyAxis // ignore: cast_nullable_to_non_nullable
+              as HistoryAxis,
     ));
   }
 }

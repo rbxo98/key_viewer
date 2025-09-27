@@ -23,6 +23,11 @@ mixin _$PresetModel {
   DateTime get createdAt;
   bool get isObserver;
   bool get isDeleted;
+  @JsonKey(
+      defaultValue: HistoryAxis.verticalUp,
+      fromJson: HistoryAxis.fromJson,
+      toJson: HistoryAxis.toJson)
+  HistoryAxis get historyAxis;
 
   /// Create a copy of PresetModel
   /// with the given fields replaced by the non-null parameter values.
@@ -54,7 +59,9 @@ mixin _$PresetModel {
             (identical(other.isObserver, isObserver) ||
                 other.isObserver == isObserver) &&
             (identical(other.isDeleted, isDeleted) ||
-                other.isDeleted == isDeleted));
+                other.isDeleted == isDeleted) &&
+            (identical(other.historyAxis, historyAxis) ||
+                other.historyAxis == historyAxis));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -68,11 +75,12 @@ mixin _$PresetModel {
       currentGroupIdx,
       createdAt,
       isObserver,
-      isDeleted);
+      isDeleted,
+      historyAxis);
 
   @override
   String toString() {
-    return 'PresetModel(presetName: $presetName, primaryKey: $primaryKey, switchKey: $switchKey, keyTileDataGroup: $keyTileDataGroup, currentGroupIdx: $currentGroupIdx, createdAt: $createdAt, isObserver: $isObserver, isDeleted: $isDeleted)';
+    return 'PresetModel(presetName: $presetName, primaryKey: $primaryKey, switchKey: $switchKey, keyTileDataGroup: $keyTileDataGroup, currentGroupIdx: $currentGroupIdx, createdAt: $createdAt, isObserver: $isObserver, isDeleted: $isDeleted, historyAxis: $historyAxis)';
   }
 }
 
@@ -90,7 +98,12 @@ abstract mixin class $PresetModelCopyWith<$Res> {
       int currentGroupIdx,
       DateTime createdAt,
       bool isObserver,
-      bool isDeleted});
+      bool isDeleted,
+      @JsonKey(
+          defaultValue: HistoryAxis.verticalUp,
+          fromJson: HistoryAxis.fromJson,
+          toJson: HistoryAxis.toJson)
+      HistoryAxis historyAxis});
 }
 
 /// @nodoc
@@ -113,6 +126,7 @@ class _$PresetModelCopyWithImpl<$Res> implements $PresetModelCopyWith<$Res> {
     Object? createdAt = null,
     Object? isObserver = null,
     Object? isDeleted = null,
+    Object? historyAxis = null,
   }) {
     return _then(_self.copyWith(
       presetName: null == presetName
@@ -147,6 +161,10 @@ class _$PresetModelCopyWithImpl<$Res> implements $PresetModelCopyWith<$Res> {
           ? _self.isDeleted
           : isDeleted // ignore: cast_nullable_to_non_nullable
               as bool,
+      historyAxis: null == historyAxis
+          ? _self.historyAxis
+          : historyAxis // ignore: cast_nullable_to_non_nullable
+              as HistoryAxis,
     ));
   }
 }
@@ -162,7 +180,12 @@ class _PresetModel extends PresetModel {
       this.currentGroupIdx = 0,
       required this.createdAt,
       this.isObserver = false,
-      this.isDeleted = false})
+      this.isDeleted = false,
+      @JsonKey(
+          defaultValue: HistoryAxis.verticalUp,
+          fromJson: HistoryAxis.fromJson,
+          toJson: HistoryAxis.toJson)
+      required this.historyAxis})
       : _keyTileDataGroup = keyTileDataGroup,
         super._();
   factory _PresetModel.fromJson(Map<String, dynamic> json) =>
@@ -196,6 +219,12 @@ class _PresetModel extends PresetModel {
   @override
   @JsonKey()
   final bool isDeleted;
+  @override
+  @JsonKey(
+      defaultValue: HistoryAxis.verticalUp,
+      fromJson: HistoryAxis.fromJson,
+      toJson: HistoryAxis.toJson)
+  final HistoryAxis historyAxis;
 
   /// Create a copy of PresetModel
   /// with the given fields replaced by the non-null parameter values.
@@ -232,7 +261,9 @@ class _PresetModel extends PresetModel {
             (identical(other.isObserver, isObserver) ||
                 other.isObserver == isObserver) &&
             (identical(other.isDeleted, isDeleted) ||
-                other.isDeleted == isDeleted));
+                other.isDeleted == isDeleted) &&
+            (identical(other.historyAxis, historyAxis) ||
+                other.historyAxis == historyAxis));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -246,11 +277,12 @@ class _PresetModel extends PresetModel {
       currentGroupIdx,
       createdAt,
       isObserver,
-      isDeleted);
+      isDeleted,
+      historyAxis);
 
   @override
   String toString() {
-    return 'PresetModel(presetName: $presetName, primaryKey: $primaryKey, switchKey: $switchKey, keyTileDataGroup: $keyTileDataGroup, currentGroupIdx: $currentGroupIdx, createdAt: $createdAt, isObserver: $isObserver, isDeleted: $isDeleted)';
+    return 'PresetModel(presetName: $presetName, primaryKey: $primaryKey, switchKey: $switchKey, keyTileDataGroup: $keyTileDataGroup, currentGroupIdx: $currentGroupIdx, createdAt: $createdAt, isObserver: $isObserver, isDeleted: $isDeleted, historyAxis: $historyAxis)';
   }
 }
 
@@ -270,7 +302,12 @@ abstract mixin class _$PresetModelCopyWith<$Res>
       int currentGroupIdx,
       DateTime createdAt,
       bool isObserver,
-      bool isDeleted});
+      bool isDeleted,
+      @JsonKey(
+          defaultValue: HistoryAxis.verticalUp,
+          fromJson: HistoryAxis.fromJson,
+          toJson: HistoryAxis.toJson)
+      HistoryAxis historyAxis});
 }
 
 /// @nodoc
@@ -293,6 +330,7 @@ class __$PresetModelCopyWithImpl<$Res> implements _$PresetModelCopyWith<$Res> {
     Object? createdAt = null,
     Object? isObserver = null,
     Object? isDeleted = null,
+    Object? historyAxis = null,
   }) {
     return _then(_PresetModel(
       presetName: null == presetName
@@ -327,6 +365,10 @@ class __$PresetModelCopyWithImpl<$Res> implements _$PresetModelCopyWith<$Res> {
           ? _self.isDeleted
           : isDeleted // ignore: cast_nullable_to_non_nullable
               as bool,
+      historyAxis: null == historyAxis
+          ? _self.historyAxis
+          : historyAxis // ignore: cast_nullable_to_non_nullable
+              as HistoryAxis,
     ));
   }
 }

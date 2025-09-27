@@ -26,7 +26,6 @@ void main(List<String> args) async {
             effect: acrylic.WindowEffect.transparent, // 퍼픽셀 투명
             color: Colors.transparent,
           );
-          acrylic.Window.makeWindowFullyTransparent();
           runApp(ProviderScope(child: KeyViewerOverlayApp(windowId: windowId, multiWindowOptionModel: multiWindowOption,)));
           return;
         }
