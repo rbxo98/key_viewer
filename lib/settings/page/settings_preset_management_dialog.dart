@@ -202,24 +202,6 @@ class _SettingsPresetManagementDialogState extends ConsumerState<SettingsPresetM
                   ),
                 ),
 
-                const SizedBox(height: 18,),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text('취소')),
-                    const SizedBox(width: 8),
-                    FilledButton(
-                        onPressed: (){
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text('완료')),
-                  ],
-                ),
               ],
             ),
           ),

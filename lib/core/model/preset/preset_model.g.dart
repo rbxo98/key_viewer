@@ -17,6 +17,7 @@ _PresetModel _$PresetModelFromJson(Map<String, dynamic> json) => _PresetModel(
           const [],
       currentGroupIdx: (json['currentGroupIdx'] as num?)?.toInt() ?? 0,
       createdAt: DateTime.parse(json['createdAt'] as String),
+      isObservable: json['isObservable'] as bool? ?? false,
       isObserver: json['isObserver'] as bool? ?? false,
       isDeleted: json['isDeleted'] as bool? ?? false,
       historyAxis: json['historyAxis'] == null
@@ -32,6 +33,7 @@ Map<String, dynamic> _$PresetModelToJson(_PresetModel instance) =>
       'keyTileDataGroup': instance.keyTileDataGroup,
       'currentGroupIdx': instance.currentGroupIdx,
       'createdAt': instance.createdAt.toIso8601String(),
+      'isObservable': instance.isObservable,
       'isObserver': instance.isObserver,
       'isDeleted': instance.isDeleted,
       'historyAxis': HistoryAxis.toJson(instance.historyAxis),

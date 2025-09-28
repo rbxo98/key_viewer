@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:key_viewer_v2/core/lib/key_input_monitor.dart';
 import 'package:key_viewer_v2/core/model/preset/preset_model.dart';
+import 'package:key_viewer_v2/settings/data/preset/base/default_preset.dart';
 import 'package:key_viewer_v2/settings/data/preset/djmax/djmax_preset.dart';
 import 'package:key_viewer_v2/settings/data/preset/ez2on/ez2on_preset.dart';
+import 'package:key_viewer_v2/settings/data/preset/musedash/musedash_preset.dart';
 import 'package:key_viewer_v2/settings/page/settings_view_model.dart';
 import 'package:key_viewer_v2/settings/page/widget/grid_snap_editor.dart';
 import 'package:key_viewer_v2/settings/page/widget/key_tile_group/key_tile_group_settings_dialog.dart';
@@ -11,8 +13,7 @@ import 'package:uuid/v4.dart';
 
 class KeyTilePresetSettingsDialog extends ConsumerStatefulWidget {
   final PresetModel? presetModel;
-  final bool isDeletable;
-  const KeyTilePresetSettingsDialog({super.key, this.presetModel, this.isDeletable = false});
+  const KeyTilePresetSettingsDialog({super.key, this.presetModel});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _KeyTilePresetSettingsDialogState();
@@ -193,6 +194,29 @@ class _KeyTilePresetSettingsDialogState extends ConsumerState<KeyTilePresetSetti
                   mainAxisAlignment:
                   MainAxisAlignment.spaceBetween,
                   children: [
+                    Text('옵저버 활성화', style: _cap),
+                    const SizedBox(width: 16),
+                    Wrap(
+                      crossAxisAlignment:
+                      WrapCrossAlignment.center,
+                      spacing: 8,
+                      children: [
+                        Switch(value: presetModel.isObservable, onChanged: (v){
+                          setState(() {
+                            presetModel = presetModel.copyWith(isObservable: v);
+                          });
+                        }),
+                      ],
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 18,),
+
+                Row(
+                  mainAxisAlignment:
+                  MainAxisAlignment.spaceBetween,
+                  children: [
                     Text('그룹 전환 키', style: _cap),
                     const SizedBox(width: 16),
                     Wrap(
@@ -362,45 +386,39 @@ class _KeyTilePresetSettingsDialogState extends ConsumerState<KeyTilePresetSetti
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   mainAxisSize: MainAxisSize.max,
                   children: [
-                    if(widget.isDeletable)
-                      OutlinedButton(
-                          onPressed: () {
-                            Navigator.of(context).pop(presetModel.copyWith(isDeleted: true));
-                          },
-                          style: OutlinedButton.styleFrom(
-                            backgroundColor: Colors.transparent,
-                            side: const BorderSide(color: Colors.red),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(Icons.delete_outline, color: Colors.red,),
-                              SizedBox(width: 8,),
-                              const Text('삭제', style: TextStyle(color: Colors.red),),
-                            ],
-                          ))
-                    else PopupMenuButton<PresetModel>(
+                    PopupMenuButton<PresetModel>(
                       tooltip: "",
-                        itemBuilder: (context) {
-                          return [
-                            PopupMenuItem<PresetModel>(
-                              child: Text(DJMAXPresetModel.presetName),
-                              value: DJMAXPresetModel,
-                            ),
-                            PopupMenuItem<PresetModel>(
-                                child: Text(EZ2ONPresetModel.presetName),
-                              value: EZ2ONPresetModel,
-                            ),
-                            ...presetList.map((e) => PopupMenuItem<PresetModel>(
-                              child: Text(e.presetName),
-                              value: e,
-                            )),
-                          ];
-                        },
-                        onSelected: (v) {
-                          _presetChanged(v);
-                        },
+                      itemBuilder: (context) {
+                        return [
+                          ...presetList.map((e) => PopupMenuItem<PresetModel>(
+                            child: Text(e.presetName),
+                            value: e,
+                          )),
+
+                          PopupMenuItem<PresetModel>(
+                            child: Text(DEFAULTPresetModel.presetName),
+                            value: DEFAULTPresetModel,
+                          ),
+                          PopupMenuItem<PresetModel>(
+                            child: Text(DJMAXPresetModel.presetName),
+                            value: DJMAXPresetModel,
+                          ),
+                          PopupMenuItem<PresetModel>(
+                            child: Text(EZ2ONPresetModel.presetName),
+                            value: EZ2ONPresetModel,
+                          ),
+                          PopupMenuItem<PresetModel>(
+                            child: Text(MUSEDASHPresetModel.presetName),
+                            value: MUSEDASHPresetModel,
+                          ),
+                        ];
+                      },
+                      onSelected: (v) {
+                        _presetChanged(v);
+                      },
                       child: Text("기존 프리셋에서 선택"),
                     ),
+
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [

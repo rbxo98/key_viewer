@@ -20,6 +20,7 @@ import 'package:key_viewer_v2/settings/page/widget/key_tile_group/group_button.d
 import 'package:key_viewer_v2/settings/page/widget/key_tile_group/key_tile_group_settings_dialog.dart';
 import 'package:key_viewer_v2/settings/page/widget/key_tile_preset/key_tile_preset_settings_dialog.dart';
 import 'package:key_viewer_v2/settings/page/widget/key_tile_settings_dialog.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:win32/win32.dart';
 import 'package:window_manager_plus/window_manager_plus.dart';
 
@@ -132,7 +133,6 @@ class _KeyViewerSettingsPageState extends ConsumerState<KeyViewerSettingsPage> w
                             builder: (_) =>
                                 KeyTilePresetSettingsDialog(
                                   presetModel: state.currentPreset,
-                                  isDeletable: state.presetList.length > 1,
                                 ));
                         if(data == null) return;
                         if(data.isDeleted){
@@ -155,9 +155,9 @@ class _KeyViewerSettingsPageState extends ConsumerState<KeyViewerSettingsPage> w
                     )
                   ],
                 ),
-
-                SizedBox(height: 8,),
-
+               if(state.currentPreset.isObservable)
+               ...[
+                 SizedBox(height: 8,),
                 SizedBox(
                   height: 32,
                   width: 120,
@@ -178,6 +178,7 @@ class _KeyViewerSettingsPageState extends ConsumerState<KeyViewerSettingsPage> w
                         : const Center(child: Text('관전X')),
                   ),
                 ),
+               ],
 
                 SizedBox(height: 8,),
 
@@ -324,13 +325,28 @@ class _KeyViewerSettingsPageState extends ConsumerState<KeyViewerSettingsPage> w
             ],
           ),
 
+
+          // Row(
+          //   children: [
+          //     Text('전역 환경 설정'),
+          //     SizedBox(width: 20),
+          //     FloatingActionButton(
+          //       heroTag: null,
+          //       onPressed: () async {
+          //       },
+          //       child: Icon(Icons.settings_applications),
+          //     ),
+          //   ],
+          // ),
+
           Row(
             children: [
-              Text('전역 환경 설정'),
+              Text('개발 정보'),
               SizedBox(width: 20),
               FloatingActionButton(
                 heroTag: null,
                 onPressed: () async {
+                  launchUrl(Uri.parse('https://lily-library-75e.notion.site/27cc4ce720f38079860ec95b71d189ea?pvs=74'));
                 },
                 child: Icon(Icons.settings_applications),
               ),

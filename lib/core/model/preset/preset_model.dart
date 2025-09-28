@@ -20,6 +20,8 @@ abstract class PresetModel with _$PresetModel {
   @Default(0)
   int currentGroupIdx,
   required DateTime createdAt,
+    @Default(true)
+    bool isObservable,
     @Default(false)
     bool isObserver,
     @Default(false)

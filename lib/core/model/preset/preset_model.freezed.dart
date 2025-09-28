@@ -21,6 +21,7 @@ mixin _$PresetModel {
   List<KeyTileDataGroupModel> get keyTileDataGroup;
   int get currentGroupIdx;
   DateTime get createdAt;
+  bool get isObservable;
   bool get isObserver;
   bool get isDeleted;
   @JsonKey(
@@ -56,6 +57,8 @@ mixin _$PresetModel {
                 other.currentGroupIdx == currentGroupIdx) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
+            (identical(other.isObservable, isObservable) ||
+                other.isObservable == isObservable) &&
             (identical(other.isObserver, isObserver) ||
                 other.isObserver == isObserver) &&
             (identical(other.isDeleted, isDeleted) ||
@@ -74,13 +77,14 @@ mixin _$PresetModel {
       const DeepCollectionEquality().hash(keyTileDataGroup),
       currentGroupIdx,
       createdAt,
+      isObservable,
       isObserver,
       isDeleted,
       historyAxis);
 
   @override
   String toString() {
-    return 'PresetModel(presetName: $presetName, primaryKey: $primaryKey, switchKey: $switchKey, keyTileDataGroup: $keyTileDataGroup, currentGroupIdx: $currentGroupIdx, createdAt: $createdAt, isObserver: $isObserver, isDeleted: $isDeleted, historyAxis: $historyAxis)';
+    return 'PresetModel(presetName: $presetName, primaryKey: $primaryKey, switchKey: $switchKey, keyTileDataGroup: $keyTileDataGroup, currentGroupIdx: $currentGroupIdx, createdAt: $createdAt, isObservable: $isObservable, isObserver: $isObserver, isDeleted: $isDeleted, historyAxis: $historyAxis)';
   }
 }
 
@@ -97,6 +101,7 @@ abstract mixin class $PresetModelCopyWith<$Res> {
       List<KeyTileDataGroupModel> keyTileDataGroup,
       int currentGroupIdx,
       DateTime createdAt,
+      bool isObservable,
       bool isObserver,
       bool isDeleted,
       @JsonKey(
@@ -124,6 +129,7 @@ class _$PresetModelCopyWithImpl<$Res> implements $PresetModelCopyWith<$Res> {
     Object? keyTileDataGroup = null,
     Object? currentGroupIdx = null,
     Object? createdAt = null,
+    Object? isObservable = null,
     Object? isObserver = null,
     Object? isDeleted = null,
     Object? historyAxis = null,
@@ -153,6 +159,10 @@ class _$PresetModelCopyWithImpl<$Res> implements $PresetModelCopyWith<$Res> {
           ? _self.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
+      isObservable: null == isObservable
+          ? _self.isObservable
+          : isObservable // ignore: cast_nullable_to_non_nullable
+              as bool,
       isObserver: null == isObserver
           ? _self.isObserver
           : isObserver // ignore: cast_nullable_to_non_nullable
@@ -179,6 +189,7 @@ class _PresetModel extends PresetModel {
       final List<KeyTileDataGroupModel> keyTileDataGroup = const [],
       this.currentGroupIdx = 0,
       required this.createdAt,
+      this.isObservable = false,
       this.isObserver = false,
       this.isDeleted = false,
       @JsonKey(
@@ -213,6 +224,9 @@ class _PresetModel extends PresetModel {
   final int currentGroupIdx;
   @override
   final DateTime createdAt;
+  @override
+  @JsonKey()
+  final bool isObservable;
   @override
   @JsonKey()
   final bool isObserver;
@@ -258,6 +272,8 @@ class _PresetModel extends PresetModel {
                 other.currentGroupIdx == currentGroupIdx) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
+            (identical(other.isObservable, isObservable) ||
+                other.isObservable == isObservable) &&
             (identical(other.isObserver, isObserver) ||
                 other.isObserver == isObserver) &&
             (identical(other.isDeleted, isDeleted) ||
@@ -276,13 +292,14 @@ class _PresetModel extends PresetModel {
       const DeepCollectionEquality().hash(_keyTileDataGroup),
       currentGroupIdx,
       createdAt,
+      isObservable,
       isObserver,
       isDeleted,
       historyAxis);
 
   @override
   String toString() {
-    return 'PresetModel(presetName: $presetName, primaryKey: $primaryKey, switchKey: $switchKey, keyTileDataGroup: $keyTileDataGroup, currentGroupIdx: $currentGroupIdx, createdAt: $createdAt, isObserver: $isObserver, isDeleted: $isDeleted, historyAxis: $historyAxis)';
+    return 'PresetModel(presetName: $presetName, primaryKey: $primaryKey, switchKey: $switchKey, keyTileDataGroup: $keyTileDataGroup, currentGroupIdx: $currentGroupIdx, createdAt: $createdAt, isObservable: $isObservable, isObserver: $isObserver, isDeleted: $isDeleted, historyAxis: $historyAxis)';
   }
 }
 
@@ -301,6 +318,7 @@ abstract mixin class _$PresetModelCopyWith<$Res>
       List<KeyTileDataGroupModel> keyTileDataGroup,
       int currentGroupIdx,
       DateTime createdAt,
+      bool isObservable,
       bool isObserver,
       bool isDeleted,
       @JsonKey(
@@ -328,6 +346,7 @@ class __$PresetModelCopyWithImpl<$Res> implements _$PresetModelCopyWith<$Res> {
     Object? keyTileDataGroup = null,
     Object? currentGroupIdx = null,
     Object? createdAt = null,
+    Object? isObservable = null,
     Object? isObserver = null,
     Object? isDeleted = null,
     Object? historyAxis = null,
@@ -357,6 +376,10 @@ class __$PresetModelCopyWithImpl<$Res> implements _$PresetModelCopyWith<$Res> {
           ? _self.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
+      isObservable: null == isObservable
+          ? _self.isObservable
+          : isObservable // ignore: cast_nullable_to_non_nullable
+              as bool,
       isObserver: null == isObserver
           ? _self.isObserver
           : isObserver // ignore: cast_nullable_to_non_nullable
