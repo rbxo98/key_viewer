@@ -242,6 +242,9 @@ class _KeyTileSettingDialogState extends State<KeyTileSettingDialog> {
                   builder: (_) => AlertDialog(
                     backgroundColor: const Color(0xFF2A2C30),
                     content: ColorPicker(
+                      pickerAreaHeightPercent: 0.6,
+                      hexInputBar: true,
+                      portraitOnly: true,
                       pickerColor: temp,
                       onColorChanged: (c) => temp = c,
                     ),
@@ -285,7 +288,7 @@ class _KeyTileSettingDialogState extends State<KeyTileSettingDialog> {
         Text(label, style: _cap),
         const SizedBox(width: 16),
         DropdownButton<int>(
-          value: 4,
+          value: value,
           dropdownColor: const Color(0xFF2A2C30),
           items: [
             DropdownMenuItem(
